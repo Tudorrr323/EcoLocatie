@@ -1,13 +1,16 @@
+// CustomTabBar — bara de navigare inferioara personalizata cu iconuri lucide.
+// Afiseaza tab-urile: Harta, Enciclopedie, Adauga, Plantele mele, Cont. Inlocuieste tab bar-ul default Expo.
+
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet, Platform } from 'react-native';
-import { Map, BookOpen, Camera, Leaf, User } from 'lucide-react-native';
+import { Home, HeartPulse, Camera, Flower2, User } from 'lucide-react-native';
 import { colors } from '../styles/theme';
 
-const TAB_CONFIG: Record<string, { icon: typeof Map; label: string }> = {
-  index: { icon: Map, label: 'Harta' },
-  encyclopedia: { icon: BookOpen, label: 'Enciclopedie' },
+const TAB_CONFIG: Record<string, { icon: typeof Home; label: string }> = {
+  index: { icon: Home, label: 'Harta' },
+  encyclopedia: { icon: HeartPulse, label: 'Enciclopedie' },
   'add-sighting': { icon: Camera, label: '' },
-  'my-plants': { icon: Leaf, label: 'Plantele mele' },
+  'my-plants': { icon: Flower2, label: 'Plantele mele' },
   account: { icon: User, label: 'Contul meu' },
 };
 
@@ -21,7 +24,7 @@ export function CustomTabBar({ state, navigation }: any) {
         if (!config) return null;
 
         const { icon: Icon, label } = config;
-        const color = isFocused ? colors.primary : colors.textSecondary;
+        const color = isFocused ? colors.tabActive : colors.textSecondary;
 
         const onPress = () => {
           const event = navigation.emit({
@@ -43,7 +46,7 @@ export function CustomTabBar({ state, navigation }: any) {
               activeOpacity={0.8}
             >
               <View style={styles.centerButton}>
-                <Icon size={26} color={colors.textLight} />
+                <Icon size={30} color={colors.textLight} />
               </View>
             </TouchableOpacity>
           );
@@ -56,7 +59,7 @@ export function CustomTabBar({ state, navigation }: any) {
             onPress={onPress}
             activeOpacity={0.7}
           >
-            <Icon size={22} color={color} />
+            <Icon size={26} color={color} />
             {label ? <Text style={[styles.label, { color }]}>{label}</Text> : null}
           </TouchableOpacity>
         );
@@ -69,8 +72,8 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     backgroundColor: colors.surface,
-    paddingTop: 8,
-    paddingBottom: Platform.OS === 'ios' ? 28 : 12,
+    paddingTop: 12,
+    paddingBottom: Platform.OS === 'ios' ? 32 : 16,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: colors.border,
     ...Platform.select({
@@ -92,25 +95,25 @@ const styles = StyleSheet.create({
     gap: 3,
   },
   label: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '600',
   },
   centerTab: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: -30,
+    marginTop: -34,
   },
   centerButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: colors.primary,
+    width: 62,
+    height: 62,
+    borderRadius: 31,
+    backgroundColor: colors.logoTeal,
     alignItems: 'center',
     justifyContent: 'center',
     ...Platform.select({
       ios: {
-        shadowColor: colors.primary,
+        shadowColor: colors.logoTeal,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,

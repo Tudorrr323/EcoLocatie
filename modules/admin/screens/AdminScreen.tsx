@@ -1,3 +1,6 @@
+// AdminScreen — ecranul principal de administrare, vizibil doar pentru rolul admin.
+// Afiseaza statistici, lista utilizatori cu toggle activ/inactiv si observatii de moderat.
+
 import React from 'react';
 import {
   View,

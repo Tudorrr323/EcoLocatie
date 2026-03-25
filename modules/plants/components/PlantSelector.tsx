@@ -1,9 +1,16 @@
+// PlantSelector — picker modal pentru alegerea manuala a unei plante.
+// Folosit in flow-ul de creare observatie cand identificarea AI nu returneaza rezultatul corect.
+
 import React, { useState, useMemo } from 'react';
-import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { SearchBar } from '../../../shared/components/SearchBar';
+import { Pagination } from '../../../shared/components/Pagination';
+import { removeDiacritics } from '../../../shared/utils/removeDiacritics';
 import type { Plant } from '../../../shared/types/plant.types';
 import { getAllPlants } from '../repository/plantsRepository';
 import { plantsStyles } from '../styles/plants.styles';
+
+const PAGE_SIZE = 10;
 
 interface PlantSelectorProps {
   onSelect: (plant: Plant) => void;
@@ -11,26 +18,36 @@ interface PlantSelectorProps {
 
 export function PlantSelector({ onSelect }: PlantSelectorProps) {
   const [query, setQuery] = useState('');
+  const [page, setPage] = useState(1);
 
   const allPlants = useMemo(() => getAllPlants(), []);
 
   const filtered = useMemo(() => {
     if (!query.trim()) return allPlants;
-    const lower = query.toLowerCase();
+    const normalizedQuery = removeDiacritics(query.toLowerCase());
     return allPlants.filter(
       (p) =>
-        p.name_ro.toLowerCase().includes(lower) ||
-        p.name_latin.toLowerCase().includes(lower) ||
-        p.family.toLowerCase().includes(lower),
+        removeDiacritics(p.name_ro.toLowerCase()).includes(normalizedQuery) ||
+        removeDiacritics(p.name_latin.toLowerCase()).includes(normalizedQuery) ||
+        removeDiacritics(p.family.toLowerCase()).includes(normalizedQuery),
     );
   }, [query, allPlants]);
+
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const currentPage = Math.min(page, Math.max(totalPages, 1));
+  const pageItems = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+  const handleSearch = (q: string) => {
+    setQuery(q);
+    setPage(1);
+  };
 
   return (
     <View style={plantsStyles.selectorContainer}>
       <View style={plantsStyles.selectorSearchWrapper}>
         <SearchBar
           placeholder="Cauta o planta..."
-          onSearch={setQuery}
+          onSearch={handleSearch}
           debounceMs={200}
         />
       </View>
@@ -40,11 +57,10 @@ export function PlantSelector({ onSelect }: PlantSelectorProps) {
           Nu au fost gasite plante.
         </Text>
       ) : (
-        <FlatList
-          data={filtered}
-          keyExtractor={(item) => String(item.id)}
-          renderItem={({ item }) => (
+        <View>
+          {pageItems.map((item) => (
             <TouchableOpacity
+              key={String(item.id)}
               style={plantsStyles.selectorItem}
               onPress={() => onSelect(item)}
               activeOpacity={0.7}
@@ -57,9 +73,13 @@ export function PlantSelector({ onSelect }: PlantSelectorProps) {
                 <Text style={plantsStyles.selectorNameLatin}>{item.name_latin}</Text>
               </View>
             </TouchableOpacity>
-          )}
-          showsVerticalScrollIndicator={false}
-        />
+          ))}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+        </View>
       )}
     </View>
   );

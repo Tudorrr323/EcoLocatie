@@ -22,7 +22,7 @@
       "habitat": "Câmpii, marginea drumurilor, terenuri virane, locuri însorite",
       "harvest_period": "Mai - August",
       "preparation": "Ceai (infuzie), comprese, băi, ulei esențial",
-      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Matricaria_February_2008-1.jpg/800px-Matricaria_February_2008-1.jpg",
+      "image_url": "https://picsum.photos/seed/musetel/800/600",
       "icon_color": "#FBBF24"
     },
     {
@@ -48,7 +48,7 @@
       "habitat": "Pajiști uscate, marginea pădurilor, terenuri virane",
       "harvest_period": "Iunie - August",
       "preparation": "Ceai, tinctură, ulei de sunătoare (macerat)",
-      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Hypericum_perforatum_i04.jpg/800px-Hypericum_perforatum_i04.jpg",
+      "image_url": "https://picsum.photos/seed/sunatoare/800/600",
       "icon_color": "#EAB308"
     },
     {
@@ -73,7 +73,7 @@
       "habitat": "Locuri umede, maluri de ape, șanțuri, lunci",
       "harvest_period": "Mai - Iulie",
       "preparation": "Decoct, pulbere, extract lichid",
-      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Equisetum_arvense_foliage.jpg/800px-Equisetum_arvense_foliage.jpg",
+      "image_url": "https://picsum.photos/seed/coadacalului/800/600",
       "icon_color": "#22C55E"
     },
     {
@@ -98,7 +98,7 @@
       "habitat": "Păduri de foioase, parcuri, alei, grădini",
       "harvest_period": "Iunie - Iulie",
       "preparation": "Ceai (infuzie), miere de tei",
-      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Tilia_cordata_flowers.jpg/800px-Tilia_cordata_flowers.jpg",
+      "image_url": "https://picsum.photos/seed/tei/800/600",
       "icon_color": "#A3E635"
     },
     {
@@ -123,7 +123,7 @@
       "habitat": "Cultivată în grădini, dar și subspontană pe maluri de ape",
       "harvest_period": "Iunie - Septembrie",
       "preparation": "Ceai, ulei esențial, tinctură",
-      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Mentha_x_piperita_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-095.jpg/800px-Mentha_x_piperita_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-095.jpg",
+      "image_url": "https://picsum.photos/seed/menta/800/600",
       "icon_color": "#34D399"
     },
     {
@@ -148,7 +148,7 @@
       "habitat": "Pajiști, câmpuri, grădini, margini de drumuri — omniprezentă",
       "harvest_period": "Aprilie - Octombrie (frunze); Toamna (rădăcini)",
       "preparation": "Ceai, salate (frunze tinere), suc, decoct de rădăcină",
-      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Taraxacum_officinale_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-135.jpg/800px-Taraxacum_officinale_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-135.jpg",
+      "image_url": "https://picsum.photos/seed/papadie/800/600",
       "icon_color": "#FACC15"
     },
     {
@@ -173,7 +173,7 @@
       "habitat": "Locuri umede, umbroase, garduri, zăvoaie, ruine",
       "harvest_period": "Aprilie - Iunie (frunze); Toamna (rădăcini)",
       "preparation": "Ceai, suc, supă, tinctură",
-      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Urtica_dioica_subsp._dioica-MW0105092-live-1.jpg/800px-Urtica_dioica_subsp._dioica-MW0105092-live-1.jpg",
+      "image_url": "https://picsum.photos/seed/urzica/800/600",
       "icon_color": "#16A34A"
     },
     {
@@ -199,7 +199,7 @@
       "habitat": "Terenuri virane, margini de drumuri, câmpii uscate",
       "harvest_period": "Iulie - August",
       "preparation": "Ceai (infuzie scurtă), tinctură, vin de pelin",
-      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Artemisia_absinthium_P1210748.jpg/800px-Artemisia_absinthium_P1210748.jpg",
+      "image_url": "https://picsum.photos/seed/pelin/800/600",
       "icon_color": "#94A3B8"
     },
     {
@@ -224,7 +224,7 @@
       "habitat": "Pajiști, fânețe, marginea drumurilor — de la câmpie la munte",
       "harvest_period": "Iunie - Septembrie",
       "preparation": "Ceai, comprese, tinctură, băi",
-      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Achillea_millefolium_20041012_2574.jpg/800px-Achillea_millefolium_20041012_2574.jpg",
+      "image_url": "https://picsum.photos/seed/coadasoricelului/800/600",
       "icon_color": "#F9FAFB"
     },
     {
@@ -249,7 +249,7 @@
       "habitat": "Câmpuri, margini de drumuri, terenuri virane, pajiști uscate",
       "harvest_period": "Iulie - Septembrie (flori); Toamna (rădăcini)",
       "preparation": "Decoct de rădăcină, salată (frunze), cafea de cicoare",
-      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Cichorium_intybus_a1.jpg/800px-Cichorium_intybus_a1.jpg",
+      "image_url": "https://picsum.photos/seed/cicoare/800/600",
       "icon_color": "#60A5FA"
     },
     {
@@ -275,7 +275,7 @@
       "habitat": "Lunci, maluri de ape, locuri umede din câmpie",
       "harvest_period": "Primăvara și toamna (rădăcini); Vara (frunze)",
       "preparation": "Unguent, cataplasme (doar uz extern!)",
-      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Symphytum_officinale_Beinwell.jpg/800px-Symphytum_officinale_Beinwell.jpg",
+      "image_url": "https://picsum.photos/seed/tataneasa/800/600",
       "icon_color": "#A78BFA"
     },
     {
@@ -300,7 +300,7 @@
       "habitat": "Marginea pădurilor, tufișuri, garduri vii, dealuri",
       "harvest_period": "Septembrie - Noiembrie (fructe)",
       "preparation": "Ceai, dulceață, sirop, marmeladă",
-      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Rosa_canina_fruit.jpg/800px-Rosa_canina_fruit.jpg",
+      "image_url": "https://picsum.photos/seed/maces/800/600",
       "icon_color": "#F87171"
     },
     {
@@ -325,7 +325,7 @@
       "habitat": "Marginea pădurilor, tufișuri, garduri vii",
       "harvest_period": "Mai (flori); Septembrie - Octombrie (fructe)",
       "preparation": "Ceai, tinctură, extract",
-      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Crataegus_monogyna_fruits.jpg/800px-Crataegus_monogyna_fruits.jpg",
+      "image_url": "https://picsum.photos/seed/paducel/800/600",
       "icon_color": "#DC2626"
     },
     {
@@ -350,7 +350,7 @@
       "habitat": "Păduri, zăvoaie, garduri, câmpie până la zona premontană",
       "harvest_period": "Mai - Iulie (flori); Septembrie (fructe)",
       "preparation": "Ceai de flori, sirop de soc, socată, dulceață de fructe",
-      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Sambucus_nigra_004.jpg/800px-Sambucus_nigra_004.jpg",
+      "image_url": "https://picsum.photos/seed/soc/800/600",
       "icon_color": "#E2E8F0"
     },
     {
@@ -375,7 +375,7 @@
       "habitat": "Cultivată în grădini și culturi (zona de câmpie, soluri calcaroase)",
       "harvest_period": "Iunie - August",
       "preparation": "Ceai, ulei esențial, săculețe parfumate, baie",
-      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Single_lavendar_flower02.jpg/800px-Single_lavendar_flower02.jpg",
+      "image_url": "https://picsum.photos/seed/lavanda/800/600",
       "icon_color": "#8B5CF6"
     },
     {
@@ -400,7 +400,7 @@
       "habitat": "Grădini, garduri, locuri umbroase, cultivată și subspontană",
       "harvest_period": "Iunie - Septembrie",
       "preparation": "Ceai, tinctură, ulei esențial",
-      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Melissa_officinalis_%284%29.jpg/800px-Melissa_officinalis_%284%29.jpg",
+      "image_url": "https://picsum.photos/seed/roinita/800/600",
       "icon_color": "#86EFAC"
     },
     {
@@ -425,7 +425,7 @@
       "habitat": "Cultivată în grădini, zonele sudice ale României",
       "harvest_period": "Mai - Iulie",
       "preparation": "Ceai, gargarisme, condiment, tinctură",
-      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Salvia_officinalis_p1150380.jpg/800px-Salvia_officinalis_p1150380.jpg",
+      "image_url": "https://picsum.photos/seed/salvie/800/600",
       "icon_color": "#7C3AED"
     },
     {
@@ -450,7 +450,7 @@
       "habitat": "Cultivat în grădini, câmpii uscate, soluri calcaroase",
       "harvest_period": "Mai - August",
       "preparation": "Ceai, sirop, condiment, ulei esențial, inhalații",
-      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Thymus_vulgaris_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-271.jpg/800px-Thymus_vulgaris_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-271.jpg",
+      "image_url": "https://picsum.photos/seed/cimbru/800/600",
       "icon_color": "#059669"
     },
     {
@@ -475,7 +475,7 @@
       "habitat": "Cultivată în grădini, subspontană pe terenuri virane",
       "harvest_period": "Iunie - Octombrie",
       "preparation": "Ceai, unguent, ulei macerat, tinctură",
-      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Calendula_officinalis_7.jpg/800px-Calendula_officinalis_7.jpg",
+      "image_url": "https://picsum.photos/seed/galbenele/800/600",
       "icon_color": "#F97316"
     },
     {
@@ -501,7 +501,7 @@
       "habitat": "Cultivat în grădini, subspontan lângă garduri și locuri umede",
       "harvest_period": "Toamna (rădăcini); Primăvara (frunze)",
       "preparation": "Ras proaspăt, cataplasme, tinctură, sirop cu miere",
-      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Kren_Meerrettich_Horseradish.jpg/800px-Kren_Meerrettich_Horseradish.jpg",
+      "image_url": "https://picsum.photos/seed/hrean/800/600",
       "icon_color": "#D4D4D4"
     }
   ],
@@ -560,7 +560,7 @@
       "ai_confidence": 0.94,
       "is_approved": true,
       "created_at": "2025-06-15T08:30:00Z",
-      "image_url": "/uploads/musetel_gradina.jpg"
+      "image_url": "https://picsum.photos/seed/poi1/800/600"
     },
     {
       "id": 2,
@@ -572,7 +572,7 @@
       "ai_confidence": 0.98,
       "is_approved": true,
       "created_at": "2025-04-20T10:15:00Z",
-      "image_url": "/uploads/papadie_parc.jpg"
+      "image_url": "https://picsum.photos/seed/poi2/800/600"
     },
     {
       "id": 3,
@@ -584,7 +584,7 @@
       "ai_confidence": 0.91,
       "is_approved": true,
       "created_at": "2025-04-10T07:45:00Z",
-      "image_url": "/uploads/urzica_dunare.jpg"
+      "image_url": "https://picsum.photos/seed/poi3/800/600"
     },
     {
       "id": 4,
@@ -596,7 +596,7 @@
       "ai_confidence": 0.96,
       "is_approved": true,
       "created_at": "2025-06-22T17:00:00Z",
-      "image_url": "/uploads/tei_parc.jpg"
+      "image_url": "https://picsum.photos/seed/poi4/800/600"
     },
     {
       "id": 5,
@@ -608,7 +608,7 @@
       "ai_confidence": 0.87,
       "is_approved": true,
       "created_at": "2025-07-05T11:30:00Z",
-      "image_url": "/uploads/sunatoare_padure.jpg"
+      "image_url": "https://picsum.photos/seed/poi5/800/600"
     },
     {
       "id": 6,
@@ -620,7 +620,7 @@
       "ai_confidence": 0.93,
       "is_approved": true,
       "created_at": "2025-06-01T09:00:00Z",
-      "image_url": "/uploads/soc_garboavele.jpg"
+      "image_url": "https://picsum.photos/seed/poi6/800/600"
     },
     {
       "id": 7,
@@ -632,7 +632,7 @@
       "ai_confidence": 0.89,
       "is_approved": true,
       "created_at": "2025-05-18T14:20:00Z",
-      "image_url": "/uploads/coada_calului_lac.jpg"
+      "image_url": "https://picsum.photos/seed/poi7/800/600"
     },
     {
       "id": 8,
@@ -644,7 +644,7 @@
       "ai_confidence": 0.92,
       "is_approved": true,
       "created_at": "2025-10-10T15:00:00Z",
-      "image_url": "/uploads/maces_padure.jpg"
+      "image_url": "https://picsum.photos/seed/poi8/800/600"
     },
     {
       "id": 9,
@@ -656,7 +656,7 @@
       "ai_confidence": 0.85,
       "is_approved": true,
       "created_at": "2025-07-20T12:00:00Z",
-      "image_url": "/uploads/coada_soricelului_teren.jpg"
+      "image_url": "https://picsum.photos/seed/poi9/800/600"
     },
     {
       "id": 10,
@@ -668,7 +668,7 @@
       "ai_confidence": 0.90,
       "is_approved": true,
       "created_at": "2025-08-05T08:00:00Z",
-      "image_url": "/uploads/cicoare_drum.jpg"
+      "image_url": "https://picsum.photos/seed/poi10/800/600"
     },
     {
       "id": 11,
@@ -680,7 +680,7 @@
       "ai_confidence": 0.88,
       "is_approved": true,
       "created_at": "2025-07-28T16:30:00Z",
-      "image_url": "/uploads/pelin_teren.jpg"
+      "image_url": "https://picsum.photos/seed/poi11/800/600"
     },
     {
       "id": 12,
@@ -692,7 +692,7 @@
       "ai_confidence": 0.91,
       "is_approved": true,
       "created_at": "2025-09-25T10:45:00Z",
-      "image_url": "/uploads/paducel_garboavele.jpg"
+      "image_url": "https://picsum.photos/seed/poi12/800/600"
     },
     {
       "id": 13,
@@ -704,7 +704,7 @@
       "ai_confidence": 0.86,
       "is_approved": true,
       "created_at": "2025-05-05T13:15:00Z",
-      "image_url": "/uploads/tataneasa_dunare.jpg"
+      "image_url": "https://picsum.photos/seed/poi13/800/600"
     },
     {
       "id": 14,
@@ -716,7 +716,7 @@
       "ai_confidence": 0.97,
       "is_approved": true,
       "created_at": "2025-08-15T09:30:00Z",
-      "image_url": "/uploads/galbenele_gradina.jpg"
+      "image_url": "https://picsum.photos/seed/poi14/800/600"
     },
     {
       "id": 15,
@@ -728,7 +728,7 @@
       "ai_confidence": 0.82,
       "is_approved": false,
       "created_at": "2025-06-30T11:00:00Z",
-      "image_url": "/uploads/menta_canal.jpg"
+      "image_url": "https://picsum.photos/seed/poi15/800/600"
     },
     {
       "id": 16,
@@ -740,7 +740,7 @@
       "ai_confidence": 0.95,
       "is_approved": true,
       "created_at": "2025-07-10T18:00:00Z",
-      "image_url": "/uploads/lavanda_bloc.jpg"
+      "image_url": "https://picsum.photos/seed/poi16/800/600"
     }
   ],
 

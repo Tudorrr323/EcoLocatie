@@ -1,3 +1,6 @@
+// LoginScreen — ecranul de autentificare cu email si parola.
+// Foloseste AuthForm si navigheaza la tab-uri dupa login reusit sau la register.
+
 import React from 'react';
 import { View, Text, ScrollView, SafeAreaView } from 'react-native';
 import { useRouter } from 'expo-router';

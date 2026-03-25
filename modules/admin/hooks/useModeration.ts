@@ -1,3 +1,6 @@
+// useModeration — hook pentru logica de moderare admin.
+// Gestioneaza aprobarea/respingerea observatiilor si activarea/dezactivarea utilizatorilor.
+
 import { useState, useCallback } from 'react';
 import type { User, PointOfInterest } from '../../../shared/types/plant.types';
 import type { AdminStats, ModerationAction } from '../types/admin.types';

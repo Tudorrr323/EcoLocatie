@@ -1,3 +1,5 @@
+// index.ts — barrel export al modulului map. Expune doar interfata publica catre alte module.
+
 export { default as MapScreen } from './screens/MapScreen';
 export { default as LocationPicker } from './components/LocationPicker';
 export { default as InteractiveMap } from './components/InteractiveMap';

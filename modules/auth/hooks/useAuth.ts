@@ -1,3 +1,6 @@
+// useAuth — hook pentru gestionarea autentificarii utilizatorului.
+// Ofera login, register, logout cu persistare in AsyncStorage. Doua roluri: user si admin.
+
 import { useState, useEffect, useCallback } from 'react';
 import type { User } from '../../../shared/types/plant.types';
 import type { AuthState } from '../types/auth.types';

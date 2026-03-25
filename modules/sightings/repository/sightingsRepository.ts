@@ -1,13 +1,11 @@
-import { getPlants } from '../../../shared/repository/dataProvider';
+// sightingsRepository — stratul de acces la date pentru modulul de observatii.
+// Gestioneaza crearea si salvarea observatiilor (POI) prin dataProvider.
+
+import { getPlants, addPOI } from '../../../shared/repository/dataProvider';
 import type { PointOfInterest } from '../../../shared/types/plant.types';
 import type { SightingDraft } from '../types/sightings.types';
 
-const localSightings: PointOfInterest[] = [];
 let nextId = 10000;
-
-export function getLocalSightings(): PointOfInterest[] {
-  return [...localSightings];
-}
 
 export function saveSighting(draft: SightingDraft, userId: number): PointOfInterest | null {
   if (draft.plantId === null) {
@@ -33,6 +31,11 @@ export function saveSighting(draft: SightingDraft, userId: number): PointOfInter
     plant_id: draft.plantId,
     latitude: draft.location.latitude,
     longitude: draft.location.longitude,
+    description: draft.description,
+    habitat: draft.habitat,
+    harvest_period: draft.harvestPeriod,
+    benefits: draft.benefits,
+    contraindications: draft.contraindications,
     comment: draft.comment,
     ai_confidence: confidence,
     is_approved: false,
@@ -40,6 +43,6 @@ export function saveSighting(draft: SightingDraft, userId: number): PointOfInter
     image_url: draft.imageUri ?? '',
   };
 
-  localSightings.push(newPOI);
+  addPOI(newPOI);
   return newPOI;
 }

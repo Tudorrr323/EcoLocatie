@@ -1,3 +1,6 @@
+// auth.styles — stilurile pentru ecranele si componentele modulului de autentificare.
+// Include stiluri pentru formularul de login/register, logo, link-uri de navigare.
+
 import { StyleSheet, Platform } from 'react-native';
 import { colors, fonts, spacing, borderRadius } from '../../../shared/styles/theme';
 

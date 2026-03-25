@@ -1,3 +1,6 @@
+// LoadingSpinner — indicator de incarcare centrat pe ecran.
+// Folosit in orice ecran care asteapta date de la repository sau operatii asincrone.
+
 import React from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { colors } from '../styles/theme';

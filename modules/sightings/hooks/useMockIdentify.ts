@@ -1,3 +1,6 @@
+// useMockIdentify — hook care simuleaza identificarea AI a unei plante dintr-o fotografie.
+// Returneaza top 3 plante aleatorii cu confidence score-uri mock. Va fi inlocuit cu API real.
+
 import { useState, useCallback } from 'react';
 import { getPlants } from '../../../shared/repository/dataProvider';
 import type { AIResult } from '../types/sightings.types';

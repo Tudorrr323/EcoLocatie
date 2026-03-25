@@ -1,3 +1,6 @@
+// config — constantele aplicatiei: centrul Galatiului, zoom default, limite harta, URL API.
+// Importate de modulul map si sightings.
+
 export const GALATI_CENTER = {
   latitude: 45.4353,
   longitude: 28.008,

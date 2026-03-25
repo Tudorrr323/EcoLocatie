@@ -1,3 +1,6 @@
+// sightings.styles — stilurile pentru toate componentele modulului de observatii.
+// Acopera formularul de creare, captura foto, rezultatele AI si callout-ul POI.
+
 import { StyleSheet } from 'react-native';
 import { colors, spacing, borderRadius, fonts } from '../../../shared/styles/theme';
 
@@ -5,18 +8,33 @@ export const sightingsStyles = StyleSheet.create({
   // ── Screen ──────────────────────────────────────────────────
   screen: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.surface,
   },
-  headerContainer: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: spacing.md,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.lg,
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: 12,
+    backgroundColor: colors.surface,
   },
-  headerTitle: {
-    fontSize: fonts.sizes.title,
+  headerTitleBrand: {
+    fontSize: fonts.sizes.xl,
     fontWeight: '700',
-    color: colors.textLight,
+    color: colors.text,
+    flex: 1,
+    marginLeft: spacing.sm,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  headerIconButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   // ── Step Indicator ───────────────────────────────────────────
@@ -77,15 +95,17 @@ export const sightingsStyles = StyleSheet.create({
   // ── Form / Scroll ────────────────────────────────────────────
   formScroll: {
     flex: 1,
+    backgroundColor: colors.surface,
   },
   formScrollContent: {
     padding: spacing.md,
     paddingBottom: spacing.xl,
+    backgroundColor: colors.surface,
   },
   stepTitle: {
     fontSize: fonts.sizes.xl,
     fontWeight: '700',
-    color: colors.text,
+    color: colors.primary,
     marginBottom: spacing.md,
   },
 
@@ -108,18 +128,30 @@ export const sightingsStyles = StyleSheet.create({
     height: 240,
     borderRadius: borderRadius.xl,
   },
-  photoButtonRow: {
+  photoRetakeOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     gap: spacing.sm,
+    paddingVertical: spacing.sm + 2,
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+    borderBottomLeftRadius: borderRadius.xl,
+    borderBottomRightRadius: borderRadius.xl,
   },
-  photoButtonFlex: {
-    flex: 1,
+  photoRetakeText: {
+    color: '#FFFFFF',
+    fontSize: fonts.sizes.md,
+    fontWeight: '600',
   },
   noImagePlaceholder: {
     width: '100%',
     height: 180,
     borderRadius: borderRadius.xl,
-    backgroundColor: colors.border,
+    backgroundColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.md,
@@ -242,6 +274,10 @@ export const sightingsStyles = StyleSheet.create({
     marginBottom: spacing.sm,
     textAlign: 'center',
   },
+  locationButtonsRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
 
   // ── Details Step ─────────────────────────────────────────────
   detailsContainer: {
@@ -272,11 +308,18 @@ export const sightingsStyles = StyleSheet.create({
   },
 
   // ── Navigation ───────────────────────────────────────────────
+  navFooter: {
+    backgroundColor: colors.surface,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
   navRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     gap: spacing.sm,
-    marginTop: spacing.lg,
   },
   navButtonFlex: {
     flex: 1,

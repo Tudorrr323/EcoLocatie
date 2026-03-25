@@ -1,3 +1,6 @@
+// POICallout — tooltip/callout afisat la tap pe un marker de pe harta.
+// Arata numele plantei, data observatiei, nivelul de siguranta AI si comentariul.
+
 import React from 'react';
 import { View, Text } from 'react-native';
 import { formatDate } from '../../../shared/utils/formatDate';

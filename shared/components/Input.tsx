@@ -1,3 +1,6 @@
+// Input — camp de text reutilizabil cu label, placeholder si validare vizuala.
+// Suporta multiline pentru comentarii. Folosit in auth, creare POI, search.
+
 import React from 'react';
 import { View, Text, TextInput, StyleSheet, TextInputProps } from 'react-native';
 import { colors, fonts, spacing, borderRadius } from '../styles/theme';

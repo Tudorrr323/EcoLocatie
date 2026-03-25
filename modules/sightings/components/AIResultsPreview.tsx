@@ -1,3 +1,6 @@
+// AIResultsPreview — afiseaza top 3 rezultate mock de la identificarea AI a plantei.
+// Fiecare rezultat are nume, confidence si buton de selectare. Include fallback la alegere manuala.
+
 import React from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Button } from '../../../shared/components/Button';
@@ -15,7 +18,7 @@ interface AIResultsPreviewProps {
 function getConfidenceColor(confidence: number): string {
   if (confidence > 0.9) return colors.success;
   if (confidence >= 0.8) return colors.warning;
-  return '#FF8F00';
+  return colors.secondary;
 }
 
 export function AIResultsPreview({ results, loading, onSelect, onManualSelect }: AIResultsPreviewProps) {
@@ -56,7 +59,7 @@ export function AIResultsPreview({ results, loading, onSelect, onManualSelect }:
             </View>
 
             <TouchableOpacity
-              style={[sightingsStyles.aiSelectButton, { backgroundColor: confidenceColor }]}
+              style={sightingsStyles.aiSelectButton}
               onPress={() => onSelect(result)}
               activeOpacity={0.7}
             >

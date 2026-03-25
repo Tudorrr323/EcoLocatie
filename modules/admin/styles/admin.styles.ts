@@ -1,3 +1,6 @@
+// admin.styles — stilurile pentru ecranul si componentele modulului admin.
+// Include stiluri pentru statistici, lista utilizatori, carduri de moderare.
+
 import { StyleSheet } from 'react-native';
 import { colors, fonts, spacing, borderRadius } from '../../../shared/styles/theme';
 

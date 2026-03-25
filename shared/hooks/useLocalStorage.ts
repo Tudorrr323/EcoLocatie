@@ -1,3 +1,6 @@
+// useLocalStorage — wrapper peste AsyncStorage cu serializare JSON automata.
+// Ofera get/set/remove pentru persistarea datelor locale. Folosit de auth (token/user) si alte module.
+
 import { useState, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 

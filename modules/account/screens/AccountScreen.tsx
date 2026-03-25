@@ -1,3 +1,5 @@
+// AccountScreen — ecranul de profil al utilizatorului autentificat.
+// Afiseaza avatar, username, rol, email, data inregistrarii, setari si butonul de deconectare.
 import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';

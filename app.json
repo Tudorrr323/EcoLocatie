@@ -4,13 +4,13 @@
     "slug": "ecolocatie",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/LogoEcoLocation.png",
     "userInterfaceStyle": "light",
     "scheme": "ecolocatie",
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/SmallLogoEcoLocation.png",
       "resizeMode": "contain",
-      "backgroundColor": "#1B5E20"
+      "backgroundColor": "#FFFFFF"
     },
     "ios": {
       "supportsTablet": true,
@@ -23,10 +23,9 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#1B5E20",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "foregroundImage": "./assets/LogoEcoLocation.png"
       },
+      "softwareKeyboardLayoutMode": "adjustResize",
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
@@ -34,7 +33,7 @@
       ]
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/LogoEcoLocation.png"
     },
     "plugins": [
       "expo-router",

@@ -1,3 +1,6 @@
+// api.types — tipuri pentru viitoarele response-uri API: ApiResponse<T>, PaginatedResponse<T>, ErrorResponse.
+// Pregatite pentru cand vine backend-ul real.
+
 export interface ApiResponse<T> {
   success: boolean;
   data: T;

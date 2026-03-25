@@ -1,3 +1,6 @@
+// PlantCard — card vizual pentru o planta medicinala din enciclopedie.
+// Afiseaza imaginea, numele romanesc, numele latin si familia. La tap navigheaza la detalii.
+
 import React from 'react';
 import { View, Text, Image } from 'react-native';
 import { useRouter } from 'expo-router';

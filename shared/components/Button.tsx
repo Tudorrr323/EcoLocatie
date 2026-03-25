@@ -1,3 +1,6 @@
+// Button — buton reutilizabil cu variante: primary, secondary, danger, ghost.
+// Suporta stare de loading (spinner), disabled si icon optional. Folosit in formulare, admin, harta.
+
 import React from 'react';
 import { TouchableOpacity, Text, ActivityIndicator, StyleSheet, ViewStyle } from 'react-native';
 import { colors, fonts, spacing, borderRadius } from '../styles/theme';

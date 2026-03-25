@@ -1,3 +1,6 @@
+// authRepository — stratul de acces la date pentru modulul de autentificare.
+// Gestioneaza login mock (verificare in JSON), register si persistare sesiune in AsyncStorage.
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getUsers } from '../../../shared/repository/dataProvider';
 import type { User } from '../../../shared/types/plant.types';

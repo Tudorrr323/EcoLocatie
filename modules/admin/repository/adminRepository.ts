@@ -1,3 +1,6 @@
+// adminRepository — stratul de acces la date pentru modulul de administrare.
+// Expune functii pentru gestionarea utilizatorilor, observatiilor neaprobate si statisticilor.
+
 import {
   getPlants,
   getUsers,

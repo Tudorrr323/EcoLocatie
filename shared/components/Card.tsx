@@ -1,3 +1,6 @@
+// Card — container reutilizabil cu shadow, border radius si padding.
+// Baza vizuala pentru PlantCard, ModerationCard etc. Accepta onPress pentru navigare.
+
 import React from 'react';
 import { TouchableOpacity, View, StyleSheet, ViewStyle } from 'react-native';
 import { colors, spacing, borderRadius } from '../styles/theme';

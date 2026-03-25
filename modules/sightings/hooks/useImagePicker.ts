@@ -1,3 +1,6 @@
+// useImagePicker — hook pentru selectarea imaginilor cu expo-image-picker.
+// Ofera functii pentru deschiderea camerei si alegerea din galerie cu gestionarea permisiunilor.
+
 import { useCallback } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 

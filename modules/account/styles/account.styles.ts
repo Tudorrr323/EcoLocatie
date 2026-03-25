@@ -1,3 +1,5 @@
+// account.styles — stilurile modulului de cont al utilizatorului.
+// Defineste layout-ul pentru avatar, sectiunile de informatii, elementele de meniu si butonul de deconectare.
 import { StyleSheet } from 'react-native';
 import { colors, spacing, borderRadius, fonts } from '../../../shared/styles/theme';
 

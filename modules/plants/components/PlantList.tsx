@@ -1,3 +1,6 @@
+// PlantList — lista scrollabila de PlantCard-uri randata cu FlatList.
+// Primeste lista de plante filtrate si afiseaza EmptyState daca nu sunt rezultate.
+
 import React from 'react';
 import { FlatList, View } from 'react-native';
 import type { Plant } from '../../../shared/types/plant.types';

@@ -1,67 +1,42 @@
+// PhotoCapture — componenta pentru previzualizarea fotografiei capturate.
+// Afiseaza un placeholder cu icon camera sau previzualizarea imaginii.
+// La apasare, deschide camera in-app prin callback-ul onOpenCamera.
+
 import React from 'react';
-import { View, Text, Image } from 'react-native';
-import { Camera, ImageIcon } from 'lucide-react-native';
-import { Button } from '../../../shared/components/Button';
-import { useImagePicker } from '../hooks/useImagePicker';
+import { View, Text, Image, TouchableOpacity } from 'react-native';
+import { Camera } from 'lucide-react-native';
 import { sightingsStyles } from '../styles/sightings.styles';
 import { colors } from '../../../shared/styles/theme';
 
 interface PhotoCaptureProps {
   imageUri: string | null;
-  onImageSelected: (uri: string) => void;
+  onOpenCamera: () => void;
 }
 
-export function PhotoCapture({ imageUri, onImageSelected }: PhotoCaptureProps) {
-  const { takePhoto, pickFromGallery } = useImagePicker();
-
-  const handleTakePhoto = async () => {
-    const uri = await takePhoto();
-    if (uri) {
-      onImageSelected(uri);
-    }
-  };
-
-  const handlePickFromGallery = async () => {
-    const uri = await pickFromGallery();
-    if (uri) {
-      onImageSelected(uri);
-    }
-  };
-
+export function PhotoCapture({ imageUri, onOpenCamera }: PhotoCaptureProps) {
   return (
     <View style={sightingsStyles.photoCaptureContainer}>
-      {imageUri ? (
-        <View style={sightingsStyles.photoPreviewWrapper}>
-          <Image
-            source={{ uri: imageUri }}
-            style={sightingsStyles.photoPreview}
-            resizeMode="cover"
-            accessibilityLabel="Previzualizare imagine selectata"
-          />
-        </View>
-      ) : (
-        <View style={sightingsStyles.noImagePlaceholder}>
-          <ImageIcon size={48} color={colors.textSecondary} />
-          <Text style={sightingsStyles.noImageText}>Nicio imagine selectata</Text>
-        </View>
-      )}
-
-      <View style={sightingsStyles.photoButtonRow}>
-        <View style={sightingsStyles.photoButtonFlex}>
-          <Button
-            title="Fotografiaza"
-            onPress={handleTakePhoto}
-            variant="primary"
-          />
-        </View>
-        <View style={sightingsStyles.photoButtonFlex}>
-          <Button
-            title="Alege din galerie"
-            onPress={handlePickFromGallery}
-            variant="ghost"
-          />
-        </View>
-      </View>
+      <TouchableOpacity onPress={onOpenCamera} activeOpacity={0.7}>
+        {imageUri ? (
+          <View style={sightingsStyles.photoPreviewWrapper}>
+            <Image
+              source={{ uri: imageUri }}
+              style={sightingsStyles.photoPreview}
+              resizeMode="cover"
+              accessibilityLabel="Previzualizare imagine capturata"
+            />
+            <View style={sightingsStyles.photoRetakeOverlay}>
+              <Camera size={24} color="#FFF" />
+              <Text style={sightingsStyles.photoRetakeText}>Refotografiaza</Text>
+            </View>
+          </View>
+        ) : (
+          <View style={sightingsStyles.noImagePlaceholder}>
+            <Camera size={48} color={colors.textSecondary} />
+            <Text style={sightingsStyles.noImageText}>Apasa pentru a fotografia</Text>
+          </View>
+        )}
+      </TouchableOpacity>
     </View>
   );
 }

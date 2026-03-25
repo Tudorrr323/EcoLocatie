@@ -1,3 +1,6 @@
+// auth.types — tipuri TypeScript specifice modulului de autentificare.
+// Defineste AuthState, LoginCredentials, RegisterData si AuthContextType.
+
 import type { User } from '../../../shared/types/plant.types';
 
 export interface AuthState {

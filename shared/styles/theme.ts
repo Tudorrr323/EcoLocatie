@@ -1,7 +1,10 @@
+// theme — defineste culorile, fonturile, spacing-ul si border radius-ul aplicatiei.
+// Toate stilurile din module importa valorile de aici pentru consistenta vizuala.
+
 export const colors = {
-  primary: '#1B5E20',
-  primaryLight: '#4CAF50',
-  primaryDark: '#0D3B0F',
+  primary: '#6AAE35',
+  primaryLight: '#8BC34A',
+  primaryDark: '#4E8C2A',
   secondary: '#FF8F00',
   secondaryLight: '#FFB300',
   background: '#F5F5F5',
@@ -14,6 +17,9 @@ export const colors = {
   warning: '#F57C00',
   border: '#E0E0E0',
   overlay: 'rgba(0, 0, 0, 0.5)',
+  logoGreen: '#6AAE35',
+  logoTeal: '#1A9D94',
+  tabActive: '#22C55E',
 } as const;
 
 export const fonts = {

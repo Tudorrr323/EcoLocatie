@@ -1,3 +1,6 @@
+// map.styles — stilurile StyleSheet pentru toate componentele modulului de harta.
+// Include stiluri pentru header, search, harta, buton GPS, filtre, callout, markere, location picker.
+
 import { StyleSheet, Platform } from 'react-native';
 import { colors, spacing, borderRadius, fonts } from '../../../shared/styles/theme';
 
@@ -15,7 +18,7 @@ export const mapStyles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.md,
     paddingVertical: 12,
     backgroundColor: colors.surface,
   },
@@ -43,12 +46,45 @@ export const mapStyles = StyleSheet.create({
   },
 
   searchContainer: {
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.md,
     backgroundColor: colors.surface,
+  },
+
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+
+  searchBarWrapper: {
+    flex: 1,
   },
 
   mapWrapper: {
     flex: 1,
+  },
+
+  gpsButton: {
+    position: 'absolute',
+    right: spacing.md,
+    bottom: spacing.xl,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
 
   // Floating action buttons
@@ -142,7 +178,7 @@ export const mapStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
@@ -386,14 +422,77 @@ export const mapStyles = StyleSheet.create({
     borderColor: colors.surface,
   },
 
-  locationPickerFooter: {
+  locationPickerHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    gap: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    ...Platform.select({
+      ios: {
+        paddingTop: 50,
+      },
+      android: {
+        paddingTop: spacing.xl,
+      },
+    }),
+  },
+
+  locationPickerCloseButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  locationPickerCoordsBox: {
+    flex: 1,
+    alignItems: 'center',
+  },
+
+  locationPickerCoordsLabel: {
+    fontSize: fonts.sizes.xs,
+    color: colors.textSecondary,
+    fontWeight: '500',
+    marginBottom: 2,
+  },
+
+  locationPickerCoordsValue: {
+    fontSize: fonts.sizes.md,
+    color: colors.text,
+    fontWeight: '700',
+  },
+
+  // Center pin
+  centerPinContainer: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: -20 }, { translateY: -52 }],
+    width: 40,
+    height: 58,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    pointerEvents: 'none',
+  },
+
+  centerPinShadow: {
     position: 'absolute',
     bottom: 0,
-    left: 0,
-    right: 0,
+    width: 16,
+    height: 6,
+    borderRadius: 8,
+    backgroundColor: 'rgba(0,0,0,0.25)',
+  },
+
+  locationPickerFooter: {
     backgroundColor: colors.surface,
     padding: spacing.md,
-    gap: spacing.sm,
     borderTopWidth: 1,
     borderTopColor: colors.border,
     ...Platform.select({
@@ -409,26 +508,19 @@ export const mapStyles = StyleSheet.create({
     }),
   },
 
-  locationPickerCoordsText: {
-    fontSize: fonts.sizes.sm,
-    color: colors.textSecondary,
-    textAlign: 'center',
-  },
-
   locationPickerConfirmButton: {
+    flexDirection: 'row',
     backgroundColor: colors.primary,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.sm + 2,
     borderRadius: borderRadius.md,
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
   },
 
   locationPickerConfirmButtonText: {
     fontSize: fonts.sizes.md,
     fontWeight: '700',
     color: colors.textLight,
-  },
-
-  locationPickerConfirmButtonDisabled: {
-    backgroundColor: colors.border,
   },
 });

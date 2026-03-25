@@ -1,3 +1,6 @@
+// PlantDetailScreen — ecranul de detalii complet al unei plante medicinale.
+// Afiseaza descrierea, partile utilizabile, beneficiile, contraindicatiile,
+// habitatul, perioada de recoltare si modul de preparare.
 import React from 'react';
 import {
   View,

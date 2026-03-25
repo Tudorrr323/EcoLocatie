@@ -1,3 +1,6 @@
+// plant.types — interfetele TypeScript globale ale aplicatiei.
+// Defineste Plant, PointOfInterest, User, MapConfig si EcolocatieData. Folosite de toate modulele.
+
 export interface Plant {
   id: number;
   name_ro: string;
@@ -20,6 +23,11 @@ export interface PointOfInterest {
   plant_id: number;
   latitude: number;
   longitude: number;
+  description?: string;
+  habitat?: string;
+  harvest_period?: string;
+  benefits?: string;
+  contraindications?: string;
   comment: string;
   ai_confidence: number;
   is_approved: boolean;

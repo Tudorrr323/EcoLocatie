@@ -1,3 +1,5 @@
+// (tabs)/_layout — layout-ul navigarii prin tab-uri al aplicatiei.
+// Inregistreaza toate tab-urile vizibile si ascunde tab-ul admin din bara de navigare (href: null).
 import { Tabs } from 'expo-router';
 import { CustomTabBar } from '../../shared/components/CustomTabBar';
 

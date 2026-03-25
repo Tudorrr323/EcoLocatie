@@ -1,4 +1,8 @@
-import { useState, useCallback } from 'react';
+// useLocation — hook pentru gestionarea locatiei GPS a utilizatorului.
+// Ofera getLocation() pentru o citire unica si startWatching()/stopWatching() pentru tracking in timp real.
+// Folosit de modulul map (buton GPS) si sightings (locatie automata la creare POI).
+
+import { useState, useCallback, useEffect, useRef } from 'react';
 import * as Location from 'expo-location';
 
 interface LocationState {
@@ -13,6 +17,8 @@ export function useLocation() {
     error: null,
     loading: false,
   });
+  const [watching, setWatching] = useState(false);
+  const subscriptionRef = useRef<Location.LocationSubscription | null>(null);
 
   const getLocation = useCallback(async () => {
     setState((prev) => ({ ...prev, loading: true, error: null }));
@@ -32,5 +38,34 @@ export function useLocation() {
     }
   }, []);
 
-  return { ...state, getLocation };
+  const startWatching = useCallback(async () => {
+    if (subscriptionRef.current) return;
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      setState((prev) => ({ ...prev, error: 'Permisiunea de localizare a fost refuzata.' }));
+      return;
+    }
+    setWatching(true);
+    subscriptionRef.current = await Location.watchPositionAsync(
+      { accuracy: Location.Accuracy.High, distanceInterval: 5 },
+      (loc) => {
+        const coords = { latitude: loc.coords.latitude, longitude: loc.coords.longitude };
+        setState({ location: coords, error: null, loading: false });
+      }
+    );
+  }, []);
+
+  const stopWatching = useCallback(() => {
+    subscriptionRef.current?.remove();
+    subscriptionRef.current = null;
+    setWatching(false);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      subscriptionRef.current?.remove();
+    };
+  }, []);
+
+  return { ...state, getLocation, watching, startWatching, stopWatching };
 }

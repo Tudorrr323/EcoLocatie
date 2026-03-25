@@ -1,3 +1,6 @@
+// common.styles — stiluri reutilizabile comune: container centrat, row, shadow, separator.
+// Evita duplicarea in stilurile modulelor.
+
 import { StyleSheet } from 'react-native';
 import { colors, spacing, borderRadius } from './theme';
 

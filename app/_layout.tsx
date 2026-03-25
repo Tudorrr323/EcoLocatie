@@ -1,3 +1,5 @@
+// _layout — layout-ul radacina al aplicatiei EcoLocatie (Expo Router).
+// Configureaza stiva de navigare globala cu rutele principale: tab-uri, login, register si detaliu planta.
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 

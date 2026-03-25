@@ -1,3 +1,6 @@
+// plantsRepository — stratul de acces la date pentru modulul enciclopedie.
+// Expune functii pentru obtinerea listei de plante si detaliile unei plante dupa ID.
+
 import { getPlants, getPlantById as getPlantByIdBase } from '../../../shared/repository/dataProvider';
 import type { Plant } from '../../../shared/types/plant.types';
 

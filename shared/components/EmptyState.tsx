@@ -1,3 +1,6 @@
+// EmptyState — placeholder cu icon si mesaj afisat cand o lista este goala.
+// Exemplu: "Nu sunt observatii in aceasta zona" sau "Niciun rezultat gasit".
+
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Inbox } from 'lucide-react-native';

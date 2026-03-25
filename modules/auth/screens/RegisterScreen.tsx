@@ -1,3 +1,6 @@
+// RegisterScreen — ecranul de inregistrare cont nou.
+// Foloseste AuthForm cu campuri suplimentare (username, confirmare parola).
+
 import React from 'react';
 import { View, Text, ScrollView, SafeAreaView } from 'react-native';
 import { useRouter } from 'expo-router';

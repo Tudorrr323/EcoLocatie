@@ -1,12 +1,20 @@
-import React, { useState, useCallback } from 'react';
+// CreatePOIForm — formularul complet pentru crearea unei observatii noi (POI).
+// Integreaza captura foto, rezultatele AI, selectia locatiei GPS si comentariul utilizatorului.
+
+import React, { useState, useCallback, useImperativeHandle, forwardRef } from 'react';
 import {
   View,
   Text,
   ScrollView,
+  TouchableOpacity,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { PhotoCapture } from './PhotoCapture';
+import { CameraScreen } from './CameraScreen';
 import { AIResultsPreview } from './AIResultsPreview';
 import { PlantSelector } from '../../plants/components/PlantSelector';
+import LocationPicker from '../../map/components/LocationPicker';
+import type { Coordinates } from '../../map/components/LocationPicker';
 import { Button } from '../../../shared/components/Button';
 import { Input } from '../../../shared/components/Input';
 import { useMockIdentify } from '../hooks/useMockIdentify';
@@ -23,15 +31,18 @@ const STEP_LABELS = ['Foto', 'Identificare', 'Locatie', 'Detalii'];
 
 interface StepIndicatorProps {
   currentStep: Step;
+  maxStepReached: Step;
+  onStepPress: (step: Step) => void;
 }
 
-function StepIndicator({ currentStep }: StepIndicatorProps) {
+function StepIndicator({ currentStep, maxStepReached, onStepPress }: StepIndicatorProps) {
   return (
     <View style={sightingsStyles.stepIndicatorContainer}>
       {STEP_LABELS.map((label, index) => {
         const stepNum = (index + 1) as Step;
         const isActive = stepNum === currentStep;
-        const isDone = stepNum < currentStep;
+        const isDone = stepNum <= maxStepReached && stepNum !== currentStep;
+        const canTap = stepNum <= maxStepReached && stepNum !== currentStep;
 
         return (
           <React.Fragment key={stepNum}>
@@ -39,11 +50,16 @@ function StepIndicator({ currentStep }: StepIndicatorProps) {
               <View
                 style={[
                   sightingsStyles.stepConnector,
-                  isDone && sightingsStyles.stepConnectorActive,
+                  stepNum <= maxStepReached && sightingsStyles.stepConnectorActive,
                 ]}
               />
             )}
-            <View style={sightingsStyles.stepItem}>
+            <TouchableOpacity
+              style={sightingsStyles.stepItem}
+              onPress={() => canTap && onStepPress(stepNum)}
+              activeOpacity={canTap ? 0.6 : 1}
+              disabled={!canTap}
+            >
               <View
                 style={[
                   sightingsStyles.stepCircle,
@@ -68,12 +84,16 @@ function StepIndicator({ currentStep }: StepIndicatorProps) {
               >
                 {label}
               </Text>
-            </View>
+            </TouchableOpacity>
           </React.Fragment>
         );
       })}
     </View>
   );
+}
+
+export interface CreatePOIFormRef {
+  reset: () => void;
 }
 
 interface CreatePOIFormProps {
@@ -84,17 +104,42 @@ const EMPTY_DRAFT: SightingDraft = {
   imageUri: null,
   plantId: null,
   location: null,
+  description: '',
+  habitat: '',
+  harvestPeriod: '',
+  benefits: '',
+  contraindications: '',
   comment: '',
   aiResults: [],
 };
 
-export function CreatePOIForm({ onSubmit }: CreatePOIFormProps) {
+export const CreatePOIForm = forwardRef<CreatePOIFormRef, CreatePOIFormProps>(function CreatePOIForm({ onSubmit }, ref) {
   const [step, setStep] = useState<Step>(1);
+  const [maxStepReached, setMaxStepReached] = useState<Step>(1);
   const [draft, setDraft] = useState<SightingDraft>(EMPTY_DRAFT);
   const [showManualSelector, setShowManualSelector] = useState(false);
+  const [showCamera, setShowCamera] = useState(false);
+  const [showMapPicker, setShowMapPicker] = useState(false);
+
+  const goToStep = useCallback((s: Step) => {
+    setStep(s);
+    setMaxStepReached((prev) => Math.max(prev, s) as Step);
+  }, []);
 
   const { results: aiResults, loading: aiLoading, identify, reset: resetAI } = useMockIdentify();
   const { location, loading: locationLoading, error: locationError, getLocation } = useLocation();
+
+  useImperativeHandle(ref, () => ({
+    reset: () => {
+      setStep(1);
+      setMaxStepReached(1);
+      setDraft({ ...EMPTY_DRAFT, aiResults: [] });
+      setShowManualSelector(false);
+      setShowCamera(false);
+      setShowMapPicker(false);
+      resetAI();
+    },
+  }));
 
   // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -106,13 +151,14 @@ export function CreatePOIForm({ onSubmit }: CreatePOIFormProps) {
 
   // ── Step 1: Photo ──────────────────────────────────────────────────────────
 
-  const handleImageSelected = (uri: string) => {
+  const handleCameraCapture = useCallback((uri: string) => {
     setDraft((prev) => ({ ...prev, imageUri: uri }));
-  };
+    setShowCamera(false);
+  }, []);
 
   const handleNextFromPhoto = async () => {
     if (!draft.imageUri) return;
-    setStep(2);
+    goToStep(2);
     const results = await identify(draft.imageUri);
     setDraft((prev) => ({ ...prev, aiResults: results }));
   };
@@ -122,7 +168,7 @@ export function CreatePOIForm({ onSubmit }: CreatePOIFormProps) {
   const handleAISelect = (result: AIResult) => {
     setDraft((prev) => ({ ...prev, plantId: result.plantId }));
     setShowManualSelector(false);
-    setStep(3);
+    goToStep(3);
   };
 
   const handleManualSelect = () => {
@@ -132,7 +178,7 @@ export function CreatePOIForm({ onSubmit }: CreatePOIFormProps) {
   const handlePlantSelectorSelect = (plant: Plant) => {
     setDraft((prev) => ({ ...prev, plantId: plant.id }));
     setShowManualSelector(false);
-    setStep(3);
+    goToStep(3);
   };
 
   // ── Step 3: Location ───────────────────────────────────────────────────────
@@ -144,10 +190,22 @@ export function CreatePOIForm({ onSubmit }: CreatePOIFormProps) {
     }
   };
 
+  const handleOpenMapPicker = async () => {
+    if (!location && !draft.location) {
+      await getLocation();
+    }
+    setShowMapPicker(true);
+  };
+
+  const handleMapPickerConfirm = (coords: Coordinates) => {
+    setDraft((prev) => ({ ...prev, location: coords }));
+    setShowMapPicker(false);
+  };
+
   // ── Step 4: Details + Submit ───────────────────────────────────────────────
 
-  const handleCommentChange = (text: string) => {
-    setDraft((prev) => ({ ...prev, comment: text }));
+  const handleFieldChange = (field: 'description' | 'habitat' | 'harvestPeriod' | 'benefits' | 'contraindications' | 'comment', text: string) => {
+    setDraft((prev) => ({ ...prev, [field]: text }));
   };
 
   const handleSubmit = () => {
@@ -162,7 +220,7 @@ export function CreatePOIForm({ onSubmit }: CreatePOIFormProps) {
 
   const goBack = () => {
     if (step > 1) {
-      setStep((prev) => (prev - 1) as Step);
+      goToStep((step - 1) as Step);
       if (step === 2) {
         resetAI();
         setShowManualSelector(false);
@@ -172,7 +230,7 @@ export function CreatePOIForm({ onSubmit }: CreatePOIFormProps) {
 
   // ── Render step content ────────────────────────────────────────────────────
 
-  const renderStep = () => {
+  const renderStepContent = () => {
     switch (step) {
       case 1:
         return (
@@ -180,17 +238,8 @@ export function CreatePOIForm({ onSubmit }: CreatePOIFormProps) {
             <Text style={sightingsStyles.stepTitle}>Adauga o fotografie</Text>
             <PhotoCapture
               imageUri={draft.imageUri}
-              onImageSelected={handleImageSelected}
+              onOpenCamera={() => setShowCamera(true)}
             />
-            <View style={sightingsStyles.navRow}>
-              <View style={sightingsStyles.navButtonFlex}>
-                <Button
-                  title="Urmatorul"
-                  onPress={handleNextFromPhoto}
-                  disabled={!draft.imageUri}
-                />
-              </View>
-            </View>
           </View>
         );
 
@@ -219,12 +268,6 @@ export function CreatePOIForm({ onSubmit }: CreatePOIFormProps) {
                 onManualSelect={handleManualSelect}
               />
             )}
-
-            <View style={sightingsStyles.navRow}>
-              <View style={sightingsStyles.navButtonFlex}>
-                <Button title="Inapoi" onPress={goBack} variant="ghost" />
-              </View>
-            </View>
           </View>
         );
 
@@ -258,24 +301,22 @@ export function CreatePOIForm({ onSubmit }: CreatePOIFormProps) {
                 <Text style={sightingsStyles.locationErrorText}>{locationError}</Text>
               ) : null}
 
-              <Button
-                title="Foloseste locatia curenta"
-                onPress={handleUseCurrentLocation}
-                loading={locationLoading}
-                variant="primary"
-              />
-            </View>
-
-            <View style={sightingsStyles.navRow}>
-              <View style={sightingsStyles.navButtonFlex}>
-                <Button title="Inapoi" onPress={goBack} variant="ghost" />
-              </View>
-              <View style={sightingsStyles.navButtonFlex}>
-                <Button
-                  title="Urmatorul"
-                  onPress={() => setStep(4)}
-                  disabled={!(draft.location ?? location)}
-                />
+              <View style={sightingsStyles.locationButtonsRow}>
+                <View style={{ flex: 1 }}>
+                  <Button
+                    title="Locatia curenta"
+                    onPress={handleUseCurrentLocation}
+                    loading={locationLoading}
+                    variant="primary"
+                  />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Button
+                    title="Alege pe harta"
+                    onPress={handleOpenMapPicker}
+                    variant="secondary"
+                  />
+                </View>
               </View>
             </View>
           </View>
@@ -294,25 +335,110 @@ export function CreatePOIForm({ onSubmit }: CreatePOIFormProps) {
             ) : null}
 
             <Input
-              label="Comentariu (optional)"
-              placeholder="Adauga un comentariu despre observatie..."
-              value={draft.comment}
-              onChangeText={handleCommentChange}
+              label="Descriere"
+              placeholder="Descrie pe scurt ce ai observat..."
+              value={draft.description}
+              onChangeText={(t) => handleFieldChange('description', t)}
               multiline
-              numberOfLines={4}
+              numberOfLines={3}
             />
 
-            <View style={sightingsStyles.navRow}>
-              <View style={sightingsStyles.navButtonFlex}>
-                <Button title="Inapoi" onPress={goBack} variant="ghost" />
-              </View>
-              <View style={sightingsStyles.navButtonFlex}>
-                <Button
-                  title="Salveaza"
-                  onPress={handleSubmit}
-                  disabled={!draft.plantId || !(draft.location ?? location)}
-                />
-              </View>
+            <Input
+              label="Habitat"
+              placeholder="Zona, tipul de sol, expunerea la soare..."
+              value={draft.habitat}
+              onChangeText={(t) => handleFieldChange('habitat', t)}
+              multiline
+              numberOfLines={2}
+            />
+
+            <Input
+              label="Perioada de recoltare"
+              placeholder="Ex: Mai - August"
+              value={draft.harvestPeriod}
+              onChangeText={(t) => handleFieldChange('harvestPeriod', t)}
+            />
+
+            <Input
+              label="Beneficii"
+              placeholder="Beneficiile plantei, separate prin virgula..."
+              value={draft.benefits}
+              onChangeText={(t) => handleFieldChange('benefits', t)}
+              multiline
+              numberOfLines={3}
+            />
+
+            <Input
+              label="Contraindicatii"
+              placeholder="Contraindicatii cunoscute, separate prin virgula..."
+              value={draft.contraindications}
+              onChangeText={(t) => handleFieldChange('contraindications', t)}
+              multiline
+              numberOfLines={2}
+            />
+
+            <Input
+              label="Comentariu (optional)"
+              placeholder="Alte observatii sau detalii..."
+              value={draft.comment}
+              onChangeText={(t) => handleFieldChange('comment', t)}
+              multiline
+              numberOfLines={2}
+            />
+          </View>
+        );
+    }
+  };
+
+  const renderNavButtons = () => {
+    switch (step) {
+      case 1:
+        return (
+          <View style={sightingsStyles.navRow}>
+            <View style={sightingsStyles.navButtonFlex}>
+              <Button
+                title="Urmatorul"
+                onPress={handleNextFromPhoto}
+                disabled={!draft.imageUri}
+              />
+            </View>
+          </View>
+        );
+      case 2:
+        return (
+          <View style={sightingsStyles.navRow}>
+            <View style={sightingsStyles.navButtonFlex}>
+              <Button title="Inapoi" onPress={goBack} variant="ghost" />
+            </View>
+          </View>
+        );
+      case 3:
+        return (
+          <View style={sightingsStyles.navRow}>
+            <View style={sightingsStyles.navButtonFlex}>
+              <Button title="Inapoi" onPress={goBack} variant="ghost" />
+            </View>
+            <View style={sightingsStyles.navButtonFlex}>
+              <Button
+                title="Urmatorul"
+                onPress={() => goToStep(4)}
+                disabled={!(draft.location ?? location)}
+              />
+            </View>
+          </View>
+        );
+      case 4:
+        return (
+          <View style={sightingsStyles.navRow}>
+            <View style={sightingsStyles.navButtonFlex}>
+              <Button title="Inapoi" onPress={goBack} variant="ghost" />
+            </View>
+            <View style={sightingsStyles.navButtonFlex}>
+              <Button
+                title="Salveaza"
+                onPress={handleSubmit}
+                disabled={!draft.plantId || !(draft.location ?? location)}
+              />
             </View>
           </View>
         );
@@ -320,15 +446,31 @@ export function CreatePOIForm({ onSubmit }: CreatePOIFormProps) {
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <StepIndicator currentStep={step} />
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior="height">
+      <StepIndicator currentStep={step} maxStepReached={maxStepReached} onStepPress={goToStep} />
       <ScrollView
         style={sightingsStyles.formScroll}
         contentContainerStyle={sightingsStyles.formScrollContent}
         keyboardShouldPersistTaps="handled"
+        automaticallyAdjustKeyboardInsets
       >
-        {renderStep()}
+        {renderStepContent()}
       </ScrollView>
-    </View>
+      <View style={sightingsStyles.navFooter}>
+        {renderNavButtons()}
+      </View>
+      <CameraScreen
+        visible={showCamera}
+        onCapture={handleCameraCapture}
+        onClose={() => setShowCamera(false)}
+      />
+      <LocationPicker
+        visible={showMapPicker}
+        initialCoordinates={(draft.location ?? location) ?? undefined}
+        userLocation={location ?? undefined}
+        onConfirm={handleMapPickerConfirm}
+        onClose={() => setShowMapPicker(false)}
+      />
+    </KeyboardAvoidingView>
   );
-}
+});

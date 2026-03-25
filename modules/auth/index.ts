@@ -1,3 +1,5 @@
+// index.ts — barrel export al modulului auth. Expune ecranele si hook-ul de autentificare.
+
 export { LoginScreen } from './screens/LoginScreen';
 export { RegisterScreen } from './screens/RegisterScreen';
 export { useAuth } from './hooks/useAuth';

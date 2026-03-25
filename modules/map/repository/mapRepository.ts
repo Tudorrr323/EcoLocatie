@@ -1,3 +1,6 @@
+// mapRepository — stratul de acces la date pentru modulul de harta.
+// Transforma POI-urile in obiecte MarkerData imbogatite cu datele plantei si aplica filtrele.
+
 import {
   getApprovedPOIs,
   getPOIs,

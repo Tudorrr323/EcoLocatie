@@ -1,3 +1,7 @@
+// dataProvider — punctul unic de acces la datele aplicatiei.
+// Importa ecolocatie_data.json si expune functii: getPlants(), getUsers(), getPOIs(), getConfig().
+// Cand vine backend-ul real, se schimba DOAR acest fisier de la import static la fetch/axios.
+
 import rawData from '../../data/ecolocatie_data.json';
 import type { Plant, PointOfInterest, User, MapConfig, EcolocatieData } from '../types/plant.types';
 
@@ -29,6 +33,10 @@ export function getApprovedPOIs(): PointOfInterest[] {
 
 export function getPendingPOIs(): PointOfInterest[] {
   return data.points_of_interest.filter((p) => !p.is_approved);
+}
+
+export function addPOI(poi: PointOfInterest): void {
+  data.points_of_interest.push(poi);
 }
 
 export function getConfig(): MapConfig {

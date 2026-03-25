@@ -1,3 +1,6 @@
+// coordinates — functii helper pentru calcule geografice.
+// distanceBetween() calculeaza distanta in km intre doua puncte, isInsideBounds() verifica limitele Galatiului.
+
 import { MAP_BOUNDS } from '../constants/config';
 
 export function distanceBetween(

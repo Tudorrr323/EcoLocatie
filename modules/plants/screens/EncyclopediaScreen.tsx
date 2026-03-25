@@ -1,3 +1,6 @@
+// EncyclopediaScreen — ecranul principal al enciclopediei de plante medicinale.
+// Afiseaza o lista de carduri cu plante, bara de cautare si navigare la pagina de detalii.
+
 import React from 'react';
 import { View, Text, SafeAreaView } from 'react-native';
 import { SearchBar } from '../../../shared/components/SearchBar';

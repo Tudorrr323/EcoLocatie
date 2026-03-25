@@ -1,3 +1,5 @@
+// (tabs)/my-plants — ruta tab-ului pentru plantele salvate de utilizator.
+// Afiseaza un ecran placeholder; functionalitatea completa urmeaza a fi implementata.
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';

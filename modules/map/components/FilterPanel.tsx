@@ -1,15 +1,19 @@
-import React, { useState, useCallback } from 'react';
+// FilterPanel — panou de filtrare a markerelor de pe harta.
+// Permite selectarea/deselectarea plantelor individuale. Foloseste FullScreenPanel.
+
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   ScrollView,
-  Modal,
-  Pressable,
 } from 'react-native';
+import { X } from 'lucide-react-native';
+import { FullScreenPanel } from '../../../shared/components/FullScreenPanel';
 import type { Plant } from '../../../shared/types/plant.types';
 import type { MapFilter } from '../types/map.types';
 import { mapStyles } from '../styles/map.styles';
+import { colors } from '../../../shared/styles/theme';
 
 interface FilterPanelProps {
   visible: boolean;
@@ -32,6 +36,12 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
 
   const allSelected = localSelectedIds.length === 0;
 
+  useEffect(() => {
+    if (visible) {
+      setLocalSelectedIds(currentFilter.selectedPlantIds);
+    }
+  }, [visible, currentFilter.selectedPlantIds]);
+
   const handleTogglePlant = useCallback((plantId: number) => {
     setLocalSelectedIds((prev) => {
       if (prev.includes(plantId)) {
@@ -42,27 +52,16 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
   }, []);
 
   const handleSelectAll = useCallback(() => {
-    // Empty selectedPlantIds means "show all"
     setLocalSelectedIds([]);
   }, []);
 
   const handleDeselectAll = useCallback(() => {
-    setLocalSelectedIds(allPlants.map((p) => p.id));
-    // Actually deselect all means show none — use a sentinel approach:
-    // We'll track "explicitly none" as a full list of plant ids that effectively matches nothing
-    // but the repository filters by inclusion, so passing all ids = show all.
-    // To "deselect all" (show nothing) we could use a negative approach.
-    // The cleaner semantic: selectedPlantIds=[] means "no filter applied / all visible".
-    // To show none: we'd need a different flag. For UX, deselect all clears individual
-    // plant checkboxes so none are individually checked, effectively selecting none.
-    // We set it to a special empty-but-not-unfiltered state by using a placeholder
-    // that will match zero plants. Using [-1] as sentinel for "explicitly none":
     setLocalSelectedIds([-1]);
-  }, [allPlants]);
+  }, []);
 
   const isPlantSelected = useCallback(
     (plantId: number) => {
-      if (localSelectedIds.length === 0) return true; // "all" mode
+      if (localSelectedIds.length === 0) return true;
       return localSelectedIds.includes(plantId);
     },
     [localSelectedIds]
@@ -76,30 +75,12 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
     onClose();
   }, [localSelectedIds, currentFilter, onApply, onClose]);
 
-  const handleOpen = useCallback(() => {
-    setLocalSelectedIds(currentFilter.selectedPlantIds);
-  }, [currentFilter.selectedPlantIds]);
-
-  React.useEffect(() => {
-    if (visible) {
-      handleOpen();
-    }
-  }, [visible, handleOpen]);
-
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-    >
-      <Pressable style={mapStyles.filterPanelOverlay} onPress={onClose} />
-
-      <View style={mapStyles.filterPanel}>
-        <View style={mapStyles.filterPanelHandle} />
-
-        <View style={mapStyles.filterPanelHeader}>
-          <Text style={mapStyles.filterPanelTitle}>Filtrare plante</Text>
+    <FullScreenPanel visible={visible} onClose={onClose}>
+      {/* Header */}
+      <View style={mapStyles.filterPanelHeader}>
+        <Text style={mapStyles.filterPanelTitle}>Filtrare plante</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           <TouchableOpacity
             style={mapStyles.filterToggleAllButton}
             onPress={allSelected ? handleDeselectAll : handleSelectAll}
@@ -109,67 +90,73 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
               {allSelected ? 'Deselecteaza tot' : 'Selecteaza tot'}
             </Text>
           </TouchableOpacity>
-        </View>
-
-        <ScrollView
-          contentContainerStyle={mapStyles.filterList}
-          showsVerticalScrollIndicator={false}
-        >
-          {allPlants.map((plant, index) => {
-            const selected = isPlantSelected(plant.id);
-            const isLast = index === allPlants.length - 1;
-            return (
-              <TouchableOpacity
-                key={plant.id}
-                style={[
-                  mapStyles.filterItem,
-                  isLast && mapStyles.filterItemLast,
-                ]}
-                onPress={() => handleTogglePlant(plant.id)}
-                activeOpacity={0.7}
-              >
-                <View
-                  style={[
-                    mapStyles.filterColorDot,
-                    { backgroundColor: plant.icon_color || '#4CAF50' },
-                  ]}
-                />
-                <Text style={mapStyles.filterItemLabel} numberOfLines={1}>
-                  {plant.name_ro}
-                </Text>
-                <View
-                  style={[
-                    mapStyles.filterCheckbox,
-                    selected && mapStyles.filterCheckboxSelected,
-                  ]}
-                >
-                  {selected && (
-                    <Text style={mapStyles.filterCheckboxTick}>{'✓'}</Text>
-                  )}
-                </View>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
-
-        <View style={mapStyles.filterPanelFooter}>
-          <TouchableOpacity
-            style={mapStyles.filterCloseButton}
-            onPress={onClose}
-            activeOpacity={0.7}
-          >
-            <Text style={mapStyles.filterCloseButtonText}>Inchide</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={mapStyles.filterApplyButton}
-            onPress={handleApply}
-            activeOpacity={0.7}
-          >
-            <Text style={mapStyles.filterApplyButtonText}>Aplica</Text>
+          <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
+            <X size={22} color={colors.text} />
           </TouchableOpacity>
         </View>
       </View>
-    </Modal>
+
+      {/* Lista plante */}
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={mapStyles.filterList}
+        showsVerticalScrollIndicator={false}
+      >
+        {allPlants.map((plant, index) => {
+          const selected = isPlantSelected(plant.id);
+          const isLast = index === allPlants.length - 1;
+          return (
+            <TouchableOpacity
+              key={plant.id}
+              style={[
+                mapStyles.filterItem,
+                isLast && mapStyles.filterItemLast,
+              ]}
+              onPress={() => handleTogglePlant(plant.id)}
+              activeOpacity={0.7}
+            >
+              <View
+                style={[
+                  mapStyles.filterColorDot,
+                  { backgroundColor: plant.icon_color || '#4CAF50' },
+                ]}
+              />
+              <Text style={mapStyles.filterItemLabel} numberOfLines={1}>
+                {plant.name_ro}
+              </Text>
+              <View
+                style={[
+                  mapStyles.filterCheckbox,
+                  selected && mapStyles.filterCheckboxSelected,
+                ]}
+              >
+                {selected && (
+                  <Text style={mapStyles.filterCheckboxTick}>{'✓'}</Text>
+                )}
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
+
+      {/* Footer */}
+      <View style={mapStyles.filterPanelFooter}>
+        <TouchableOpacity
+          style={mapStyles.filterCloseButton}
+          onPress={onClose}
+          activeOpacity={0.7}
+        >
+          <Text style={mapStyles.filterCloseButtonText}>Inchide</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={mapStyles.filterApplyButton}
+          onPress={handleApply}
+          activeOpacity={0.7}
+        >
+          <Text style={mapStyles.filterApplyButtonText}>Aplica</Text>
+        </TouchableOpacity>
+      </View>
+    </FullScreenPanel>
   );
 };
 

@@ -1,3 +1,6 @@
+// Badge — eticheta mica colorata cu text pentru status (aprobat/pending), rol (admin/user), familie planta.
+// Accepta culoare custom si text scurt.
+
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { fonts, spacing, borderRadius } from '../styles/theme';

@@ -1,3 +1,6 @@
+// ModerationCard — card pentru o observatie in asteptare de aprobare.
+// Afiseaza detaliile POI-ului cu butoane Aproba/Respinge pentru admin.
+
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Card } from '../../../shared/components/Card';

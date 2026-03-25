@@ -1,3 +1,6 @@
+// AuthForm — formular reutilizabil pentru login si register.
+// Contine campuri email/parola, buton submit si link catre cealalta pagina de auth.
+
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';

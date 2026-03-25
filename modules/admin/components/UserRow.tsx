@@ -1,3 +1,6 @@
+// UserRow — rand in lista de utilizatori din panoul admin.
+// Afiseaza username, email, rol si un switch pentru activare/dezactivare cont.
+
 import React from 'react';
 import { View, Text, Switch, StyleSheet } from 'react-native';
 import { Card } from '../../../shared/components/Card';
