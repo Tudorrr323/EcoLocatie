@@ -2,13 +2,14 @@
 // Integreaza harta Leaflet, bara de cautare cu buton filtre si butonul GPS pentru localizare in timp real.
 
 import React, { useRef, useState, useCallback, useMemo, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
 import { Crosshair } from 'lucide-react-native';
 import { Image } from 'react-native';
 import { ImageViewer } from '../../../shared/components/ImageViewer';
 import { HorizontalTabs } from '../../../shared/components/HorizontalTabs';
+import { removeDiacritics } from '../../../shared/utils/removeDiacritics';
 import { useLocation } from '../../../shared/hooks/useLocation';
 import { useMapFilters } from '../hooks/useMapFilters';
 import { SearchBar } from '../../../shared/components/SearchBar';
@@ -40,13 +41,39 @@ const MapScreen: React.FC = () => {
 
   const displayedMarkers = useMemo(() => {
     if (!searchQuery.trim()) return filteredMarkers;
-    const q = searchQuery.toLowerCase();
+    const q = removeDiacritics(searchQuery.toLowerCase());
     return filteredMarkers.filter(
       (m) =>
-        m.plant.name_ro.toLowerCase().includes(q) ||
-        m.plant.name_latin.toLowerCase().includes(q)
+        removeDiacritics(m.plant.name_ro.toLowerCase()).includes(q) ||
+        removeDiacritics(m.plant.name_latin.toLowerCase()).includes(q)
     );
   }, [filteredMarkers, searchQuery]);
+
+  const suggestions = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const q = removeDiacritics(searchQuery.toLowerCase());
+    const seen = new Set<number>();
+    const results: typeof filteredMarkers = [];
+    for (const m of filteredMarkers) {
+      if (seen.has(m.plant.id)) continue;
+      if (
+        removeDiacritics(m.plant.name_ro.toLowerCase()).includes(q) ||
+        removeDiacritics(m.plant.name_latin.toLowerCase()).includes(q)
+      ) {
+        seen.add(m.plant.id);
+        results.push(m);
+        if (results.length >= 3) break;
+      }
+    }
+    return results;
+  }, [filteredMarkers, searchQuery]);
+
+  const handleSuggestionPress = useCallback((marker: MarkerData) => {
+    setSearchQuery('');
+    mapRef.current?.flyTo(marker.latitude, marker.longitude, 16);
+    setSelectedMarker(marker);
+    setActiveTab('prezentare');
+  }, []);
 
   const handleGPS = useCallback(async () => {
     // Daca avem deja locatia, centreaza imediat
@@ -111,13 +138,47 @@ const MapScreen: React.FC = () => {
         </View>
       </View>
 
-      <View style={mapStyles.searchContainer}>
+      <View style={[mapStyles.searchContainer, { zIndex: 10 }]}>
         <View style={mapStyles.searchRow}>
           <View style={mapStyles.searchBarWrapper}>
             <SearchBar placeholder="Cauta plante..." onSearch={setSearchQuery} />
           </View>
           <FilterButton onPress={() => setFilterPanelVisible(true)} />
         </View>
+
+        {suggestions.length > 0 && (
+          <View style={suggestionStyles.container}>
+            {suggestions.map((marker, index) => (
+              <TouchableOpacity
+                key={marker.id}
+                style={[
+                  suggestionStyles.item,
+                  index === suggestions.length - 1 && suggestionStyles.itemLast,
+                ]}
+                onPress={() => handleSuggestionPress(marker)}
+                activeOpacity={0.7}
+              >
+                <Image
+                  source={{ uri: marker.plant.image_url }}
+                  style={suggestionStyles.image}
+                  resizeMode="cover"
+                />
+                <View style={suggestionStyles.info}>
+                  <Text style={suggestionStyles.name} numberOfLines={1}>
+                    {marker.plant.name_ro}
+                  </Text>
+                  <Text style={suggestionStyles.latin} numberOfLines={1}>
+                    {marker.plant.name_latin}
+                  </Text>
+                  <Text style={suggestionStyles.family} numberOfLines={1}>
+                    {marker.plant.family}
+                  </Text>
+                </View>
+                <View style={[suggestionStyles.dot, { backgroundColor: marker.plant.icon_color }]} />
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
       </View>
 
       <View style={mapStyles.mapWrapper}>
@@ -376,6 +437,64 @@ const poiStyles = StyleSheet.create({
     lineHeight: 22,
     marginLeft: spacing.sm,
     marginBottom: spacing.xs,
+  },
+});
+
+const suggestionStyles = StyleSheet.create({
+  container: {
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.lg,
+    marginTop: spacing.xs,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.15,
+        shadowRadius: 6,
+      },
+      android: {
+        elevation: 6,
+      },
+    }),
+  },
+  item: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: spacing.sm,
+    gap: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  itemLast: {
+    borderBottomWidth: 0,
+  },
+  image: {
+    width: 48,
+    height: 48,
+    borderRadius: borderRadius.md,
+  },
+  info: {
+    flex: 1,
+  },
+  name: {
+    fontSize: fonts.sizes.md,
+    fontWeight: '700',
+    color: colors.text,
+  },
+  latin: {
+    fontSize: fonts.sizes.sm,
+    fontStyle: 'italic',
+    color: colors.textSecondary,
+  },
+  family: {
+    fontSize: fonts.sizes.xs,
+    color: colors.textSecondary,
+    marginTop: 2,
+  },
+  dot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
   },
 });
 
