@@ -1,11 +1,14 @@
 // UserRow — rand in lista de utilizatori din panoul admin.
 // Afiseaza username, email, rol si un switch pentru activare/dezactivare cont.
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, Switch, StyleSheet } from 'react-native';
 import { Card } from '../../../shared/components/Card';
 import { formatDate } from '../../../shared/utils/formatDate';
-import { colors, fonts, spacing, borderRadius } from '../../../shared/styles/theme';
+import { fonts, spacing, borderRadius } from '../../../shared/styles/theme';
+import type { ThemeColors } from '../../../shared/styles/theme';
+import { useThemeColors } from '../../../shared/hooks/useThemeColors';
+import { useTranslation } from '../../../shared/i18n';
 import type { User } from '../../../shared/types/plant.types';
 
 interface UserRowProps {
@@ -14,6 +17,9 @@ interface UserRowProps {
 }
 
 export function UserRow({ user, onToggle }: UserRowProps) {
+  const colors = useThemeColors();
+  const t = useTranslation();
+  const styles = useMemo(() => createUserRowStyles(colors), [colors]);
   const isAdmin = user.role === 'admin';
 
   return (
@@ -34,7 +40,7 @@ export function UserRow({ user, onToggle }: UserRowProps) {
               ]}
             >
               <Text style={styles.roleBadgeText}>
-                {isAdmin ? 'admin' : 'user'}
+                {isAdmin ? t.admin.users.admin : t.admin.users.user}
               </Text>
             </View>
           </View>
@@ -45,7 +51,7 @@ export function UserRow({ user, onToggle }: UserRowProps) {
             {user.email}
           </Text>
           <Text style={styles.date}>
-            Inregistrat: {formatDate(user.created_at)}
+            {t.admin.users.registered}: {formatDate(user.created_at)}
           </Text>
         </View>
         <Switch
@@ -59,7 +65,7 @@ export function UserRow({ user, onToggle }: UserRowProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const createUserRowStyles = (colors: ThemeColors) => StyleSheet.create({
   card: {
     marginBottom: spacing.sm,
   },

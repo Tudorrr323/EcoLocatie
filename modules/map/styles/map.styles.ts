@@ -2,9 +2,10 @@
 // Include stiluri pentru header, search, harta, buton GPS, filtre, callout, markere, location picker.
 
 import { StyleSheet, Platform } from 'react-native';
-import { colors, spacing, borderRadius, fonts } from '../../../shared/styles/theme';
+import { spacing, borderRadius, fonts } from '../../../shared/styles/theme';
+import type { ThemeColors } from '../../../shared/styles/theme';
 
-export const mapStyles = StyleSheet.create({
+export const createMapStyles = (colors: ThemeColors) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.surface,
@@ -14,38 +15,7 @@ export const mapStyles = StyleSheet.create({
     flex: 1,
   },
 
-  // Header
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: spacing.md,
-    paddingVertical: 12,
-    backgroundColor: colors.surface,
-  },
-
-  headerTitle: {
-    fontSize: fonts.sizes.xl,
-    fontWeight: '700',
-    color: colors.text,
-    flex: 1,
-    marginLeft: spacing.sm,
-  },
-
-  headerActions: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-
-  headerIconButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  searchContainer: {
+searchContainer: {
     paddingHorizontal: spacing.md,
     backgroundColor: colors.surface,
   },

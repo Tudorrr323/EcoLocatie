@@ -1,24 +1,28 @@
-// PlantSelector — picker modal pentru alegerea manuala a unei plante.
+// PlantSelector — picker pentru alegerea manuala a unei plante.
 // Folosit in flow-ul de creare observatie cand identificarea AI nu returneaza rezultatul corect.
 
 import React, { useState, useMemo } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { SearchBar } from '../../../shared/components/SearchBar';
 import { Pagination } from '../../../shared/components/Pagination';
+import { usePagination } from '../../../shared/hooks/usePagination';
 import { removeDiacritics } from '../../../shared/utils/removeDiacritics';
 import type { Plant } from '../../../shared/types/plant.types';
 import { getAllPlants } from '../repository/plantsRepository';
-import { plantsStyles } from '../styles/plants.styles';
-
-const PAGE_SIZE = 10;
+import { createPlantsStyles } from '../styles/plants.styles';
+import { useThemeColors } from '../../../shared/hooks/useThemeColors';
 
 interface PlantSelectorProps {
   onSelect: (plant: Plant) => void;
+  /** Daca e furnizat, query-ul e controlat extern si search bar-ul intern nu se mai afiseaza */
+  searchQuery?: string;
 }
 
-export function PlantSelector({ onSelect }: PlantSelectorProps) {
-  const [query, setQuery] = useState('');
-  const [page, setPage] = useState(1);
+export function PlantSelector({ onSelect, searchQuery }: PlantSelectorProps) {
+  const colors = useThemeColors();
+  const plantsStyles = useMemo(() => createPlantsStyles(colors), [colors]);
+  const [internalQuery] = useState('');
+
+  const query = searchQuery !== undefined ? searchQuery : internalQuery;
 
   const allPlants = useMemo(() => getAllPlants(), []);
 
@@ -33,41 +37,25 @@ export function PlantSelector({ onSelect }: PlantSelectorProps) {
     );
   }, [query, allPlants]);
 
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  const currentPage = Math.min(page, Math.max(totalPages, 1));
-  const pageItems = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
-
-  const handleSearch = (q: string) => {
-    setQuery(q);
-    setPage(1);
-  };
+  const { currentPage, pageSize, totalPages, paginatedItems, onPageChange, onPageSizeChange } =
+    usePagination(filtered);
 
   return (
     <View style={plantsStyles.selectorContainer}>
-      <View style={plantsStyles.selectorSearchWrapper}>
-        <SearchBar
-          placeholder="Cauta o planta..."
-          onSearch={handleSearch}
-          debounceMs={200}
-        />
-      </View>
-
       {filtered.length === 0 ? (
         <Text style={plantsStyles.selectorEmpty}>
           Nu au fost gasite plante.
         </Text>
       ) : (
         <View>
-          {pageItems.map((item) => (
+          {paginatedItems.map((item) => (
             <TouchableOpacity
               key={String(item.id)}
               style={plantsStyles.selectorItem}
               onPress={() => onSelect(item)}
               activeOpacity={0.7}
             >
-              <View
-                style={[plantsStyles.selectorDot, { backgroundColor: item.icon_color }]}
-              />
+              <View style={[plantsStyles.selectorDot, { backgroundColor: item.icon_color }]} />
               <View>
                 <Text style={plantsStyles.selectorNameRo}>{item.name_ro}</Text>
                 <Text style={plantsStyles.selectorNameLatin}>{item.name_latin}</Text>
@@ -77,7 +65,9 @@ export function PlantSelector({ onSelect }: PlantSelectorProps) {
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            onPageChange={setPage}
+            onPageChange={onPageChange}
+            pageSize={pageSize}
+            onPageSizeChange={onPageSizeChange}
           />
         </View>
       )}

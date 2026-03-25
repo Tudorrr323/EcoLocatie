@@ -1,9 +1,11 @@
 // Button — buton reutilizabil cu variante: primary, secondary, danger, ghost.
 // Suporta stare de loading (spinner), disabled si icon optional. Folosit in formulare, admin, harta.
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { TouchableOpacity, Text, ActivityIndicator, StyleSheet, ViewStyle } from 'react-native';
-import { colors, fonts, spacing, borderRadius } from '../styles/theme';
+import { fonts, spacing, borderRadius } from '../styles/theme';
+import type { ThemeColors } from '../styles/theme';
+import { useThemeColors } from '../hooks/useThemeColors';
 
 type Variant = 'primary' | 'secondary' | 'danger' | 'ghost';
 
@@ -16,14 +18,17 @@ interface ButtonProps {
   style?: ViewStyle;
 }
 
-const variantStyles: Record<Variant, { bg: string; text: string }> = {
-  primary: { bg: colors.primary, text: colors.textLight },
-  secondary: { bg: colors.secondary, text: colors.textLight },
-  danger: { bg: colors.error, text: colors.textLight },
-  ghost: { bg: 'transparent', text: colors.primary },
-};
-
 export function Button({ title, onPress, variant = 'primary', loading, disabled, style }: ButtonProps) {
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
+  const variantStyles: Record<Variant, { bg: string; text: string }> = {
+    primary: { bg: colors.primary, text: colors.textLight },
+    secondary: { bg: colors.secondary, text: colors.textLight },
+    danger: { bg: colors.error, text: colors.textLight },
+    ghost: { bg: 'transparent', text: colors.primary },
+  };
+
   const v = variantStyles[variant];
   const isDisabled = disabled || loading;
 
@@ -49,7 +54,7 @@ export function Button({ title, onPress, variant = 'primary', loading, disabled,
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
   button: {
     paddingVertical: spacing.sm + 4,
     paddingHorizontal: spacing.lg,

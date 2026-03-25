@@ -1,7 +1,7 @@
 // SwipeableBottomSheet — panou glisant de jos in sus, controlabil prin swipe.
 // Header e mereu draggable. In collapsed, tap pe continut expandeaza. In expanded, ScrollView scrolleaza.
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useMemo } from 'react';
 import {
   View,
   StyleSheet,
@@ -11,7 +11,9 @@ import {
   Pressable,
   Platform,
 } from 'react-native';
-import { colors, spacing, borderRadius } from '../styles/theme';
+import { spacing, borderRadius } from '../styles/theme';
+import type { ThemeColors } from '../styles/theme';
+import { useThemeColors } from '../hooks/useThemeColors';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 const TOP_PADDING = 50;
@@ -31,6 +33,9 @@ export function SwipeableBottomSheet({
   header,
   children,
 }: SwipeableBottomSheetProps) {
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const translateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
   const posRef = useRef(SCREEN_HEIGHT);
   const expRef = useRef(false);
@@ -147,7 +152,7 @@ export function SwipeableBottomSheet({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
   sheet: {
     position: 'absolute',
     left: 0,

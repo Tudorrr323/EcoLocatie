@@ -2,42 +2,16 @@
 // Acopera formularul de creare, captura foto, rezultatele AI si callout-ul POI.
 
 import { StyleSheet } from 'react-native';
-import { colors, spacing, borderRadius, fonts } from '../../../shared/styles/theme';
+import { spacing, borderRadius, fonts } from '../../../shared/styles/theme';
+import type { ThemeColors } from '../../../shared/styles/theme';
 
-export const sightingsStyles = StyleSheet.create({
+export const createSightingsStyles = (colors: ThemeColors) => StyleSheet.create({
   // ── Screen ──────────────────────────────────────────────────
   screen: {
     flex: 1,
     backgroundColor: colors.surface,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: 12,
-    backgroundColor: colors.surface,
-  },
-  headerTitleBrand: {
-    fontSize: fonts.sizes.xl,
-    fontWeight: '700',
-    color: colors.text,
-    flex: 1,
-    marginLeft: spacing.sm,
-  },
-  headerActions: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  headerIconButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  // ── Step Indicator ───────────────────────────────────────────
+// ── Step Indicator ───────────────────────────────────────────
   stepIndicatorContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -160,6 +134,17 @@ export const sightingsStyles = StyleSheet.create({
     fontSize: fonts.sizes.md,
     color: colors.textSecondary,
     marginTop: spacing.sm,
+  },
+  photoClearBtn: {
+    position: 'absolute',
+    top: spacing.sm,
+    right: spacing.sm,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.error,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   // ── AI Results ───────────────────────────────────────────────
@@ -305,6 +290,15 @@ export const sightingsStyles = StyleSheet.create({
     fontSize: fonts.sizes.lg,
     fontWeight: '700',
     color: colors.text,
+  },
+
+  // ── Manual selector search ───────────────────────────────────
+  manualSelectorSearchBar: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    backgroundColor: colors.surface,
   },
 
   // ── Navigation ───────────────────────────────────────────────

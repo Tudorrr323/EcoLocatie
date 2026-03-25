@@ -2,13 +2,14 @@
 // Afiseaza un pin fix in centrul hartii cu coordonate actualizate in timp real la miscare.
 // Pin-ul are animatie de ridicare la miscare si de asezare (drop) la oprire.
 
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { View, Text, TouchableOpacity, Modal, Animated } from 'react-native';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import Svg, { Path, Circle } from 'react-native-svg';
 import { X, Check } from 'lucide-react-native';
-import { mapStyles } from '../styles/map.styles';
-import { colors } from '../../../shared/styles/theme';
+import { createMapStyles } from '../styles/map.styles';
+import { useThemeColors } from '../../../shared/hooks/useThemeColors';
+import { useTranslation } from '../../../shared/i18n';
 
 export interface Coordinates {
   latitude: number;
@@ -94,6 +95,9 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
   onConfirm,
   onClose,
 }) => {
+  const colors = useThemeColors();
+  const t = useTranslation();
+  const mapStyles = useMemo(() => createMapStyles(colors), [colors]);
   const [coords, setCoords] = useState<Coordinates>(
     initialCoordinates ?? userLocation ?? { latitude: 45.4353, longitude: 28.008 },
   );
@@ -200,13 +204,13 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
             <X size={24} color={colors.text} />
           </TouchableOpacity>
           <View style={mapStyles.locationPickerCoordsBox}>
-            <Text style={mapStyles.locationPickerCoordsLabel}>Latitudine</Text>
+            <Text style={mapStyles.locationPickerCoordsLabel}>{t.map.locationPicker.latitude}</Text>
             <Text style={mapStyles.locationPickerCoordsValue}>
               {coords.latitude.toFixed(6)}
             </Text>
           </View>
           <View style={mapStyles.locationPickerCoordsBox}>
-            <Text style={mapStyles.locationPickerCoordsLabel}>Longitudine</Text>
+            <Text style={mapStyles.locationPickerCoordsLabel}>{t.map.locationPicker.longitude}</Text>
             <Text style={mapStyles.locationPickerCoordsValue}>
               {coords.longitude.toFixed(6)}
             </Text>
@@ -264,7 +268,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
           >
             <Check size={20} color={colors.textLight} />
             <Text style={mapStyles.locationPickerConfirmButtonText}>
-              Confirma locatia
+              {t.map.locationPicker.confirmLocation}
             </Text>
           </TouchableOpacity>
         </View>

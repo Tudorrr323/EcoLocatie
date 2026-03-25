@@ -1,7 +1,7 @@
 // CameraScreen — ecran full-screen cu camera in-app pentru capturarea plantelor.
 // Afiseaza viewfinder cu colturi animate, bara de progres si butoane de control (galerie, captura, flip).
 
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -17,9 +17,11 @@ import {
 } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
-import { X, ImageIcon, SwitchCamera } from 'lucide-react-native';
+import { X, ImageIcon, SwitchCamera, Zap, ZapOff } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, fonts, spacing } from '../../../shared/styles/theme';
+import { fonts, spacing } from '../../../shared/styles/theme';
+import type { ThemeColors } from '../../../shared/styles/theme';
+import { useThemeColors } from '../../../shared/hooks/useThemeColors';
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
 
@@ -27,8 +29,13 @@ const VF_WIDTH = SCREEN_W * 0.84;
 const VF_HEIGHT = SCREEN_H * 0.36;
 const CORNER_LEN = 48;
 const CORNER_W = 3.5;
-const ACCENT = colors.logoTeal;
 const SCAN_DURATION = 2500;
+
+// Constante culori specifice UI-ului de camera (nu depind de tema)
+const CAM_BTN_BG = 'rgba(255,255,255,0.15)';
+const CAM_PROGRESS_BG = 'rgba(255,255,255,0.25)';
+const CAM_SHUTTER_FILL = 'rgba(255,255,255,0.9)';
+const CAM_TEXT_DIM = 'rgba(255,255,255,0.7)';
 
 interface CameraScreenProps {
   visible: boolean;
@@ -37,8 +44,13 @@ interface CameraScreenProps {
 }
 
 export function CameraScreen({ visible, onCapture, onClose }: CameraScreenProps) {
+  const colors = useThemeColors();
+  const ACCENT = colors.logoTeal;
+  const CAM_WHITE = colors.textLight;
+  const cs = useMemo(() => createCameraStyles(colors), [colors]);
   const insets = useSafeAreaInsets();
   const [facing, setFacing] = useState<'back' | 'front'>('back');
+  const [flash, setFlash] = useState<'off' | 'on' | 'torch'>('off');
   const [permission, requestPermission] = useCameraPermissions();
   const [capturedUri, setCapturedUri] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState(false);
@@ -133,7 +145,7 @@ export function CameraScreen({ visible, onCapture, onClose }: CameraScreenProps)
     setFacing((f) => (f === 'back' ? 'front' : 'back'));
   }, []);
 
-  const handleGallery = useCallback(async () => {
+const handleGallery = useCallback(async () => {
     if (isScanning) return;
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') return;
@@ -192,7 +204,13 @@ export function CameraScreen({ visible, onCapture, onClose }: CameraScreenProps)
             resizeMode="cover"
           />
         ) : (
-          <CameraView ref={cameraRef} style={StyleSheet.absoluteFill} facing={facing} />
+          <CameraView
+            ref={cameraRef}
+            style={StyleSheet.absoluteFill}
+            facing={facing}
+            flash={flash === 'torch' ? 'off' : flash}
+            enableTorch={flash === 'torch'}
+          />
         )}
 
         {/* Overlay layer */}
@@ -205,10 +223,19 @@ export function CameraScreen({ visible, onCapture, onClose }: CameraScreenProps)
               disabled={isScanning}
               style={{ opacity: isScanning ? 0.4 : 1 }}
             >
-              <X color="#FFF" size={26} />
+              <X color={CAM_WHITE} size={26} />
             </TouchableOpacity>
             <Text style={cs.topTitle}>Identificare</Text>
-            <View style={{ width: 26 }} />
+            <TouchableOpacity
+              onPress={() => setFlash((f) => f === 'off' ? 'on' : f === 'on' ? 'torch' : 'off')}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              disabled={isScanning || facing === 'front'}
+              style={{ opacity: (isScanning || facing === 'front') ? 0.4 : 1 }}
+            >
+              {flash === 'on' && <Zap color={ACCENT} size={26} fill={ACCENT} />}
+              {flash === 'torch' && <Zap color={colors.flashTorch} size={26} fill={colors.flashTorch} />}
+              {flash === 'off' && <ZapOff color={CAM_WHITE} size={26} />}
+            </TouchableOpacity>
           </View>
 
           {/* ── Viewfinder ── */}
@@ -247,7 +274,7 @@ export function CameraScreen({ visible, onCapture, onClose }: CameraScreenProps)
                 onPress={handleGallery}
                 disabled={isScanning}
               >
-                <ImageIcon color="#FFF" size={22} />
+                <ImageIcon color={CAM_WHITE} size={22} />
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -264,7 +291,7 @@ export function CameraScreen({ visible, onCapture, onClose }: CameraScreenProps)
                 onPress={handleFlip}
                 disabled={isScanning}
               >
-                <SwitchCamera color="#FFF" size={22} />
+                <SwitchCamera color={CAM_WHITE} size={22} />
               </TouchableOpacity>
             </View>
           </View>
@@ -275,183 +302,188 @@ export function CameraScreen({ visible, onCapture, onClose }: CameraScreenProps)
 }
 
 // ── Styles ──────────────────────────────────────────────────────
-const cs = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: '#000',
-  },
-  overlayLayer: {
-    flex: 1,
-  },
+const createCameraStyles = (colors: ThemeColors) => {
+  const accent = colors.logoTeal;
+  const camWhite = colors.textLight;
 
-  // Top bar
-  topBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.sm,
-  },
-  topTitle: {
-    color: '#FFF',
-    fontSize: fonts.sizes.xl,
-    fontWeight: '700',
-  },
+  return StyleSheet.create({
+    root: {
+      flex: 1,
+      backgroundColor: colors.black,
+    },
+    overlayLayer: {
+      flex: 1,
+    },
 
-  // Viewfinder
-  vfContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  vfFrame: {
-    width: VF_WIDTH,
-    height: VF_HEIGHT,
-  },
-  corner: {
-    position: 'absolute',
-    width: CORNER_LEN,
-    height: CORNER_LEN,
-  },
-  cTL: {
-    top: 0,
-    left: 0,
-    borderTopWidth: CORNER_W,
-    borderLeftWidth: CORNER_W,
-    borderTopColor: ACCENT,
-    borderLeftColor: ACCENT,
-    borderTopLeftRadius: 6,
-  },
-  cTR: {
-    top: 0,
-    right: 0,
-    borderTopWidth: CORNER_W,
-    borderRightWidth: CORNER_W,
-    borderTopColor: ACCENT,
-    borderRightColor: ACCENT,
-    borderTopRightRadius: 6,
-  },
-  cBL: {
-    bottom: 0,
-    left: 0,
-    borderBottomWidth: CORNER_W,
-    borderLeftWidth: CORNER_W,
-    borderBottomColor: ACCENT,
-    borderLeftColor: ACCENT,
-    borderBottomLeftRadius: 6,
-  },
-  cBR: {
-    bottom: 0,
-    right: 0,
-    borderBottomWidth: CORNER_W,
-    borderRightWidth: CORNER_W,
-    borderBottomColor: ACCENT,
-    borderRightColor: ACCENT,
-    borderBottomRightRadius: 6,
-  },
-  scanLine: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    height: 3,
-    backgroundColor: ACCENT,
-    shadowColor: ACCENT,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 10,
-    elevation: 5,
-  },
+    // Top bar
+    topBar: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: spacing.lg,
+      paddingBottom: spacing.sm,
+    },
+    topTitle: {
+      color: camWhite,
+      fontSize: fonts.sizes.xl,
+      fontWeight: '700',
+    },
 
-  // Bottom
-  bottom: {
-    paddingHorizontal: spacing.lg,
-  },
-  progressWrap: {
-    alignItems: 'center',
-    marginBottom: spacing.lg,
-  },
-  progBarBg: {
-    width: '70%',
-    height: 6,
-    backgroundColor: 'rgba(255,255,255,0.25)',
-    borderRadius: 3,
-    overflow: 'hidden',
-    marginBottom: spacing.sm,
-  },
-  progBarFill: {
-    height: '100%',
-    backgroundColor: ACCENT,
-    borderRadius: 3,
-  },
-  progPct: {
-    color: '#FFF',
-    fontSize: fonts.sizes.xxl,
-    fontWeight: '700',
-    marginBottom: spacing.xs,
-  },
-  progLabel: {
-    color: 'rgba(255,255,255,0.7)',
-    fontSize: fonts.sizes.md,
-  },
+    // Viewfinder
+    vfContainer: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    vfFrame: {
+      width: VF_WIDTH,
+      height: VF_HEIGHT,
+    },
+    corner: {
+      position: 'absolute',
+      width: CORNER_LEN,
+      height: CORNER_LEN,
+    },
+    cTL: {
+      top: 0,
+      left: 0,
+      borderTopWidth: CORNER_W,
+      borderLeftWidth: CORNER_W,
+      borderTopColor: accent,
+      borderLeftColor: accent,
+      borderTopLeftRadius: 6,
+    },
+    cTR: {
+      top: 0,
+      right: 0,
+      borderTopWidth: CORNER_W,
+      borderRightWidth: CORNER_W,
+      borderTopColor: accent,
+      borderRightColor: accent,
+      borderTopRightRadius: 6,
+    },
+    cBL: {
+      bottom: 0,
+      left: 0,
+      borderBottomWidth: CORNER_W,
+      borderLeftWidth: CORNER_W,
+      borderBottomColor: accent,
+      borderLeftColor: accent,
+      borderBottomLeftRadius: 6,
+    },
+    cBR: {
+      bottom: 0,
+      right: 0,
+      borderBottomWidth: CORNER_W,
+      borderRightWidth: CORNER_W,
+      borderBottomColor: accent,
+      borderRightColor: accent,
+      borderBottomRightRadius: 6,
+    },
+    scanLine: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      height: 3,
+      backgroundColor: accent,
+      shadowColor: accent,
+      shadowOffset: { width: 0, height: 0 },
+      shadowOpacity: 0.8,
+      shadowRadius: 10,
+      elevation: 5,
+    },
 
-  // Controls
-  controls: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 36,
-  },
-  sideBtn: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  shutter: {
-    width: 76,
-    height: 76,
-    borderRadius: 38,
-    borderWidth: 4,
-    borderColor: ACCENT,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'transparent',
-  },
-  shutterInner: {
-    width: 62,
-    height: 62,
-    borderRadius: 31,
-    backgroundColor: 'rgba(255,255,255,0.9)',
-  },
-  disabledBtn: {
-    opacity: 0.4,
-  },
+    // Bottom
+    bottom: {
+      paddingHorizontal: spacing.lg,
+    },
+    progressWrap: {
+      alignItems: 'center',
+      marginBottom: spacing.lg,
+    },
+    progBarBg: {
+      width: '70%',
+      height: 6,
+      backgroundColor: CAM_PROGRESS_BG,
+      borderRadius: 3,
+      overflow: 'hidden',
+      marginBottom: spacing.sm,
+    },
+    progBarFill: {
+      height: '100%',
+      backgroundColor: accent,
+      borderRadius: 3,
+    },
+    progPct: {
+      color: camWhite,
+      fontSize: fonts.sizes.xxl,
+      fontWeight: '700',
+      marginBottom: spacing.xs,
+    },
+    progLabel: {
+      color: CAM_TEXT_DIM,
+      fontSize: fonts.sizes.md,
+    },
 
-  // Permission screens
-  permissionWrap: {
-    flex: 1,
-    backgroundColor: '#000',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: spacing.xl,
-  },
-  permissionText: {
-    color: '#FFF',
-    fontSize: fonts.sizes.lg,
-    textAlign: 'center',
-    marginBottom: spacing.lg,
-  },
-  permissionBtn: {
-    backgroundColor: ACCENT,
-    paddingVertical: spacing.sm + 4,
-    paddingHorizontal: spacing.xl,
-    borderRadius: 12,
-  },
-  permissionBtnText: {
-    color: '#FFF',
-    fontSize: fonts.sizes.lg,
-    fontWeight: '600',
-  },
-});
+    // Controls
+    controls: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 36,
+    },
+    sideBtn: {
+      width: 50,
+      height: 50,
+      borderRadius: 25,
+      backgroundColor: CAM_BTN_BG,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    shutter: {
+      width: 76,
+      height: 76,
+      borderRadius: 38,
+      borderWidth: 4,
+      borderColor: accent,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: 'transparent',
+    },
+    shutterInner: {
+      width: 62,
+      height: 62,
+      borderRadius: 31,
+      backgroundColor: CAM_SHUTTER_FILL,
+    },
+    disabledBtn: {
+      opacity: 0.4,
+    },
+
+    // Permission screens
+    permissionWrap: {
+      flex: 1,
+      backgroundColor: colors.black,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: spacing.xl,
+    },
+    permissionText: {
+      color: camWhite,
+      fontSize: fonts.sizes.lg,
+      textAlign: 'center',
+      marginBottom: spacing.lg,
+    },
+    permissionBtn: {
+      backgroundColor: accent,
+      paddingVertical: spacing.sm + 4,
+      paddingHorizontal: spacing.xl,
+      borderRadius: 12,
+    },
+    permissionBtnText: {
+      color: camWhite,
+      fontSize: fonts.sizes.lg,
+      fontWeight: '600',
+    },
+  });
+};

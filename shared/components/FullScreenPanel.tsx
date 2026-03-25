@@ -1,7 +1,9 @@
 // FullScreenPanel — panou full-screen reutilizabil cu overlay static intunecat si continut care gliseaza de jos.
 // Overlay-ul apare cu fade, continutul cu slide. Overlay-ul NU se misca la swipe.
+// slideAnim foloseste useNativeDriver: false intentionat — zona de touch ramane la pozitia din layout
+// si nu urmareste animatia vizuala, evitand rata primului tap imediat dupa deschidere.
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useMemo } from 'react';
 import {
   View,
   StyleSheet,
@@ -10,7 +12,9 @@ import {
   Pressable,
   Platform,
 } from 'react-native';
-import { colors, borderRadius } from '../styles/theme';
+import { borderRadius } from '../styles/theme';
+import type { ThemeColors } from '../styles/theme';
+import { useThemeColors } from '../hooks/useThemeColors';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
@@ -21,6 +25,9 @@ interface FullScreenPanelProps {
 }
 
 export function FullScreenPanel({ visible, onClose, children }: FullScreenPanelProps) {
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
   const overlayOpacity = useRef(new Animated.Value(0)).current;
   const [alive, setAlive] = useState(false);
@@ -40,7 +47,7 @@ export function FullScreenPanel({ visible, onClose, children }: FullScreenPanelP
           }),
           Animated.spring(slideAnim, {
             toValue: 0,
-            useNativeDriver: true,
+            useNativeDriver: false,
             damping: 22,
             stiffness: 160,
           }),
@@ -56,23 +63,22 @@ export function FullScreenPanel({ visible, onClose, children }: FullScreenPanelP
         Animated.timing(slideAnim, {
           toValue: SCREEN_HEIGHT,
           duration: 250,
-          useNativeDriver: true,
+          useNativeDriver: false,
         }),
       ]).start(() => setAlive(false));
     }
     prevVisible.current = visible;
   }, [visible]);
 
-  if (!alive) return null;
-
   return (
-    <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
-      {/* Overlay static — nu se misca */}
+    <View
+      style={[StyleSheet.absoluteFill, { zIndex: 20 }]}
+      pointerEvents={alive ? 'box-none' : 'none'}
+    >
       <Animated.View style={[styles.overlay, { opacity: overlayOpacity }]}>
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
       </Animated.View>
 
-      {/* Continut care gliseaza de jos */}
       <Animated.View style={[styles.panel, { transform: [{ translateY: slideAnim }] }]}>
         {children}
       </Animated.View>
@@ -80,7 +86,7 @@ export function FullScreenPanel({ visible, onClose, children }: FullScreenPanelP
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
   overlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.5)',

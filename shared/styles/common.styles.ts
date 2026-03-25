@@ -2,9 +2,10 @@
 // Evita duplicarea in stilurile modulelor.
 
 import { StyleSheet } from 'react-native';
-import { colors, spacing, borderRadius } from './theme';
+import { spacing, borderRadius } from './theme';
+import type { ThemeColors } from './theme';
 
-export const commonStyles = StyleSheet.create({
+export const createCommonStyles = (colors: ThemeColors) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,

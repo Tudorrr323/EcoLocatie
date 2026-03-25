@@ -1,25 +1,27 @@
 // plants.styles — stilurile centralizate ale modulului plants din EcoLocatie.
 // Acopera stilurile pentru ecrane, carduri, detalii, liste si selectorul de plante.
 import { StyleSheet } from 'react-native';
-import { colors, spacing, borderRadius, fonts } from '../../../shared/styles/theme';
+import { spacing, borderRadius, fonts } from '../../../shared/styles/theme';
+import type { ThemeColors } from '../../../shared/styles/theme';
 
-export const plantsStyles = StyleSheet.create({
+export const createPlantsStyles = (colors: ThemeColors) => StyleSheet.create({
   // ── Screens ─────────────────────────────────────────────
   screen: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.surface,
   },
-  headerContainer: {
-    backgroundColor: colors.primary,
+searchContainer: {
     paddingHorizontal: spacing.md,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.lg,
+    paddingBottom: spacing.sm,
+    backgroundColor: colors.surface,
   },
-  headerTitle: {
-    fontSize: fonts.sizes.title,
-    fontWeight: '700',
-    color: colors.textLight,
-    marginBottom: spacing.md,
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  searchBarWrapper: {
+    flex: 1,
   },
   listContent: {
     paddingHorizontal: spacing.md,

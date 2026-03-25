@@ -1,10 +1,12 @@
 // EmptyState — placeholder cu icon si mesaj afisat cand o lista este goala.
 // Exemplu: "Nu sunt observatii in aceasta zona" sau "Niciun rezultat gasit".
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Inbox } from 'lucide-react-native';
-import { colors, fonts, spacing } from '../styles/theme';
+import { fonts, spacing } from '../styles/theme';
+import type { ThemeColors } from '../styles/theme';
+import { useThemeColors } from '../hooks/useThemeColors';
 
 interface EmptyStateProps {
   message: string;
@@ -12,6 +14,9 @@ interface EmptyStateProps {
 }
 
 export function EmptyState({ message, icon }: EmptyStateProps) {
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   return (
     <View style={styles.container}>
       {icon || <Inbox size={48} color={colors.textSecondary} />}
@@ -20,7 +25,7 @@ export function EmptyState({ message, icon }: EmptyStateProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',

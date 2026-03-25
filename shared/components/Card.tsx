@@ -1,9 +1,11 @@
 // Card — container reutilizabil cu shadow, border radius si padding.
 // Baza vizuala pentru PlantCard, ModerationCard etc. Accepta onPress pentru navigare.
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { TouchableOpacity, View, StyleSheet, ViewStyle } from 'react-native';
-import { colors, spacing, borderRadius } from '../styles/theme';
+import { spacing, borderRadius } from '../styles/theme';
+import type { ThemeColors } from '../styles/theme';
+import { useThemeColors } from '../hooks/useThemeColors';
 
 interface CardProps {
   children: React.ReactNode;
@@ -12,6 +14,8 @@ interface CardProps {
 }
 
 export function Card({ children, onPress, style }: CardProps) {
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const Wrapper = onPress ? TouchableOpacity : View;
   return (
     <Wrapper
@@ -23,7 +27,7 @@ export function Card({ children, onPress, style }: CardProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
   card: {
     backgroundColor: colors.surface,
     borderRadius: borderRadius.lg,

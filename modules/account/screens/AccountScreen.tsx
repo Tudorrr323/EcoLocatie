@@ -1,15 +1,17 @@
 // AccountScreen — ecranul de profil al utilizatorului autentificat.
 // Afiseaza avatar, username, rol, email, data inregistrarii, setari si butonul de deconectare.
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { User, Mail, Calendar, LogOut, Settings, Shield } from 'lucide-react-native';
 import { useAuth } from '../../auth/hooks/useAuth';
-import { accountStyles } from '../styles/account.styles';
-import { colors } from '../../../shared/styles/theme';
+import { createAccountStyles } from '../styles/account.styles';
+import { useThemeColors } from '../../../shared/hooks/useThemeColors';
 import { Badge } from '../../../shared/components/Badge';
 
 const AccountScreen: React.FC = () => {
+  const colors = useThemeColors();
+  const accountStyles = useMemo(() => createAccountStyles(colors), [colors]);
   const { user, isAuthenticated, logout } = useAuth();
 
   if (!isAuthenticated || !user) {

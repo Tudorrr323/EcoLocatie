@@ -1,0 +1,57 @@
+import type { sightingsRo } from './ro';
+
+export const sightingsEn: typeof sightingsRo = {
+  steps: {
+    photo: 'Photo',
+    identify: 'Identify',
+    location: 'Location',
+    details: 'Details',
+  },
+  photo: {
+    title: 'Add a photo',
+    takePhoto: 'Take photo',
+    chooseGallery: 'Choose from gallery',
+    noImage: 'Tap to take a photo',
+    retake: 'Retake',
+  },
+  ai: {
+    title: 'AI identification results',
+    selectPlant: 'Choose plant',
+    analyzing: 'Identifying plant...',
+    confidence: 'Confidence',
+    select: 'Select',
+    manualSelect: 'Choose manually',
+    backToResults: 'Back to AI results',
+    searchPlaceholder: 'Search plant...',
+  },
+  location: {
+    title: 'Observation location',
+    useGPS: 'Current location',
+    chooseOnMap: 'Choose on map',
+    latitude: 'Latitude',
+    longitude: 'Longitude',
+    noLocation: 'Location has not been obtained yet.',
+    gpsError: 'Could not get GPS location',
+  },
+  details: {
+    title: 'Observation details',
+    selectedPlant: 'Selected plant',
+    comment: 'Comment (optional)',
+    commentPlaceholder: 'Other observations or details...',
+    submit: 'Save',
+    description: 'Description',
+    descriptionPlaceholder: 'Briefly describe what you observed...',
+    habitat: 'Habitat',
+    habitatPlaceholder: 'Area, soil type, sun exposure...',
+    harvestPeriod: 'Harvest period',
+    harvestPeriodPlaceholder: 'E.g.: May - August',
+    benefits: 'Benefits',
+    benefitsPlaceholder: 'Plant benefits, separated by commas...',
+    contraindications: 'Contraindications',
+    contraindicationsPlaceholder: 'Known contraindications, separated by commas...',
+  },
+  nav: {
+    back: 'Back',
+    next: 'Next',
+  },
+};

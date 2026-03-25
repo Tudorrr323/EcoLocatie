@@ -1,5 +1,7 @@
 # EcoLocație — Structura Proiectului
 
+> **NOTĂ PENTRU CLAUDE/GEMINI:** Actualizează OBLIGATORIU acest fișier ori de câte ori creezi un modul, componentă, hook sau orice resursă nouă semnificativă, pentru a menține documentația sincronizată cu codul.
+
 ## ARHITECTURA
 
 Proiectul e organizat pe module. Fiecare modul e o funcționalitate izolată cu propriile componente, hooks, repository, screens, styles și types. Tot ce e reutilizabil între module stă în `shared/`. Fișierele `index.ts` din fiecare modul exportă doar ce trebuie expus, restul rămâne intern.
@@ -15,18 +17,26 @@ ecolocatie/
 │   │   ├── index.tsx                       # → map module → MapScreen
 │   │   ├── encyclopedia.tsx                # → plants module → EncyclopediaScreen
 │   │   ├── add-sighting.tsx                # → sightings module → AddSightingScreen
-│   │   └── admin.tsx                       # → admin module → AdminScreen
+│   │   ├── my-plants.tsx                   # → account module → MyPlantsScreen
+│   │   ├── settings.tsx                    # → account module → SettingsScreen [TAB ACTIV]
+│   │   ├── account.tsx                     # → account module → AccountScreen [href: null, ascuns]
+│   │   └── admin.tsx                       # → admin module → AdminScreen [href: null, ascuns]
 │   ├── plant/[id].tsx                      # → plants module → PlantDetailScreen
 │   ├── login.tsx                           # → auth module → LoginScreen
 │   ├── register.tsx                        # → auth module → RegisterScreen
-│   └── _layout.tsx
+│   ├── privacy-policy.tsx                  # → auth module → PrivacyPolicyScreen [publica]
+│   ├── terms.tsx                           # → auth module → TermsScreen [publica]
+│   ├── about.tsx                           # → account module → AboutScreen [publica]
+│   ├── forgot-password.tsx                 # → auth module → ForgotPasswordScreen [publica]
+│   ├── edit-profile.tsx                    # → account module → EditProfileScreen
+│   ├── account-security.tsx                # → account module → AccountSecurityScreen
+│   └── _layout.tsx                         # AuthProvider + guard navigare
 │
 ├── modules/
 │   ├── map/
 │   │   ├── components/
-│   │   │   ├── InteractiveMap.tsx
+│   │   │   ├── InteractiveMap.tsx          # WebView + Leaflet
 │   │   │   ├── PlantMarker.tsx
-│   │   │   ├── FilterPanel.tsx
 │   │   │   └── LocationPicker.tsx
 │   │   ├── hooks/
 │   │   │   └── useMapFilters.ts
@@ -61,7 +71,8 @@ ecolocatie/
 │   ├── sightings/
 │   │   ├── components/
 │   │   │   ├── CreatePOIForm.tsx
-│   │   │   ├── PhotoCapture.tsx
+│   │   │   ├── PhotoCapture.tsx            # expo-image-picker integration
+│   │   │   ├── CameraScreen.tsx            # expo-camera implementation
 │   │   │   ├── AIResultsPreview.tsx
 │   │   │   └── POICallout.tsx
 │   │   ├── hooks/
@@ -93,34 +104,54 @@ ecolocatie/
 │   │   │   └── admin.types.ts
 │   │   └── index.ts
 │   │
+│   ├── account/
+│   │   ├── screens/
+│   │   │   ├── AccountScreen.tsx           # profil simplu (ascuns din navigare)
+│   │   │   ├── SettingsScreen.tsx          # tab Setări activ — profil + setări + legal + logout
+│   │   │   ├── EditProfileScreen.tsx       # editare profil: avatar, nume, email (readonly), telefon, data nasterii
+│   │   │   ├── AccountSecurityScreen.tsx   # cont & securitate: schimba parola, dezactivare cont
+│   │   │   └── AboutScreen.tsx             # pagina Despre EcoLocation
+│   │   ├── styles/
+│   │   │   └── account.styles.ts
+│   │   └── index.ts
+│   │
 │   └── auth/
 │       ├── components/
-│       │   └── AuthForm.tsx
+│       │   └── AuthForm.tsx                # formular legacy (nefolosit activ)
 │       ├── hooks/
-│       │   └── useAuth.ts
+│       │   └── useAuth.ts                  # re-export din shared/context/AuthContext
 │       ├── repository/
-│       │   └── authRepository.ts
+│       │   └── authRepository.ts           # login prin email, register cu date complete
 │       ├── screens/
-│       │   ├── LoginScreen.tsx
-│       │   └── RegisterScreen.tsx
+│       │   ├── LoginScreen.tsx             # design modern, email+parola, loading overlay
+│       │   ├── RegisterScreen.tsx          # firstName, lastName, email, parola x2, DatePicker, phone
+│       │   ├── ForgotPasswordScreen.tsx    # flow 3 pasi: email, parola noua, succes
+│       │   ├── PrivacyPolicyScreen.tsx     # 10 sectiuni GDPR
+│       │   └── TermsScreen.tsx             # 13 sectiuni T&C + avertisment medical
 │       ├── styles/
 │       │   └── auth.styles.ts
 │       ├── types/
-│       │   └── auth.types.ts
+│       │   └── auth.types.ts               # AuthState, LoginCredentials, RegisterData
 │       └── index.ts
 │
 ├── shared/
-│   ├── components/
-│   ├── hooks/
-│   ├── repository/
-│   ├── styles/
-│   ├── types/
-│   ├── utils/
-│   └── constants/
+│   ├── components/                         # Common UI (Button, Input, Badge, DatePickerModal etc.)
+│   ├── context/                            # React Context (AuthContext)
+│   ├── hooks/                              # Global hooks (useLocation, useLocalStorage, usePagination, useThemeColors)
+│   ├── i18n/                               # Traduceri shared + hook useTranslation
+│   │   ├── ro.ts                           # Traduceri romana (tabs, common, pagination, etc.)
+│   │   ├── en.ts                           # Traduceri engleza
+│   │   └── index.ts                        # Hook useTranslation() + merge toate traducerile
+│   ├── repository/                         # Centralized data (dataProvider)
+│   ├── styles/                             # Theme (colors, fonts, spacing, borderRadius)
+│   ├── types/                              # Global interfaces (Plant, User, POI)
+│   ├── utils/                              # Helpers (formatDate, coordinates, sightingGuard)
+│   └── constants/                          # Global config (GALATI_CENTER)
 │
+├── assets/
+│   └── SmallLogoEcoLocation.png            # Logo aplicatie (folosit in AppHeader, SettingsScreen)
 ├── data/
 │   └── ecolocatie_data.json
-│
 ├── app.json
 ├── package.json
 └── tsconfig.json

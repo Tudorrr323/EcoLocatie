@@ -2,11 +2,13 @@
 // Afiseaza markere colorate per planta, popup-uri cu detalii si locatia utilizatorului in timp real.
 // Expune o referinta (MapRef) pentru flyTo() si updateUserLocation() din exterior.
 
-import React, { useRef, useImperativeHandle, forwardRef } from 'react';
+import React, { useRef, useImperativeHandle, forwardRef, useEffect, useMemo } from 'react';
 import { View } from 'react-native';
 import { WebView } from 'react-native-webview';
 import type { MarkerData } from '../types/map.types';
-import { mapStyles } from '../styles/map.styles';
+import { createMapStyles } from '../styles/map.styles';
+import { useThemeColors } from '../../../shared/hooks/useThemeColors';
+import { useSettings } from '../../../shared/context/SettingsContext';
 
 export interface MapRef {
   flyTo: (lat: number, lng: number, zoom?: number) => void;
@@ -21,20 +23,14 @@ interface InteractiveMapProps {
   onMapReady?: () => void;
 }
 
-function buildHtml(markers: MarkerData[]): string {
-  const markersJson = JSON.stringify(
-    markers.map((m) => ({
-      id: m.id,
-      lat: m.latitude,
-      lng: m.longitude,
-      color: m.plant.icon_color || '#4CAF50',
-      name: m.plant.name_ro,
-      nameLatin: m.plant.name_latin,
-      confidence: Math.round(m.ai_confidence * 100),
-      comment: m.comment || '',
-      date: new Date(m.created_at).toLocaleDateString('ro-RO'),
-    }))
-  );
+function buildBaseHtml(isDark: boolean): string {
+  const tileUrl = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+  const tileFilter = isDark
+    ? 'filter: invert(90%) hue-rotate(180deg) brightness(110%) contrast(85%) saturate(90%);'
+    : '';
+  const mapBg = isDark ? '#121212' : '#f0f0f0';
+  const labelColor = isDark ? '#E8E8E8' : '#212121';
+  const labelBg = isDark ? 'rgba(30,30,30,0.92)' : 'rgba(255,255,255,0.92)';
 
   return `
 <!DOCTYPE html>
@@ -45,7 +41,8 @@ function buildHtml(markers: MarkerData[]): string {
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     * { margin: 0; padding: 0; }
-    #map { width: 100vw; height: 100vh; }
+    #map { width: 100vw; height: 100vh; background: ${mapBg}; }
+    .leaflet-tile-pane { ${tileFilter} }
     .custom-marker {
       display: flex;
       flex-direction: column;
@@ -59,8 +56,8 @@ function buildHtml(markers: MarkerData[]): string {
       margin-top: 1px;
       font-size: 9px;
       font-weight: 600;
-      color: #212121;
-      background: rgba(255,255,255,0.92);
+      color: ${labelColor};
+      background: ${labelBg};
       padding: 1px 5px;
       border-radius: 4px;
       white-space: nowrap;
@@ -86,13 +83,15 @@ function buildHtml(markers: MarkerData[]): string {
       zoomControl: false
     }).setView([45.4353, 28.008], 13);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap',
-      maxZoom: 18,
+    L.tileLayer('${tileUrl}', {
+      attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+      maxZoom: 19,
       minZoom: 10
     }).addTo(map);
 
-    var markers = ${markersJson};
+    var markerLayer = L.layerGroup().addTo(map);
+    var userMarker = null;
+    var programmaticMove = false;
 
     function pinSvg(color) {
       return '<svg class="marker-pin-svg" width="28" height="36" viewBox="0 0 28 36" xmlns="http://www.w3.org/2000/svg">'
@@ -101,26 +100,27 @@ function buildHtml(markers: MarkerData[]): string {
         + '</svg>';
     }
 
-    markers.forEach(function(m) {
-      var icon = L.divIcon({
-        className: 'custom-marker',
-        html: pinSvg(m.color) + '<div class="marker-label">' + m.name + '</div>',
-        iconSize: [28, 42],
-        iconAnchor: [14, 36],
-      });
-
-      L.marker([m.lat, m.lng], { icon: icon })
-        .addTo(map)
-        .on('click', function(e) {
-          e.originalEvent._markerClicked = true;
-          map.flyTo([m.lat, m.lng], Math.max(map.getZoom(), 15), { duration: 0.5 });
-          window.ReactNativeWebView && window.ReactNativeWebView.postMessage(
-            JSON.stringify({ type: 'markerTap', id: m.id })
-          );
+    function updateMarkers(markers) {
+      markerLayer.clearLayers();
+      markers.forEach(function(m) {
+        var icon = L.divIcon({
+          className: 'custom-marker',
+          html: pinSvg(m.color) + '<div class="marker-label">' + m.name + '</div>',
+          iconSize: [28, 42],
+          iconAnchor: [14, 36],
         });
-    });
 
-    var userMarker = null;
+        L.marker([m.lat, m.lng], { icon: icon })
+          .addTo(markerLayer)
+          .on('click', function(e) {
+            e.originalEvent._markerClicked = true;
+            map.flyTo([m.lat, m.lng], Math.max(map.getZoom(), 15), { duration: 0.5 });
+            window.ReactNativeWebView && window.ReactNativeWebView.postMessage(
+              JSON.stringify({ type: 'markerTap', id: m.id })
+            );
+          });
+      });
+    }
 
     window.flyTo = function(lat, lng, zoom) {
       programmaticMove = true;
@@ -147,12 +147,11 @@ function buildHtml(markers: MarkerData[]): string {
         var msg = JSON.parse(e.data);
         if (msg.type === 'flyTo') window.flyTo(msg.lat, msg.lng, msg.zoom);
         if (msg.type === 'userLocation') window.updateUserLocation(msg.lat, msg.lng);
+        if (msg.type === 'updateMarkers') updateMarkers(msg.markers);
       } catch(err) {}
     }
     document.addEventListener('message', handleMessage);
     window.addEventListener('message', handleMessage);
-
-    var programmaticMove = false;
 
     map.on('dragstart', function() {
       window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'userDrag' }));
@@ -169,6 +168,9 @@ function buildHtml(markers: MarkerData[]): string {
         window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'mapTap' }));
       }
     });
+
+    // Notify that map is ready
+    window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'mapReady' }));
   </script>
 </body>
 </html>`;
@@ -176,7 +178,12 @@ function buildHtml(markers: MarkerData[]): string {
 
 const InteractiveMap = forwardRef<MapRef, InteractiveMapProps>(
   ({ markers, onUserDrag, onMarkerTap, onMapTap, onMapReady }, ref) => {
+    const colors = useThemeColors();
+    const { resolvedTheme } = useSettings();
+    const isDark = resolvedTheme === 'dark';
+    const mapStyles = useMemo(() => createMapStyles(colors), [colors]);
     const webViewRef = useRef<WebView>(null);
+    const isReady = useRef(false);
 
     useImperativeHandle(ref, () => ({
       flyTo: (lat: number, lng: number, zoom?: number) => {
@@ -191,11 +198,41 @@ const InteractiveMap = forwardRef<MapRef, InteractiveMapProps>(
       },
     }));
 
-    const html = buildHtml(markers);
+    const html = useMemo(() => buildBaseHtml(isDark), [isDark]);
+
+    useEffect(() => {
+      if (isReady.current) {
+        const markersJson = markers.map((m) => ({
+          id: m.id,
+          lat: m.latitude,
+          lng: m.longitude,
+          color: m.plant.icon_color || '#4CAF50',
+          name: m.plant.name_ro,
+        }));
+        webViewRef.current?.postMessage(
+          JSON.stringify({ type: 'updateMarkers', markers: markersJson })
+        );
+      }
+    }, [markers]);
 
     const handleWebViewMessage = (event: { nativeEvent: { data: string } }) => {
       try {
         const msg = JSON.parse(event.nativeEvent.data);
+        if (msg.type === 'mapReady') {
+          isReady.current = true;
+          // Initial markers update
+          const markersJson = markers.map((m) => ({
+            id: m.id,
+            lat: m.latitude,
+            lng: m.longitude,
+            color: m.plant.icon_color || '#4CAF50',
+            name: m.plant.name_ro,
+          }));
+          webViewRef.current?.postMessage(
+            JSON.stringify({ type: 'updateMarkers', markers: markersJson })
+          );
+          if (onMapReady) onMapReady();
+        }
         if (msg.type === 'userDrag' && onUserDrag) onUserDrag();
         if (msg.type === 'markerTap' && onMarkerTap) onMarkerTap(msg.id);
         if (msg.type === 'mapTap' && onMapTap) onMapTap();
@@ -216,7 +253,6 @@ const InteractiveMap = forwardRef<MapRef, InteractiveMapProps>(
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
           onMessage={handleWebViewMessage}
-          onLoadEnd={onMapReady}
         />
       </View>
     );

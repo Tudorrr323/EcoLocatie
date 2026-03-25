@@ -2,9 +2,10 @@
 // Include stiluri pentru statistici, lista utilizatori, carduri de moderare.
 
 import { StyleSheet } from 'react-native';
-import { colors, fonts, spacing, borderRadius } from '../../../shared/styles/theme';
+import { fonts, spacing, borderRadius } from '../../../shared/styles/theme';
+import type { ThemeColors } from '../../../shared/styles/theme';
 
-export const adminStyles = StyleSheet.create({
+export const createAdminStyles = (colors: ThemeColors) => StyleSheet.create({
   // ── Screen ───────────────────────────────────────────────
   screen: {
     flex: 1,

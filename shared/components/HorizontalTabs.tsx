@@ -1,7 +1,7 @@
 // HorizontalTabs — lista orizontala scrollabila de taburi.
 // Fiecare tab afiseaza un label, tab-ul activ e evidentiat. Continutul se schimba la apasare.
 
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,9 @@ import {
   StyleSheet,
   LayoutChangeEvent,
 } from 'react-native';
-import { colors, spacing, borderRadius, fonts } from '../styles/theme';
+import { spacing, borderRadius, fonts } from '../styles/theme';
+import type { ThemeColors } from '../styles/theme';
+import { useThemeColors } from '../hooks/useThemeColors';
 
 export interface Tab {
   key: string;
@@ -25,6 +27,9 @@ interface HorizontalTabsProps {
 }
 
 export function HorizontalTabs({ tabs, activeKey, onTabChange }: HorizontalTabsProps) {
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const scrollRef = useRef<ScrollView>(null);
   const tabPositions = useRef<Record<string, { x: number; width: number }>>({});
 
@@ -73,7 +78,7 @@ export function HorizontalTabs({ tabs, activeKey, onTabChange }: HorizontalTabsP
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
   container: {
     marginBottom: spacing.md,
   },

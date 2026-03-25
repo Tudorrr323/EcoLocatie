@@ -1,7 +1,7 @@
 // MapScreen — ecranul principal al aplicatiei cu harta interactiva.
 // Integreaza harta Leaflet, bara de cautare cu buton filtre si butonul GPS pentru localizare in timp real.
 
-import React, { useRef, useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useRef, useState, useCallback, useEffect, useMemo } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
@@ -9,67 +9,50 @@ import { Crosshair } from 'lucide-react-native';
 import { Image } from 'react-native';
 import { ImageViewer } from '../../../shared/components/ImageViewer';
 import { HorizontalTabs } from '../../../shared/components/HorizontalTabs';
-import { removeDiacritics } from '../../../shared/utils/removeDiacritics';
+import { AppHeader } from '../../../shared/components/AppHeader';
 import { useLocation } from '../../../shared/hooks/useLocation';
 import { useMapFilters } from '../hooks/useMapFilters';
-import { SearchBar } from '../../../shared/components/SearchBar';
+import { SearchBar, SearchBarRef } from '../../../shared/components/SearchBar';
 import { FilterButton } from '../../../shared/components/FilterButton';
-import { NotificationButton } from '../../../shared/components/NotificationButton';
 import { SwipeableBottomSheet } from '../../../shared/components/SwipeableBottomSheet';
 import InteractiveMap, { MapRef } from '../components/InteractiveMap';
-import FilterPanel from '../components/FilterPanel';
-import { mapStyles } from '../styles/map.styles';
-import { colors, fonts, spacing, borderRadius } from '../../../shared/styles/theme';
+import PlantFilterPanel from '../../../shared/components/PlantFilterPanel';
+import { createMapStyles } from '../styles/map.styles';
+import { useThemeColors } from '../../../shared/hooks/useThemeColors';
+import type { ThemeColors } from '../../../shared/styles/theme';
+import { fonts, spacing, borderRadius } from '../../../shared/styles/theme';
 import type { MarkerData } from '../types/map.types';
+import { Keyboard } from 'react-native';
+import { useTranslation } from '../../../shared/i18n';
 
 const MapScreen: React.FC = () => {
+  const colors = useThemeColors();
+  const t = useTranslation();
+  const mapStyles = useMemo(() => createMapStyles(colors), [colors]);
+  const poiStyles = useMemo(() => createPoiStyles(colors), [colors]);
+  const suggestionStyles = useMemo(() => createSuggestionStyles(colors), [colors]);
   const mapRef = useRef<MapRef>(null);
+  const searchBarRef = useRef<SearchBarRef>(null);
   const [filterPanelVisible, setFilterPanelVisible] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [centeredOnUser, setCenteredOnUser] = useState(false);
   const [selectedMarker, setSelectedMarker] = useState<MarkerData | null>(null);
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
   const [imgPressed, setImgPressed] = useState(false);
   const [activeTab, setActiveTab] = useState('prezentare');
+  const [searchAreaHeight, setSearchAreaHeight] = useState(0);
 
-  const { filters, setFilters, filteredMarkers, allPlants, refreshMarkers } = useMapFilters();
+  const { filters, setFilters, displayedMarkers, suggestions, allPlants, setSearchQuery, refreshMarkers } = useMapFilters();
 
   useFocusEffect(useCallback(() => {
     refreshMarkers();
   }, [refreshMarkers]));
   const { location, getLocation, loading: locationLoading, watching, startWatching } = useLocation();
 
-  const displayedMarkers = useMemo(() => {
-    if (!searchQuery.trim()) return filteredMarkers;
-    const q = removeDiacritics(searchQuery.toLowerCase());
-    return filteredMarkers.filter(
-      (m) =>
-        removeDiacritics(m.plant.name_ro.toLowerCase()).includes(q) ||
-        removeDiacritics(m.plant.name_latin.toLowerCase()).includes(q)
-    );
-  }, [filteredMarkers, searchQuery]);
-
-  const suggestions = useMemo(() => {
-    if (!searchQuery.trim()) return [];
-    const q = removeDiacritics(searchQuery.toLowerCase());
-    const seen = new Set<number>();
-    const results: typeof filteredMarkers = [];
-    for (const m of filteredMarkers) {
-      if (seen.has(m.plant.id)) continue;
-      if (
-        removeDiacritics(m.plant.name_ro.toLowerCase()).includes(q) ||
-        removeDiacritics(m.plant.name_latin.toLowerCase()).includes(q)
-      ) {
-        seen.add(m.plant.id);
-        results.push(m);
-        if (results.length >= 3) break;
-      }
-    }
-    return results;
-  }, [filteredMarkers, searchQuery]);
-
   const handleSuggestionPress = useCallback((marker: MarkerData) => {
     setSearchQuery('');
+    searchBarRef.current?.clear();
+    searchBarRef.current?.blur();
+    Keyboard.dismiss();
     mapRef.current?.flyTo(marker.latitude, marker.longitude, 16);
     setSelectedMarker(marker);
     setActiveTab('prezentare');
@@ -127,27 +110,63 @@ const MapScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={mapStyles.container}>
-      <View style={mapStyles.header}>
-        <Image source={require('../../../assets/SmallLogoEcoLocation.png')} style={{ width: 36, height: 36 }} resizeMode="contain" />
-        <Text style={mapStyles.headerTitle}>
-          <Text style={{ color: colors.logoGreen }}>Eco</Text>
-          <Text style={{ color: colors.logoTeal }}>Location</Text>
-        </Text>
-        <View style={mapStyles.headerActions}>
-          <NotificationButton />
-        </View>
-      </View>
+      <AppHeader />
 
-      <View style={[mapStyles.searchContainer, { zIndex: 10 }]}>
-        <View style={mapStyles.searchRow}>
-          <View style={mapStyles.searchBarWrapper}>
-            <SearchBar placeholder="Cauta plante..." onSearch={setSearchQuery} />
+      <View style={{ flex: 1 }}>
+        <View
+          style={mapStyles.searchContainer}
+          onLayout={(e) => setSearchAreaHeight(e.nativeEvent.layout.height)}
+        >
+          <View style={mapStyles.searchRow}>
+            <View style={mapStyles.searchBarWrapper}>
+              <SearchBar
+                ref={searchBarRef}
+                placeholder={t.map.searchPlaceholder}
+                onSearch={setSearchQuery}
+              />
+            </View>
+            <FilterButton onPress={() => setFilterPanelVisible(true)} />
           </View>
-          <FilterButton onPress={() => setFilterPanelVisible(true)} />
+        </View>
+
+        <View style={mapStyles.mapWrapper}>
+        <InteractiveMap
+          ref={mapRef}
+          markers={displayedMarkers}
+          onUserDrag={handleUserDrag}
+          onMarkerTap={handleMarkerTap}
+          onMapTap={handleMapTap}
+          onMapReady={() => {
+            if (location) {
+              setTimeout(() => {
+                mapRef.current?.updateUserLocation(location.latitude, location.longitude);
+              }, 300);
+            }
+          }}
+        />
+
+        <TouchableOpacity
+          style={mapStyles.gpsButton}
+          onPress={handleGPS}
+          activeOpacity={0.8}
+          disabled={locationLoading}
+        >
+          <Crosshair
+            size={24}
+            color={centeredOnUser ? colors.primary : colors.text}
+            fill={centeredOnUser ? colors.primary : 'none'}
+          />
+        </TouchableOpacity>
         </View>
 
         {suggestions.length > 0 && (
-          <View style={suggestionStyles.container}>
+          <View style={[suggestionStyles.container, {
+            position: 'absolute',
+            top: searchAreaHeight + spacing.xs,
+            left: spacing.md,
+            right: spacing.md,
+            zIndex: 20,
+          }]}>
             {suggestions.map((marker, index) => (
               <TouchableOpacity
                 key={marker.id}
@@ -181,44 +200,11 @@ const MapScreen: React.FC = () => {
         )}
       </View>
 
-      <View style={mapStyles.mapWrapper}>
-        <InteractiveMap
-          ref={mapRef}
-          markers={displayedMarkers}
-          onUserDrag={handleUserDrag}
-          onMarkerTap={handleMarkerTap}
-          onMapTap={handleMapTap}
-          onMapReady={() => {
-            if (location) {
-              setTimeout(() => {
-                mapRef.current?.updateUserLocation(location.latitude, location.longitude);
-              }, 300);
-            }
-          }}
-        />
-
-        <TouchableOpacity
-          style={mapStyles.gpsButton}
-          onPress={handleGPS}
-          activeOpacity={0.8}
-          disabled={locationLoading}
-        >
-          <Crosshair
-            size={24}
-            color={centeredOnUser ? colors.primary : colors.text}
-            fill={centeredOnUser ? colors.primary : 'none'}
-          />
-        </TouchableOpacity>
-      </View>
-
-      <FilterPanel
+      <PlantFilterPanel
         visible={filterPanelVisible}
         allPlants={allPlants}
-        currentFilter={filters}
-        onApply={(newFilter) => {
-          setFilters(newFilter);
-          setFilterPanelVisible(false);
-        }}
+        selectedPlantIds={filters.selectedPlantIds}
+        onApply={(ids) => setFilters({ ...filters, selectedPlantIds: ids })}
         onClose={() => setFilterPanelVisible(false)}
       />
 
@@ -268,10 +254,10 @@ const MapScreen: React.FC = () => {
           <View style={{ flex: 1 }}>
             <HorizontalTabs
               tabs={[
-                { key: 'prezentare', label: 'Prezentare', content: null },
-                { key: 'beneficii', label: 'Beneficii', content: null },
-                { key: 'contraindicatii', label: 'Contraindicatii', content: null },
-                { key: 'detalii', label: 'Detalii', content: null },
+                { key: 'prezentare', label: t.map.tabs.overview, content: null },
+                { key: 'beneficii', label: t.map.tabs.benefits, content: null },
+                { key: 'contraindicatii', label: t.map.tabs.contraindications, content: null },
+                { key: 'detalii', label: t.map.tabs.details, content: null },
               ]}
               activeKey={activeTab}
               onTabChange={setActiveTab}
@@ -289,7 +275,7 @@ const MapScreen: React.FC = () => {
                   </Text>
                   {selectedMarker.comment ? (
                     <>
-                      <Text style={poiStyles.sectionTitle}>Comentariu</Text>
+                      <Text style={poiStyles.sectionTitle}>{t.map.sections.comment}</Text>
                       <Text style={poiStyles.sectionText}>{selectedMarker.comment}</Text>
                     </>
                   ) : null}
@@ -307,7 +293,7 @@ const MapScreen: React.FC = () => {
                   )}
                   {selectedMarker.plant.parts_used.length > 0 && (
                     <>
-                      <Text style={[poiStyles.sectionTitle, { marginTop: spacing.md }]}>Parti utilizabile</Text>
+                      <Text style={[poiStyles.sectionTitle, { marginTop: spacing.md }]}>{t.map.sections.partsUsed}</Text>
                       {selectedMarker.plant.parts_used.map((p, i) => (
                         <Text key={i} style={poiStyles.bulletItem}>• {p}</Text>
                       ))}
@@ -330,17 +316,17 @@ const MapScreen: React.FC = () => {
 
               {activeTab === 'detalii' && (
                 <>
-                  <Text style={poiStyles.sectionTitle}>Habitat</Text>
+                  <Text style={poiStyles.sectionTitle}>{t.map.sections.habitat}</Text>
                   <Text style={poiStyles.sectionText}>
                     {selectedMarker.habitat || selectedMarker.plant.habitat}
                   </Text>
 
-                  <Text style={poiStyles.sectionTitle}>Perioada de recoltare</Text>
+                  <Text style={poiStyles.sectionTitle}>{t.map.sections.harvestPeriod}</Text>
                   <Text style={poiStyles.sectionText}>
                     {selectedMarker.harvest_period || selectedMarker.plant.harvest_period}
                   </Text>
 
-                  <Text style={poiStyles.sectionTitle}>Mod de preparare</Text>
+                  <Text style={poiStyles.sectionTitle}>{t.map.sections.preparation}</Text>
                   <Text style={poiStyles.sectionText}>
                     {selectedMarker.plant.preparation}
                   </Text>
@@ -357,7 +343,7 @@ const MapScreen: React.FC = () => {
   );
 };
 
-const poiStyles = StyleSheet.create({
+const createPoiStyles = (colors: ThemeColors) => StyleSheet.create({
   headerDrag: {
     paddingHorizontal: spacing.md,
   },
@@ -440,11 +426,10 @@ const poiStyles = StyleSheet.create({
   },
 });
 
-const suggestionStyles = StyleSheet.create({
+const createSuggestionStyles = (colors: ThemeColors) => StyleSheet.create({
   container: {
     backgroundColor: colors.surface,
     borderRadius: borderRadius.lg,
-    marginTop: spacing.xs,
     ...Platform.select({
       ios: {
         shadowColor: '#000',

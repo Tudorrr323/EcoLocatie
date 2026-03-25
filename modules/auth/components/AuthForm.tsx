@@ -1,13 +1,14 @@
 // AuthForm — formular reutilizabil pentru login si register.
 // Contine campuri email/parola, buton submit si link catre cealalta pagina de auth.
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Input } from '../../../shared/components/Input';
 import { Button } from '../../../shared/components/Button';
 import { useAuth } from '../hooks/useAuth';
-import { authStyles } from '../styles/auth.styles';
+import { createAuthStyles } from '../styles/auth.styles';
+import { useThemeColors } from '../../../shared/hooks/useThemeColors';
 
 interface AuthFormProps {
   mode: 'login' | 'register';
@@ -15,6 +16,8 @@ interface AuthFormProps {
 }
 
 export function AuthForm({ mode, onSuccess }: AuthFormProps) {
+  const colors = useThemeColors();
+  const authStyles = useMemo(() => createAuthStyles(colors), [colors]);
   const router = useRouter();
   const { login, register } = useAuth();
 

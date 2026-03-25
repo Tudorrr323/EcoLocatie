@@ -1,9 +1,11 @@
 // Input — camp de text reutilizabil cu label, placeholder si validare vizuala.
 // Suporta multiline pentru comentarii. Folosit in auth, creare POI, search.
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, TextInput, StyleSheet, TextInputProps } from 'react-native';
-import { colors, fonts, spacing, borderRadius } from '../styles/theme';
+import { fonts, spacing, borderRadius } from '../styles/theme';
+import type { ThemeColors } from '../styles/theme';
+import { useThemeColors } from '../hooks/useThemeColors';
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -11,6 +13,9 @@ interface InputProps extends TextInputProps {
 }
 
 export function Input({ label, error, style, ...props }: InputProps) {
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   return (
     <View style={styles.container}>
       {label && <Text style={styles.label}>{label}</Text>}
@@ -24,7 +29,7 @@ export function Input({ label, error, style, ...props }: InputProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
   container: {
     marginBottom: spacing.md,
   },

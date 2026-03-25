@@ -1,7 +1,8 @@
 // theme — defineste culorile, fonturile, spacing-ul si border radius-ul aplicatiei.
 // Toate stilurile din module importa valorile de aici pentru consistenta vizuala.
+// Pentru dark mode, componentele folosesc useThemeColors() care returneaza paleta corecta.
 
-export const colors = {
+export const lightColors = {
   primary: '#6AAE35',
   primaryLight: '#8BC34A',
   primaryDark: '#4E8C2A',
@@ -20,7 +21,44 @@ export const colors = {
   logoGreen: '#6AAE35',
   logoTeal: '#1A9D94',
   tabActive: '#22C55E',
+  black: '#000000',
+  flashTorch: '#FFD600',
+  filterDotBorder: 'rgba(0,0,0,0.1)',
+  errorBackground: '#FFEBEE',
+  placeholderText: '#BDBDBD',
 } as const;
+
+export type ThemeColors = { [K in keyof typeof lightColors]: string };
+
+export const darkColors: ThemeColors = {
+  primary: '#7CC142',
+  primaryLight: '#9CD45E',
+  primaryDark: '#5A9A30',
+  secondary: '#FFB300',
+  secondaryLight: '#FFC94D',
+  background: '#121212',
+  surface: '#1E1E1E',
+  text: '#E8E8E8',
+  textSecondary: '#A0A0A0',
+  textLight: '#FFFFFF',
+  error: '#EF5350',
+  success: '#4CAF50',
+  warning: '#FFB74D',
+  border: '#333333',
+  overlay: 'rgba(0, 0, 0, 0.7)',
+  logoGreen: '#7CC142',
+  logoTeal: '#26B5AB',
+  tabActive: '#34D399',
+  black: '#000000',
+  flashTorch: '#FFD600',
+  filterDotBorder: 'rgba(255,255,255,0.15)',
+  errorBackground: '#3D1515',
+  placeholderText: '#666666',
+};
+
+// Alias pentru compatibilitate — folosit doar in cod non-React (ex: sightingGuard).
+// In componente React, foloseste INTOTDEAUNA useThemeColors().
+export const colors = lightColors;
 
 export const fonts = {
   regular: { fontWeight: '400' as const },

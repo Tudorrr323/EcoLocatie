@@ -39,9 +39,15 @@ export interface User {
   id: number;
   username: string;
   email: string;
+  password?: string;
   role: 'admin' | 'user';
   created_at: string;
   is_active: boolean;
+  first_name?: string;
+  last_name?: string;
+  phone?: string;
+  birth_date?: string;
+  profile_image?: string;
 }
 
 export interface MapConfig {

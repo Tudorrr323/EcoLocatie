@@ -1,11 +1,11 @@
 // POICallout — tooltip/callout afisat la tap pe un marker de pe harta.
 // Arata numele plantei, data observatiei, nivelul de siguranta AI si comentariul.
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text } from 'react-native';
 import { formatDate } from '../../../shared/utils/formatDate';
-import { sightingsStyles } from '../styles/sightings.styles';
-import { colors } from '../../../shared/styles/theme';
+import { createSightingsStyles } from '../styles/sightings.styles';
+import { useThemeColors } from '../../../shared/hooks/useThemeColors';
 
 interface POICalloutProps {
   plantName: string;
@@ -15,13 +15,16 @@ interface POICalloutProps {
   comment: string;
 }
 
-function getConfidenceColor(confidence: number): string {
-  if (confidence > 0.9) return colors.success;
-  if (confidence >= 0.8) return colors.warning;
-  return '#FF8F00';
-}
-
 export function POICallout({ plantName, username, createdAt, confidence, comment }: POICalloutProps) {
+  const colors = useThemeColors();
+  const sightingsStyles = useMemo(() => createSightingsStyles(colors), [colors]);
+
+  function getConfidenceColor(conf: number): string {
+    if (conf > 0.9) return colors.success;
+    if (conf >= 0.8) return colors.warning;
+    return '#FF8F00';
+  }
+
   const pct = Math.round(confidence * 100);
   const confidenceColor = getConfidenceColor(confidence);
   const formattedDate = formatDate(createdAt);

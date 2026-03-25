@@ -1,12 +1,13 @@
 // AIResultsPreview — afiseaza top 3 rezultate mock de la identificarea AI a plantei.
 // Fiecare rezultat are nume, confidence si buton de selectare. Include fallback la alegere manuala.
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Button } from '../../../shared/components/Button';
 import type { AIResult } from '../types/sightings.types';
-import { sightingsStyles } from '../styles/sightings.styles';
-import { colors } from '../../../shared/styles/theme';
+import { createSightingsStyles } from '../styles/sightings.styles';
+import { useThemeColors } from '../../../shared/hooks/useThemeColors';
+import { useTranslation } from '../../../shared/i18n';
 
 interface AIResultsPreviewProps {
   results: AIResult[];
@@ -15,18 +16,22 @@ interface AIResultsPreviewProps {
   onManualSelect: () => void;
 }
 
-function getConfidenceColor(confidence: number): string {
-  if (confidence > 0.9) return colors.success;
-  if (confidence >= 0.8) return colors.warning;
-  return colors.secondary;
-}
-
 export function AIResultsPreview({ results, loading, onSelect, onManualSelect }: AIResultsPreviewProps) {
+  const colors = useThemeColors();
+  const t = useTranslation();
+  const sightingsStyles = useMemo(() => createSightingsStyles(colors), [colors]);
+
+  function getConfidenceColor(confidence: number): string {
+    if (confidence > 0.9) return colors.success;
+    if (confidence >= 0.8) return colors.warning;
+    return colors.secondary;
+  }
+
   if (loading) {
     return (
       <View style={sightingsStyles.aiLoadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={sightingsStyles.aiLoadingText}>Se identifica planta...</Text>
+        <Text style={sightingsStyles.aiLoadingText}>{t.sightings.ai.analyzing}</Text>
       </View>
     );
   }
@@ -63,14 +68,14 @@ export function AIResultsPreview({ results, loading, onSelect, onManualSelect }:
               onPress={() => onSelect(result)}
               activeOpacity={0.7}
             >
-              <Text style={sightingsStyles.aiSelectButtonText}>Selecteaza</Text>
+              <Text style={sightingsStyles.aiSelectButtonText}>{t.sightings.ai.select}</Text>
             </TouchableOpacity>
           </View>
         );
       })}
 
       <Button
-        title="Alege manual"
+        title={t.sightings.ai.manualSelect}
         onPress={onManualSelect}
         variant="ghost"
         style={sightingsStyles.aiManualButton}

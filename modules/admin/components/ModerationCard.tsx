@@ -1,18 +1,20 @@
 // ModerationCard — card pentru o observatie in asteptare de aprobare.
 // Afiseaza detaliile POI-ului cu butoane Aproba/Respinge pentru admin.
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Card } from '../../../shared/components/Card';
 import { Button } from '../../../shared/components/Button';
 import { formatDate } from '../../../shared/utils/formatDate';
 import { getPlantById } from '../../../shared/repository/dataProvider';
 import {
-  colors,
   fonts,
   spacing,
   borderRadius,
 } from '../../../shared/styles/theme';
+import type { ThemeColors } from '../../../shared/styles/theme';
+import { useThemeColors } from '../../../shared/hooks/useThemeColors';
+import { useTranslation } from '../../../shared/i18n';
 import type { PointOfInterest } from '../../../shared/types/plant.types';
 import type { ModerationAction } from '../types/admin.types';
 
@@ -22,6 +24,9 @@ interface ModerationCardProps {
 }
 
 export function ModerationCard({ poi, onModerate }: ModerationCardProps) {
+  const colors = useThemeColors();
+  const t = useTranslation();
+  const styles = useMemo(() => createModerationCardStyles(colors), [colors]);
   const plant = getPlantById(poi.plant_id);
   const confidencePercent = Math.round(poi.ai_confidence * 100);
 
@@ -45,19 +50,19 @@ export function ModerationCard({ poi, onModerate }: ModerationCardProps) {
 
       <View style={styles.detailsGrid}>
         <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Coordonate</Text>
+          <Text style={styles.detailLabel}>{t.admin.moderation.coordinates}</Text>
           <Text style={styles.detailValue}>
             {poi.latitude.toFixed(4)}, {poi.longitude.toFixed(4)}
           </Text>
         </View>
 
         <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Data</Text>
+          <Text style={styles.detailLabel}>{t.admin.moderation.date}</Text>
           <Text style={styles.detailValue}>{formatDate(poi.created_at)}</Text>
         </View>
 
         <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Incredere AI</Text>
+          <Text style={styles.detailLabel}>{t.admin.moderation.confidence}</Text>
           <View style={styles.confidenceBadge}>
             <View
               style={[
@@ -74,20 +79,20 @@ export function ModerationCard({ poi, onModerate }: ModerationCardProps) {
 
       {poi.comment ? (
         <View style={styles.commentBox}>
-          <Text style={styles.detailLabel}>Comentariu</Text>
+          <Text style={styles.detailLabel}>{t.admin.moderation.comment}</Text>
           <Text style={styles.commentText}>{poi.comment}</Text>
         </View>
       ) : null}
 
       <View style={styles.actions}>
         <Button
-          title="Aproba"
+          title={t.admin.moderation.approve}
           variant="primary"
           onPress={() => onModerate(poi.id, 'approve')}
           style={styles.approveButton}
         />
         <Button
-          title="Respinge"
+          title={t.admin.moderation.reject}
           variant="danger"
           onPress={() => onModerate(poi.id, 'reject')}
           style={styles.rejectButton}
@@ -97,7 +102,7 @@ export function ModerationCard({ poi, onModerate }: ModerationCardProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const createModerationCardStyles = (colors: ThemeColors) => StyleSheet.create({
   card: {
     marginBottom: spacing.md,
   },

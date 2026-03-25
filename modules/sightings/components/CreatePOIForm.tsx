@@ -1,7 +1,7 @@
 // CreatePOIForm — formularul complet pentru crearea unei observatii noi (POI).
 // Integreaza captura foto, rezultatele AI, selectia locatiei GPS si comentariul utilizatorului.
 
-import React, { useState, useCallback, useImperativeHandle, forwardRef } from 'react';
+import React, { useState, useCallback, useImperativeHandle, forwardRef, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,8 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
 } from 'react-native';
+import { SearchBar } from '../../../shared/components/SearchBar';
+import { sightingGuard } from '../../../shared/utils/sightingGuard';
 import { PhotoCapture } from './PhotoCapture';
 import { CameraScreen } from './CameraScreen';
 import { AIResultsPreview } from './AIResultsPreview';
@@ -21,13 +23,12 @@ import { useMockIdentify } from '../hooks/useMockIdentify';
 import { useLocation } from '../../../shared/hooks/useLocation';
 import type { SightingDraft, AIResult } from '../types/sightings.types';
 import type { Plant } from '../../../shared/types/plant.types';
-import { sightingsStyles } from '../styles/sightings.styles';
-import { colors } from '../../../shared/styles/theme';
+import { createSightingsStyles } from '../styles/sightings.styles';
+import { useThemeColors } from '../../../shared/hooks/useThemeColors';
+import { useTranslation } from '../../../shared/i18n';
 import { getPlants } from '../../../shared/repository/dataProvider';
 
 type Step = 1 | 2 | 3 | 4;
-
-const STEP_LABELS = ['Foto', 'Identificare', 'Locatie', 'Detalii'];
 
 interface StepIndicatorProps {
   currentStep: Step;
@@ -36,9 +37,14 @@ interface StepIndicatorProps {
 }
 
 function StepIndicator({ currentStep, maxStepReached, onStepPress }: StepIndicatorProps) {
+  const colors = useThemeColors();
+  const t = useTranslation();
+  const sightingsStyles = useMemo(() => createSightingsStyles(colors), [colors]);
+  const stepLabels = [t.sightings.steps.photo, t.sightings.steps.identify, t.sightings.steps.location, t.sightings.steps.details];
+
   return (
     <View style={sightingsStyles.stepIndicatorContainer}>
-      {STEP_LABELS.map((label, index) => {
+      {stepLabels.map((label, index) => {
         const stepNum = (index + 1) as Step;
         const isActive = stepNum === currentStep;
         const isDone = stepNum <= maxStepReached && stepNum !== currentStep;
@@ -114,12 +120,16 @@ const EMPTY_DRAFT: SightingDraft = {
 };
 
 export const CreatePOIForm = forwardRef<CreatePOIFormRef, CreatePOIFormProps>(function CreatePOIForm({ onSubmit }, ref) {
+  const colors = useThemeColors();
+  const t = useTranslation();
+  const sightingsStyles = useMemo(() => createSightingsStyles(colors), [colors]);
   const [step, setStep] = useState<Step>(1);
   const [maxStepReached, setMaxStepReached] = useState<Step>(1);
   const [draft, setDraft] = useState<SightingDraft>(EMPTY_DRAFT);
   const [showManualSelector, setShowManualSelector] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [showMapPicker, setShowMapPicker] = useState(false);
+  const [manualQuery, setManualQuery] = useState('');
 
   const goToStep = useCallback((s: Step) => {
     setStep(s);
@@ -129,6 +139,10 @@ export const CreatePOIForm = forwardRef<CreatePOIFormRef, CreatePOIFormProps>(fu
   const { results: aiResults, loading: aiLoading, identify, reset: resetAI } = useMockIdentify();
   const { location, loading: locationLoading, error: locationError, getLocation } = useLocation();
 
+  useEffect(() => {
+    sightingGuard.hasProgress = step > 1 || draft.imageUri !== null;
+  }, [step, draft.imageUri]);
+
   useImperativeHandle(ref, () => ({
     reset: () => {
       setStep(1);
@@ -137,7 +151,9 @@ export const CreatePOIForm = forwardRef<CreatePOIFormRef, CreatePOIFormProps>(fu
       setShowManualSelector(false);
       setShowCamera(false);
       setShowMapPicker(false);
+      setManualQuery('');
       resetAI();
+      sightingGuard.hasProgress = false;
     },
   }));
 
@@ -178,6 +194,7 @@ export const CreatePOIForm = forwardRef<CreatePOIFormRef, CreatePOIFormProps>(fu
   const handlePlantSelectorSelect = (plant: Plant) => {
     setDraft((prev) => ({ ...prev, plantId: plant.id }));
     setShowManualSelector(false);
+    setManualQuery('');
     goToStep(3);
   };
 
@@ -224,6 +241,7 @@ export const CreatePOIForm = forwardRef<CreatePOIFormRef, CreatePOIFormProps>(fu
       if (step === 2) {
         resetAI();
         setShowManualSelector(false);
+        setManualQuery('');
       }
     }
   };
@@ -235,10 +253,11 @@ export const CreatePOIForm = forwardRef<CreatePOIFormRef, CreatePOIFormProps>(fu
       case 1:
         return (
           <View>
-            <Text style={sightingsStyles.stepTitle}>Adauga o fotografie</Text>
+            <Text style={sightingsStyles.stepTitle}>{t.sightings.photo.title}</Text>
             <PhotoCapture
               imageUri={draft.imageUri}
               onOpenCamera={() => setShowCamera(true)}
+              onClear={() => setDraft((prev) => ({ ...prev, imageUri: null }))}
             />
           </View>
         );
@@ -247,15 +266,15 @@ export const CreatePOIForm = forwardRef<CreatePOIFormRef, CreatePOIFormProps>(fu
         return (
           <View>
             <Text style={sightingsStyles.stepTitle}>
-              {showManualSelector ? 'Alege planta' : 'Rezultate identificare AI'}
+              {showManualSelector ? t.sightings.ai.selectPlant : t.sightings.ai.title}
             </Text>
 
             {showManualSelector ? (
               <View style={{ minHeight: 300 }}>
-                <PlantSelector onSelect={handlePlantSelectorSelect} />
+                <PlantSelector onSelect={handlePlantSelectorSelect} searchQuery={manualQuery} />
                 <Button
-                  title="Inapoi la rezultate AI"
-                  onPress={() => setShowManualSelector(false)}
+                  title={t.sightings.ai.backToResults}
+                  onPress={() => { setShowManualSelector(false); setManualQuery(''); }}
                   variant="ghost"
                   style={{ marginTop: 8 }}
                 />
@@ -274,18 +293,18 @@ export const CreatePOIForm = forwardRef<CreatePOIFormRef, CreatePOIFormProps>(fu
       case 3:
         return (
           <View>
-            <Text style={sightingsStyles.stepTitle}>Locatia observatiei</Text>
+            <Text style={sightingsStyles.stepTitle}>{t.sightings.location.title}</Text>
             <View style={sightingsStyles.locationContainer}>
               {(draft.location ?? location) ? (
                 <View style={sightingsStyles.locationCard}>
                   <View style={sightingsStyles.locationCoordRow}>
-                    <Text style={sightingsStyles.locationLabel}>Latitudine</Text>
+                    <Text style={sightingsStyles.locationLabel}>{t.sightings.location.latitude}</Text>
                     <Text style={sightingsStyles.locationValue}>
                       {((draft.location ?? location)!.latitude).toFixed(6)}
                     </Text>
                   </View>
                   <View style={sightingsStyles.locationCoordRow}>
-                    <Text style={sightingsStyles.locationLabel}>Longitudine</Text>
+                    <Text style={sightingsStyles.locationLabel}>{t.sightings.location.longitude}</Text>
                     <Text style={sightingsStyles.locationValue}>
                       {((draft.location ?? location)!.longitude).toFixed(6)}
                     </Text>
@@ -293,7 +312,7 @@ export const CreatePOIForm = forwardRef<CreatePOIFormRef, CreatePOIFormProps>(fu
                 </View>
               ) : (
                 <Text style={sightingsStyles.locationNoDataText}>
-                  Locatia nu a fost obtinuta inca.
+                  {t.sightings.location.noLocation}
                 </Text>
               )}
 
@@ -304,7 +323,7 @@ export const CreatePOIForm = forwardRef<CreatePOIFormRef, CreatePOIFormProps>(fu
               <View style={sightingsStyles.locationButtonsRow}>
                 <View style={{ flex: 1 }}>
                   <Button
-                    title="Locatia curenta"
+                    title={t.sightings.location.useGPS}
                     onPress={handleUseCurrentLocation}
                     loading={locationLoading}
                     variant="primary"
@@ -312,7 +331,7 @@ export const CreatePOIForm = forwardRef<CreatePOIFormRef, CreatePOIFormProps>(fu
                 </View>
                 <View style={{ flex: 1 }}>
                   <Button
-                    title="Alege pe harta"
+                    title={t.sightings.location.chooseOnMap}
                     onPress={handleOpenMapPicker}
                     variant="secondary"
                   />
@@ -325,63 +344,63 @@ export const CreatePOIForm = forwardRef<CreatePOIFormRef, CreatePOIFormProps>(fu
       case 4:
         return (
           <View>
-            <Text style={sightingsStyles.stepTitle}>Detalii observatie</Text>
+            <Text style={sightingsStyles.stepTitle}>{t.sightings.details.title}</Text>
 
             {draft.plantId ? (
               <View style={sightingsStyles.selectedPlantCard}>
-                <Text style={sightingsStyles.selectedPlantLabel}>Planta selectata</Text>
+                <Text style={sightingsStyles.selectedPlantLabel}>{t.sightings.details.selectedPlant}</Text>
                 <Text style={sightingsStyles.selectedPlantName}>{selectedPlantName()}</Text>
               </View>
             ) : null}
 
             <Input
-              label="Descriere"
-              placeholder="Descrie pe scurt ce ai observat..."
+              label={t.sightings.details.description}
+              placeholder={t.sightings.details.descriptionPlaceholder}
               value={draft.description}
-              onChangeText={(t) => handleFieldChange('description', t)}
+              onChangeText={(v) => handleFieldChange('description', v)}
               multiline
               numberOfLines={3}
             />
 
             <Input
-              label="Habitat"
-              placeholder="Zona, tipul de sol, expunerea la soare..."
+              label={t.sightings.details.habitat}
+              placeholder={t.sightings.details.habitatPlaceholder}
               value={draft.habitat}
-              onChangeText={(t) => handleFieldChange('habitat', t)}
+              onChangeText={(v) => handleFieldChange('habitat', v)}
               multiline
               numberOfLines={2}
             />
 
             <Input
-              label="Perioada de recoltare"
-              placeholder="Ex: Mai - August"
+              label={t.sightings.details.harvestPeriod}
+              placeholder={t.sightings.details.harvestPeriodPlaceholder}
               value={draft.harvestPeriod}
-              onChangeText={(t) => handleFieldChange('harvestPeriod', t)}
+              onChangeText={(v) => handleFieldChange('harvestPeriod', v)}
             />
 
             <Input
-              label="Beneficii"
-              placeholder="Beneficiile plantei, separate prin virgula..."
+              label={t.sightings.details.benefits}
+              placeholder={t.sightings.details.benefitsPlaceholder}
               value={draft.benefits}
-              onChangeText={(t) => handleFieldChange('benefits', t)}
+              onChangeText={(v) => handleFieldChange('benefits', v)}
               multiline
               numberOfLines={3}
             />
 
             <Input
-              label="Contraindicatii"
-              placeholder="Contraindicatii cunoscute, separate prin virgula..."
+              label={t.sightings.details.contraindications}
+              placeholder={t.sightings.details.contraindicationsPlaceholder}
               value={draft.contraindications}
-              onChangeText={(t) => handleFieldChange('contraindications', t)}
+              onChangeText={(v) => handleFieldChange('contraindications', v)}
               multiline
               numberOfLines={2}
             />
 
             <Input
-              label="Comentariu (optional)"
-              placeholder="Alte observatii sau detalii..."
+              label={t.sightings.details.comment}
+              placeholder={t.sightings.details.commentPlaceholder}
               value={draft.comment}
-              onChangeText={(t) => handleFieldChange('comment', t)}
+              onChangeText={(v) => handleFieldChange('comment', v)}
               multiline
               numberOfLines={2}
             />
@@ -397,7 +416,7 @@ export const CreatePOIForm = forwardRef<CreatePOIFormRef, CreatePOIFormProps>(fu
           <View style={sightingsStyles.navRow}>
             <View style={sightingsStyles.navButtonFlex}>
               <Button
-                title="Urmatorul"
+                title={t.sightings.nav.next}
                 onPress={handleNextFromPhoto}
                 disabled={!draft.imageUri}
               />
@@ -408,7 +427,7 @@ export const CreatePOIForm = forwardRef<CreatePOIFormRef, CreatePOIFormProps>(fu
         return (
           <View style={sightingsStyles.navRow}>
             <View style={sightingsStyles.navButtonFlex}>
-              <Button title="Inapoi" onPress={goBack} variant="ghost" />
+              <Button title={t.sightings.nav.back} onPress={goBack} variant="ghost" />
             </View>
           </View>
         );
@@ -416,11 +435,11 @@ export const CreatePOIForm = forwardRef<CreatePOIFormRef, CreatePOIFormProps>(fu
         return (
           <View style={sightingsStyles.navRow}>
             <View style={sightingsStyles.navButtonFlex}>
-              <Button title="Inapoi" onPress={goBack} variant="ghost" />
+              <Button title={t.sightings.nav.back} onPress={goBack} variant="ghost" />
             </View>
             <View style={sightingsStyles.navButtonFlex}>
               <Button
-                title="Urmatorul"
+                title={t.sightings.nav.next}
                 onPress={() => goToStep(4)}
                 disabled={!(draft.location ?? location)}
               />
@@ -431,11 +450,11 @@ export const CreatePOIForm = forwardRef<CreatePOIFormRef, CreatePOIFormProps>(fu
         return (
           <View style={sightingsStyles.navRow}>
             <View style={sightingsStyles.navButtonFlex}>
-              <Button title="Inapoi" onPress={goBack} variant="ghost" />
+              <Button title={t.sightings.nav.back} onPress={goBack} variant="ghost" />
             </View>
             <View style={sightingsStyles.navButtonFlex}>
               <Button
-                title="Salveaza"
+                title={t.sightings.details.submit}
                 onPress={handleSubmit}
                 disabled={!draft.plantId || !(draft.location ?? location)}
               />
@@ -448,6 +467,17 @@ export const CreatePOIForm = forwardRef<CreatePOIFormRef, CreatePOIFormProps>(fu
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior="height">
       <StepIndicator currentStep={step} maxStepReached={maxStepReached} onStepPress={goToStep} />
+
+      {step === 2 && showManualSelector && (
+        <View style={sightingsStyles.manualSelectorSearchBar}>
+          <SearchBar
+            placeholder={t.sightings.ai.searchPlaceholder}
+            onSearch={setManualQuery}
+            debounceMs={200}
+          />
+        </View>
+      )}
+
       <ScrollView
         style={sightingsStyles.formScroll}
         contentContainerStyle={sightingsStyles.formScrollContent}

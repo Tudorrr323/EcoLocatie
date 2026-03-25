@@ -1,16 +1,21 @@
 // FilterButton — buton patrat cu icon de filtre (SlidersHorizontal).
 // Deschide panoul de filtre pe harta. Inaltime fixa 44px, aliniata cu SearchBar.
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { TouchableOpacity, StyleSheet } from 'react-native';
 import { SlidersHorizontal } from 'lucide-react-native';
-import { colors, spacing, borderRadius } from '../styles/theme';
+import { spacing, borderRadius } from '../styles/theme';
+import type { ThemeColors } from '../styles/theme';
+import { useThemeColors } from '../hooks/useThemeColors';
 
 interface FilterButtonProps {
   onPress: () => void;
 }
 
 export function FilterButton({ onPress }: FilterButtonProps) {
+  const colors = useThemeColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   return (
     <TouchableOpacity
       style={styles.container}
@@ -22,7 +27,7 @@ export function FilterButton({ onPress }: FilterButtonProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
   container: {
     height: 44,
     width: 44,

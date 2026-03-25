@@ -1,32 +1,72 @@
 // CustomTabBar — bara de navigare inferioara personalizata cu iconuri lucide.
 // Afiseaza tab-urile: Harta, Enciclopedie, Adauga, Plantele mele, Cont. Inlocuieste tab bar-ul default Expo.
+// Intercepteaza navigarea de pe add-sighting daca observatia are progres si afiseaza ConfirmModal.
 
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, TouchableOpacity, Text, StyleSheet, Platform } from 'react-native';
-import { Home, HeartPulse, Camera, Flower2, User } from 'lucide-react-native';
-import { colors } from '../styles/theme';
+import { Home, HeartPulse, Camera, Flower2, Settings, LogOut } from 'lucide-react-native';
+import type { ThemeColors } from '../styles/theme';
+import { useThemeColors } from '../hooks/useThemeColors';
+import { sightingGuard } from '../utils/sightingGuard';
+import { ConfirmModal } from './ConfirmModal';
+import { useTranslation } from '../i18n';
 
-const TAB_CONFIG: Record<string, { icon: typeof Home; label: string }> = {
-  index: { icon: Home, label: 'Harta' },
-  encyclopedia: { icon: HeartPulse, label: 'Enciclopedie' },
-  'add-sighting': { icon: Camera, label: '' },
-  'my-plants': { icon: Flower2, label: 'Plantele mele' },
-  account: { icon: User, label: 'Contul meu' },
+const TAB_ICONS: Record<string, typeof Home> = {
+  index: Home,
+  encyclopedia: HeartPulse,
+  'add-sighting': Camera,
+  'my-plants': Flower2,
+  settings: Settings,
 };
 
 export function CustomTabBar({ state, navigation }: any) {
+  const colors = useThemeColors();
+  const t = useTranslation();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
+  const tabLabels: Record<string, string> = {
+    index: t.shared.tabs.map,
+    encyclopedia: t.shared.tabs.encyclopedia,
+    'add-sighting': '',
+    'my-plants': t.shared.tabs.myPlants,
+    settings: t.shared.tabs.settings,
+  };
+
+  const [pendingRoute, setPendingRoute] = useState<string | null>(null);
+
+  const handleConfirmLeave = () => {
+    if (!pendingRoute) return;
+    sightingGuard.reset();
+    navigation.navigate(pendingRoute);
+    setPendingRoute(null);
+  };
+
+  const handleCancelLeave = () => {
+    setPendingRoute(null);
+  };
+
   return (
     <View style={styles.container}>
       {state.routes.map((route: any, index: number) => {
         const isFocused = state.index === index;
         const isCenter = route.name === 'add-sighting';
-        const config = TAB_CONFIG[route.name];
-        if (!config) return null;
+        const Icon = TAB_ICONS[route.name];
+        if (!Icon) return null;
 
-        const { icon: Icon, label } = config;
+        const label = tabLabels[route.name] ?? '';
         const color = isFocused ? colors.tabActive : colors.textSecondary;
 
         const onPress = () => {
+          const isLeavingAddSighting =
+            !isFocused &&
+            state.routes[state.index]?.name === 'add-sighting' &&
+            sightingGuard.hasProgress;
+
+          if (isLeavingAddSighting) {
+            setPendingRoute(route.name);
+            return;
+          }
+
           const event = navigation.emit({
             type: 'tabPress',
             target: route.key,
@@ -64,11 +104,23 @@ export function CustomTabBar({ state, navigation }: any) {
           </TouchableOpacity>
         );
       })}
+
+      <ConfirmModal
+        visible={pendingRoute !== null}
+        title="Parasesti observatia?"
+        message="Daca iesi acum, progresul observatiei va fi pierdut si nu poate fi recuperat."
+        confirmLabel="Ies"
+        cancelLabel="Raman"
+        confirmDestructive
+        icon={<LogOut size={36} color={colors.error} />}
+        onConfirm={handleConfirmLeave}
+        onCancel={handleCancelLeave}
+      />
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ThemeColors) => StyleSheet.create({
   container: {
     flexDirection: 'row',
     backgroundColor: colors.surface,
@@ -78,7 +130,7 @@ const styles = StyleSheet.create({
     borderTopColor: colors.border,
     ...Platform.select({
       ios: {
-        shadowColor: '#000',
+        shadowColor: colors.black,
         shadowOffset: { width: 0, height: -2 },
         shadowOpacity: 0.06,
         shadowRadius: 6,

@@ -510,7 +510,10 @@
     {
       "id": 1,
       "username": "admin",
+      "first_name": "Admin",
+      "last_name": "Admin",
       "email": "admin@ecolocatie.ro",
+      "password": "admin123",
       "role": "admin",
       "created_at": "2025-01-15T10:00:00Z",
       "is_active": true
@@ -518,7 +521,12 @@
     {
       "id": 2,
       "username": "maria_botanist",
+      "first_name": "Maria",
+      "last_name": "Ionescu",
       "email": "maria@gmail.com",
+      "password": "maria123",
+      "phone": "0745123456",
+      "birth_date": "1995-06-12T00:00:00Z",
       "role": "user",
       "created_at": "2025-02-20T14:30:00Z",
       "is_active": true
@@ -526,7 +534,12 @@
     {
       "id": 3,
       "username": "ion_nature",
+      "first_name": "Ion",
+      "last_name": "Dumitrescu",
       "email": "ion.explorer@yahoo.com",
+      "password": "ion123",
+      "phone": "0722987654",
+      "birth_date": "1988-03-25T00:00:00Z",
       "role": "user",
       "created_at": "2025-03-01T09:15:00Z",
       "is_active": true
@@ -534,7 +547,12 @@
     {
       "id": 4,
       "username": "elena_herbs",
+      "first_name": "Elena",
+      "last_name": "Vasilescu",
       "email": "elena.herbs@gmail.com",
+      "password": "elena123",
+      "phone": "0731456789",
+      "birth_date": "1992-11-08T00:00:00Z",
       "role": "user",
       "created_at": "2025-03-10T16:45:00Z",
       "is_active": true
@@ -542,7 +560,12 @@
     {
       "id": 5,
       "username": "spammer_bot",
+      "first_name": "Bot",
+      "last_name": "Spam",
       "email": "spam@fake.com",
+      "password": "spam123",
+      "phone": "0700000000",
+      "birth_date": "2000-01-01T00:00:00Z",
       "role": "user",
       "created_at": "2025-03-12T02:00:00Z",
       "is_active": false

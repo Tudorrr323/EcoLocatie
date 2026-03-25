@@ -10,12 +10,15 @@ export interface AuthState {
 }
 
 export interface LoginCredentials {
-  username: string;
+  email: string;
   password: string;
 }
 
-export interface RegisterCredentials {
-  username: string;
+export interface RegisterData {
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
+  phone?: string;
+  birthDate?: string;
 }

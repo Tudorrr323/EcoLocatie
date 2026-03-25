@@ -13,7 +13,8 @@ export default function TabsLayout() {
       <Tabs.Screen name="encyclopedia" />
       <Tabs.Screen name="add-sighting" />
       <Tabs.Screen name="my-plants" />
-      <Tabs.Screen name="account" />
+      <Tabs.Screen name="settings" />
+      <Tabs.Screen name="account" options={{ href: null }} />
       <Tabs.Screen name="admin" options={{ href: null }} />
     </Tabs>
   );

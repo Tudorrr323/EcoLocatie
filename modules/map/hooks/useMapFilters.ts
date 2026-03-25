@@ -3,7 +3,7 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { getPlants } from '../../../shared/repository/dataProvider';
-import { getFilteredMarkers } from '../repository/mapRepository';
+import { getFilteredMarkers, searchMarkers, getSearchSuggestions } from '../repository/mapRepository';
 import type { MapFilter, MarkerData } from '../types/map.types';
 import type { Plant } from '../../../shared/types/plant.types';
 
@@ -15,36 +15,47 @@ const DEFAULT_FILTER: MapFilter = {
 interface UseMapFiltersResult {
   filters: MapFilter;
   setFilters: (filters: MapFilter) => void;
-  filteredMarkers: MarkerData[];
+  displayedMarkers: MarkerData[];
+  suggestions: MarkerData[];
   allPlants: Plant[];
+  setSearchQuery: (q: string) => void;
   resetFilters: () => void;
   refreshMarkers: () => void;
 }
 
 export function useMapFilters(): UseMapFiltersResult {
   const [filters, setFilters] = useState<MapFilter>(DEFAULT_FILTER);
+  const [searchQuery, setSearchQuery] = useState('');
   const [refreshKey, setRefreshKey] = useState(0);
 
   const allPlants = useMemo(() => getPlants(), []);
 
   const filteredMarkers = useMemo(
     () => getFilteredMarkers(filters),
-    [filters, refreshKey]
+    [filters, refreshKey],
   );
 
-  const resetFilters = useCallback(() => {
-    setFilters(DEFAULT_FILTER);
-  }, []);
+  const displayedMarkers = useMemo(
+    () => searchMarkers(filteredMarkers, searchQuery),
+    [filteredMarkers, searchQuery],
+  );
 
-  const refreshMarkers = useCallback(() => {
-    setRefreshKey((k) => k + 1);
-  }, []);
+  const suggestions = useMemo(
+    () => getSearchSuggestions(filteredMarkers, searchQuery),
+    [filteredMarkers, searchQuery],
+  );
+
+  const resetFilters = useCallback(() => setFilters(DEFAULT_FILTER), []);
+
+  const refreshMarkers = useCallback(() => setRefreshKey((k) => k + 1), []);
 
   return {
     filters,
     setFilters,
-    filteredMarkers,
+    displayedMarkers,
+    suggestions,
     allPlants,
+    setSearchQuery,
     resetFilters,
     refreshMarkers,
   };
