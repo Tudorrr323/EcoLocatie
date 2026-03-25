@@ -1,0 +1,769 @@
+{
+  "plants": [
+    {
+      "id": 1,
+      "name_ro": "Mușețel",
+      "name_latin": "Matricaria chamomilla",
+      "family": "Asteraceae",
+      "description": "Plantă ierboasă anuală, cu flori albe și centru galben. Crește spontan pe câmpii, margini de drumuri, terenuri virane.",
+      "parts_used": ["flori", "părți aeriene"],
+      "benefits": [
+        "Calmant și antispastic digestiv",
+        "Antiinflamator",
+        "Tratament pentru insomnie și anxietate",
+        "Remediu pentru afecțiuni ale pielii",
+        "Ameliorează durerile menstruale"
+      ],
+      "contraindications": [
+        "Alergie la plante din familia Asteraceae",
+        "Nu se recomandă în sarcină în doze mari",
+        "Poate interacționa cu anticoagulantele"
+      ],
+      "habitat": "Câmpii, marginea drumurilor, terenuri virane, locuri însorite",
+      "harvest_period": "Mai - August",
+      "preparation": "Ceai (infuzie), comprese, băi, ulei esențial",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Matricaria_February_2008-1.jpg/800px-Matricaria_February_2008-1.jpg",
+      "icon_color": "#FBBF24"
+    },
+    {
+      "id": 2,
+      "name_ro": "Sunătoare",
+      "name_latin": "Hypericum perforatum",
+      "family": "Hypericaceae",
+      "description": "Plantă perenă cu flori galbene, frunze cu puncte translucide. Crește pe pajiști, margini de pădure.",
+      "parts_used": ["flori", "frunze", "tulpini tinere"],
+      "benefits": [
+        "Antidepresiv natural",
+        "Cicatrizant pentru răni și arsuri",
+        "Antiinflamator",
+        "Antiseptic",
+        "Ameliorează tulburările nervoase"
+      ],
+      "contraindications": [
+        "Fotosensibilizare (evitați expunerea la soare)",
+        "Interacțiune cu antidepresive ISRS",
+        "Interacțiune cu contraceptive orale",
+        "Nu se recomandă în sarcină"
+      ],
+      "habitat": "Pajiști uscate, marginea pădurilor, terenuri virane",
+      "harvest_period": "Iunie - August",
+      "preparation": "Ceai, tinctură, ulei de sunătoare (macerat)",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Hypericum_perforatum_i04.jpg/800px-Hypericum_perforatum_i04.jpg",
+      "icon_color": "#EAB308"
+    },
+    {
+      "id": 3,
+      "name_ro": "Coada-calului",
+      "name_latin": "Equisetum arvense",
+      "family": "Equisetaceae",
+      "description": "Plantă perenă fără flori, cu tulpini articulate verzi. Crește în locuri umede, lângă ape.",
+      "parts_used": ["tulpini sterile (verzi)"],
+      "benefits": [
+        "Remineralizant (bogată în siliciu)",
+        "Diuretic natural",
+        "Ajută la vindecarea fracturilor osoase",
+        "Combate celulita",
+        "Întărește părul și unghiile"
+      ],
+      "contraindications": [
+        "Nu se recomandă în insuficiență renală",
+        "Nu se administrează mai mult de 6 săptămâni continuu",
+        "Contraindicată în sarcină și alăptare"
+      ],
+      "habitat": "Locuri umede, maluri de ape, șanțuri, lunci",
+      "harvest_period": "Mai - Iulie",
+      "preparation": "Decoct, pulbere, extract lichid",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Equisetum_arvense_foliage.jpg/800px-Equisetum_arvense_foliage.jpg",
+      "icon_color": "#22C55E"
+    },
+    {
+      "id": 4,
+      "name_ro": "Tei",
+      "name_latin": "Tilia cordata",
+      "family": "Malvaceae",
+      "description": "Arbore înalt cu flori galbene-verzui foarte parfumate. Comun în parcuri, alei, și păduri de foioase.",
+      "parts_used": ["flori", "bractee"],
+      "benefits": [
+        "Calmant și sedativ ușor",
+        "Antispastic",
+        "Diaforetic (induce transpirația)",
+        "Ameliorează răcelile și gripa",
+        "Reduce tensiunea arterială"
+      ],
+      "contraindications": [
+        "Consum excesiv poate afecta inima",
+        "Prudență la persoanele cu probleme cardiace",
+        "Poate cauza somnolență"
+      ],
+      "habitat": "Păduri de foioase, parcuri, alei, grădini",
+      "harvest_period": "Iunie - Iulie",
+      "preparation": "Ceai (infuzie), miere de tei",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Tilia_cordata_flowers.jpg/800px-Tilia_cordata_flowers.jpg",
+      "icon_color": "#A3E635"
+    },
+    {
+      "id": 5,
+      "name_ro": "Mentă",
+      "name_latin": "Mentha piperita",
+      "family": "Lamiaceae",
+      "description": "Plantă perenă aromatică cu frunze ovale, dantelate și miros puternic de mentol.",
+      "parts_used": ["frunze", "tulpini cu flori"],
+      "benefits": [
+        "Ameliorează tulburările digestive",
+        "Antispastic intestinal",
+        "Efect răcoritor și analgezic local",
+        "Descongestionant nazal",
+        "Ameliorează durerile de cap"
+      ],
+      "contraindications": [
+        "Reflux gastroesofagian (poate agrava)",
+        "Nu se recomandă copiilor sub 3 ani",
+        "Poate interacționa cu medicamente antiacide"
+      ],
+      "habitat": "Cultivată în grădini, dar și subspontană pe maluri de ape",
+      "harvest_period": "Iunie - Septembrie",
+      "preparation": "Ceai, ulei esențial, tinctură",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Mentha_x_piperita_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-095.jpg/800px-Mentha_x_piperita_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-095.jpg",
+      "icon_color": "#34D399"
+    },
+    {
+      "id": 6,
+      "name_ro": "Păpădie",
+      "name_latin": "Taraxacum officinale",
+      "family": "Asteraceae",
+      "description": "Plantă erbacee perenă cu flori galbene și fructe tip puf. Extrem de comună pe câmpii și pajiști.",
+      "parts_used": ["frunze", "rădăcini", "flori"],
+      "benefits": [
+        "Diuretic natural puternic",
+        "Stimulează funcția hepatică",
+        "Efect depurativ și detoxifiant",
+        "Bogată în vitamine A, C, K",
+        "Ameliorează constipația"
+      ],
+      "contraindications": [
+        "Alergie la plante Asteraceae",
+        "Obstrucție biliară",
+        "Interacțiune cu diuretice și litiu"
+      ],
+      "habitat": "Pajiști, câmpuri, grădini, margini de drumuri — omniprezentă",
+      "harvest_period": "Aprilie - Octombrie (frunze); Toamna (rădăcini)",
+      "preparation": "Ceai, salate (frunze tinere), suc, decoct de rădăcină",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Taraxacum_officinale_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-135.jpg/800px-Taraxacum_officinale_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-135.jpg",
+      "icon_color": "#FACC15"
+    },
+    {
+      "id": 7,
+      "name_ro": "Urzică",
+      "name_latin": "Urtica dioica",
+      "family": "Urticaceae",
+      "description": "Plantă perenă cu frunze acoperite de peri urticanți. Crește în locuri umede, umbroase.",
+      "parts_used": ["frunze tinere", "rădăcini", "semințe"],
+      "benefits": [
+        "Antianemică (bogată în fier)",
+        "Diuretică și depurativă",
+        "Antiinflamatorie",
+        "Ameliorează simptomele alergice",
+        "Întărește părul"
+      ],
+      "contraindications": [
+        "Insuficiență cardiacă sau renală severă",
+        "Interacțiune cu anticoagulante",
+        "Nu se recomandă în sarcină (stimulează contracțiile)"
+      ],
+      "habitat": "Locuri umede, umbroase, garduri, zăvoaie, ruine",
+      "harvest_period": "Aprilie - Iunie (frunze); Toamna (rădăcini)",
+      "preparation": "Ceai, suc, supă, tinctură",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Urtica_dioica_subsp._dioica-MW0105092-live-1.jpg/800px-Urtica_dioica_subsp._dioica-MW0105092-live-1.jpg",
+      "icon_color": "#16A34A"
+    },
+    {
+      "id": 8,
+      "name_ro": "Pelin",
+      "name_latin": "Artemisia absinthium",
+      "family": "Asteraceae",
+      "description": "Plantă perenă cu frunze argintii, puternic aromatică, cu gust foarte amar.",
+      "parts_used": ["frunze", "vârfuri înflorite"],
+      "benefits": [
+        "Stimulează apetitul și digestia",
+        "Antiparazitar intestinal",
+        "Efect colagog (stimulează bila)",
+        "Tonic general",
+        "Febrifug"
+      ],
+      "contraindications": [
+        "Toxic în doze mari (tujonă)",
+        "Strict interzis în sarcină",
+        "Nu se administrează copiilor",
+        "Nu se folosește pe perioade lungi"
+      ],
+      "habitat": "Terenuri virane, margini de drumuri, câmpii uscate",
+      "harvest_period": "Iulie - August",
+      "preparation": "Ceai (infuzie scurtă), tinctură, vin de pelin",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Artemisia_absinthium_P1210748.jpg/800px-Artemisia_absinthium_P1210748.jpg",
+      "icon_color": "#94A3B8"
+    },
+    {
+      "id": 9,
+      "name_ro": "Coada-șoricelului",
+      "name_latin": "Achillea millefolium",
+      "family": "Asteraceae",
+      "description": "Plantă perenă cu flori mici albe sau rozalii în corimb și frunze fin divizate.",
+      "parts_used": ["părți aeriene înflorite"],
+      "benefits": [
+        "Hemostatic (oprește sângerările)",
+        "Antiinflamator digestiv",
+        "Ameliorează crampele menstruale",
+        "Cicatrizant",
+        "Antiseptic"
+      ],
+      "contraindications": [
+        "Alergie la Asteraceae",
+        "Sarcină (stimulează contracțiile)",
+        "Interacțiune cu anticoagulante"
+      ],
+      "habitat": "Pajiști, fânețe, marginea drumurilor — de la câmpie la munte",
+      "harvest_period": "Iunie - Septembrie",
+      "preparation": "Ceai, comprese, tinctură, băi",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Achillea_millefolium_20041012_2574.jpg/800px-Achillea_millefolium_20041012_2574.jpg",
+      "icon_color": "#F9FAFB"
+    },
+    {
+      "id": 10,
+      "name_ro": "Cicoare",
+      "name_latin": "Cichorium intybus",
+      "family": "Asteraceae",
+      "description": "Plantă perenă cu flori albastre-azurii și rădăcină pivotantă groasă. Comună pe câmpuri.",
+      "parts_used": ["rădăcini", "frunze", "flori"],
+      "benefits": [
+        "Stimulează digestia și apetitul",
+        "Efect hepatoprotector",
+        "Diuretic ușor",
+        "Prebiotic natural (inulină)",
+        "Înlocuitor de cafea (rădăcina prăjită)"
+      ],
+      "contraindications": [
+        "Calculi biliari",
+        "Alergie la Asteraceae",
+        "Poate cauza dermatită de contact"
+      ],
+      "habitat": "Câmpuri, margini de drumuri, terenuri virane, pajiști uscate",
+      "harvest_period": "Iulie - Septembrie (flori); Toamna (rădăcini)",
+      "preparation": "Decoct de rădăcină, salată (frunze), cafea de cicoare",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Cichorium_intybus_a1.jpg/800px-Cichorium_intybus_a1.jpg",
+      "icon_color": "#60A5FA"
+    },
+    {
+      "id": 11,
+      "name_ro": "Tătăneasa",
+      "name_latin": "Symphytum officinale",
+      "family": "Boraginaceae",
+      "description": "Plantă perenă robustă cu frunze mari păroase și flori tubulare roz-violete. Crește lângă ape.",
+      "parts_used": ["rădăcini", "frunze (doar uz extern)"],
+      "benefits": [
+        "Accelerează vindecarea fracturilor",
+        "Cicatrizant puternic",
+        "Antiinflamator",
+        "Ameliorează durerile articulare",
+        "Tratează entorsele și contuziile"
+      ],
+      "contraindications": [
+        "NU se administrează intern (alcaloizi pirrolizidinici hepatotoxici)",
+        "Nu se aplică pe răni deschise",
+        "Contraindicată în sarcină și alăptare",
+        "Uz extern maxim 4-6 săptămâni/an"
+      ],
+      "habitat": "Lunci, maluri de ape, locuri umede din câmpie",
+      "harvest_period": "Primăvara și toamna (rădăcini); Vara (frunze)",
+      "preparation": "Unguent, cataplasme (doar uz extern!)",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Symphytum_officinale_Beinwell.jpg/800px-Symphytum_officinale_Beinwell.jpg",
+      "icon_color": "#A78BFA"
+    },
+    {
+      "id": 12,
+      "name_ro": "Măceș",
+      "name_latin": "Rosa canina",
+      "family": "Rosaceae",
+      "description": "Arbust spinos cu flori roz și fructe roșii (măceșe). Comun la marginea pădurilor.",
+      "parts_used": ["fructe (măceșe)", "petale"],
+      "benefits": [
+        "Foarte bogat în vitamina C",
+        "Imunostimulator",
+        "Antioxidant puternic",
+        "Ușor laxativ",
+        "Antiinflamator articular"
+      ],
+      "contraindications": [
+        "Calculi renali (oxalați)",
+        "Poate cauza disconfort gastric în exces",
+        "Diabetici — conține zaharuri naturale"
+      ],
+      "habitat": "Marginea pădurilor, tufișuri, garduri vii, dealuri",
+      "harvest_period": "Septembrie - Noiembrie (fructe)",
+      "preparation": "Ceai, dulceață, sirop, marmeladă",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Rosa_canina_fruit.jpg/800px-Rosa_canina_fruit.jpg",
+      "icon_color": "#F87171"
+    },
+    {
+      "id": 13,
+      "name_ro": "Păducel",
+      "name_latin": "Crataegus monogyna",
+      "family": "Rosaceae",
+      "description": "Arbust sau arbore mic spinos, cu flori albe și fructe roșii mici. Crește la marginea pădurilor.",
+      "parts_used": ["flori", "fructe", "frunze"],
+      "benefits": [
+        "Cardiotonic — întărește mușchiul inimii",
+        "Reglează tensiunea arterială",
+        "Sedativ ușor",
+        "Antioxidant",
+        "Ameliorează palpitațiile"
+      ],
+      "contraindications": [
+        "Interacțiune cu medicamente cardiace (digoxină)",
+        "Nu se recomandă fără supraveghere medicală în boli cardiace",
+        "Sarcină și alăptare"
+      ],
+      "habitat": "Marginea pădurilor, tufișuri, garduri vii",
+      "harvest_period": "Mai (flori); Septembrie - Octombrie (fructe)",
+      "preparation": "Ceai, tinctură, extract",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Crataegus_monogyna_fruits.jpg/800px-Crataegus_monogyna_fruits.jpg",
+      "icon_color": "#DC2626"
+    },
+    {
+      "id": 14,
+      "name_ro": "Soc",
+      "name_latin": "Sambucus nigra",
+      "family": "Adoxaceae",
+      "description": "Arbust sau arbore mic cu flori albe parfumate în corimb și fructe negre.",
+      "parts_used": ["flori", "fructe"],
+      "benefits": [
+        "Diaforetic (induce transpirația)",
+        "Antiviral (eficient contra gripei)",
+        "Diuretic și depurativ",
+        "Expectorant",
+        "Imunostimulator"
+      ],
+      "contraindications": [
+        "Fructele crude sunt ușor toxice (trebuie gătite)",
+        "Frunzele, scoarța și rădăcinile sunt TOXICE",
+        "Nu se recomandă în boli autoimune"
+      ],
+      "habitat": "Păduri, zăvoaie, garduri, câmpie până la zona premontană",
+      "harvest_period": "Mai - Iulie (flori); Septembrie (fructe)",
+      "preparation": "Ceai de flori, sirop de soc, socată, dulceață de fructe",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Sambucus_nigra_004.jpg/800px-Sambucus_nigra_004.jpg",
+      "icon_color": "#E2E8F0"
+    },
+    {
+      "id": 15,
+      "name_ro": "Lavandă",
+      "name_latin": "Lavandula angustifolia",
+      "family": "Lamiaceae",
+      "description": "Plantă perenă aromatică cu flori violet-albăstrui dispuse în spic. Cultivată frecvent.",
+      "parts_used": ["flori", "ulei esențial"],
+      "benefits": [
+        "Calmant și relaxant",
+        "Ameliorează insomnia",
+        "Antiseptic și cicatrizant",
+        "Repelent natural pentru insecte",
+        "Ameliorează durerile de cap"
+      ],
+      "contraindications": [
+        "Ulei esențial nediuat poate irita pielea",
+        "Poate cauza somnolență excesivă",
+        "Prudență în sarcină (primele luni)"
+      ],
+      "habitat": "Cultivată în grădini și culturi (zona de câmpie, soluri calcaroase)",
+      "harvest_period": "Iunie - August",
+      "preparation": "Ceai, ulei esențial, săculețe parfumate, baie",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Single_lavendar_flower02.jpg/800px-Single_lavendar_flower02.jpg",
+      "icon_color": "#8B5CF6"
+    },
+    {
+      "id": 16,
+      "name_ro": "Roiniță (Melisă)",
+      "name_latin": "Melissa officinalis",
+      "family": "Lamiaceae",
+      "description": "Plantă perenă cu frunze ce emană miros de lămâie la frecare. Cultivată și subspontană.",
+      "parts_used": ["frunze", "vârfuri înflorite"],
+      "benefits": [
+        "Sedativ și anxiolitic natural",
+        "Antispastic digestiv",
+        "Ameliorează colicile",
+        "Antiviral (herpes labial)",
+        "Îmbunătățește memoria"
+      ],
+      "contraindications": [
+        "Hipotiroidism (poate suprima funcția tiroidiană)",
+        "Poate cauza somnolență",
+        "Interacțiune cu sedative"
+      ],
+      "habitat": "Grădini, garduri, locuri umbroase, cultivată și subspontană",
+      "harvest_period": "Iunie - Septembrie",
+      "preparation": "Ceai, tinctură, ulei esențial",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Melissa_officinalis_%284%29.jpg/800px-Melissa_officinalis_%284%29.jpg",
+      "icon_color": "#86EFAC"
+    },
+    {
+      "id": 17,
+      "name_ro": "Salvie",
+      "name_latin": "Salvia officinalis",
+      "family": "Lamiaceae",
+      "description": "Plantă perenă aromatică cu frunze cenușii-verzui catifelate și flori violet.",
+      "parts_used": ["frunze"],
+      "benefits": [
+        "Antiseptic buco-faringian",
+        "Reduce transpirația excesivă",
+        "Ameliorează simptomele menopauzei",
+        "Antiinflamator",
+        "Stimulează memoria"
+      ],
+      "contraindications": [
+        "Epilepsie (tujonă — efect convulsivant)",
+        "Sarcină și alăptare (reduce lactația)",
+        "Nu se administrează în doze mari pe perioade lungi"
+      ],
+      "habitat": "Cultivată în grădini, zonele sudice ale României",
+      "harvest_period": "Mai - Iulie",
+      "preparation": "Ceai, gargarisme, condiment, tinctură",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Salvia_officinalis_p1150380.jpg/800px-Salvia_officinalis_p1150380.jpg",
+      "icon_color": "#7C3AED"
+    },
+    {
+      "id": 18,
+      "name_ro": "Cimbru",
+      "name_latin": "Thymus vulgaris",
+      "family": "Lamiaceae",
+      "description": "Plantă perenă mică, aromatică, cu tulpini lemnoase și frunze foarte mici.",
+      "parts_used": ["părți aeriene înflorite"],
+      "benefits": [
+        "Expectorant și antitusiv",
+        "Antiseptic puternic al căilor respiratorii",
+        "Antifungic",
+        "Stimulează digestia",
+        "Antioxidant"
+      ],
+      "contraindications": [
+        "Hipertensiune arterială severă",
+        "Sarcină (în doze mari)",
+        "Ulcer gastric activ"
+      ],
+      "habitat": "Cultivat în grădini, câmpii uscate, soluri calcaroase",
+      "harvest_period": "Mai - August",
+      "preparation": "Ceai, sirop, condiment, ulei esențial, inhalații",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Thymus_vulgaris_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-271.jpg/800px-Thymus_vulgaris_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-271.jpg",
+      "icon_color": "#059669"
+    },
+    {
+      "id": 19,
+      "name_ro": "Gălbenele",
+      "name_latin": "Calendula officinalis",
+      "family": "Asteraceae",
+      "description": "Plantă anuală cu flori mari, portocalii sau galbene. Cultivată frecvent în grădini.",
+      "parts_used": ["flori (ligule)"],
+      "benefits": [
+        "Cicatrizant și regenerant al pielii",
+        "Antiinflamator",
+        "Antiseptic ușor",
+        "Ameliorează afecțiunile gastrice",
+        "Antifungic"
+      ],
+      "contraindications": [
+        "Alergie la Asteraceae",
+        "Sarcină (efect emenagog)",
+        "Nu se aplică pe răni profunde infectate"
+      ],
+      "habitat": "Cultivată în grădini, subspontană pe terenuri virane",
+      "harvest_period": "Iunie - Octombrie",
+      "preparation": "Ceai, unguent, ulei macerat, tinctură",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Calendula_officinalis_7.jpg/800px-Calendula_officinalis_7.jpg",
+      "icon_color": "#F97316"
+    },
+    {
+      "id": 20,
+      "name_ro": "Hrean",
+      "name_latin": "Armoracia rusticana",
+      "family": "Brassicaceae",
+      "description": "Plantă perenă cu frunze mari și rădăcină albă, groasă, cu gust iute puternic.",
+      "parts_used": ["rădăcini", "frunze"],
+      "benefits": [
+        "Antibiotic natural puternic",
+        "Descongestionant (sinuzită)",
+        "Stimulează digestia",
+        "Efect antiscorbutic (vitamina C)",
+        "Ameliorează durerile reumatice (cataplasme)"
+      ],
+      "contraindications": [
+        "Ulcer gastric sau duodenal",
+        "Probleme renale severe",
+        "Nu se administrează copiilor sub 4 ani",
+        "Aplicarea pe piele poate cauza iritare"
+      ],
+      "habitat": "Cultivat în grădini, subspontan lângă garduri și locuri umede",
+      "harvest_period": "Toamna (rădăcini); Primăvara (frunze)",
+      "preparation": "Ras proaspăt, cataplasme, tinctură, sirop cu miere",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Kren_Meerrettich_Horseradish.jpg/800px-Kren_Meerrettich_Horseradish.jpg",
+      "icon_color": "#D4D4D4"
+    }
+  ],
+
+  "users": [
+    {
+      "id": 1,
+      "username": "admin",
+      "email": "admin@ecolocatie.ro",
+      "role": "admin",
+      "created_at": "2025-01-15T10:00:00Z",
+      "is_active": true
+    },
+    {
+      "id": 2,
+      "username": "maria_botanist",
+      "email": "maria@gmail.com",
+      "role": "user",
+      "created_at": "2025-02-20T14:30:00Z",
+      "is_active": true
+    },
+    {
+      "id": 3,
+      "username": "ion_nature",
+      "email": "ion.explorer@yahoo.com",
+      "role": "user",
+      "created_at": "2025-03-01T09:15:00Z",
+      "is_active": true
+    },
+    {
+      "id": 4,
+      "username": "elena_herbs",
+      "email": "elena.herbs@gmail.com",
+      "role": "user",
+      "created_at": "2025-03-10T16:45:00Z",
+      "is_active": true
+    },
+    {
+      "id": 5,
+      "username": "spammer_bot",
+      "email": "spam@fake.com",
+      "role": "user",
+      "created_at": "2025-03-12T02:00:00Z",
+      "is_active": false
+    }
+  ],
+
+  "points_of_interest": [
+    {
+      "id": 1,
+      "user_id": 2,
+      "plant_id": 1,
+      "latitude": 45.4400,
+      "longitude": 28.0200,
+      "comment": "Mușețel din abundență în Grădina Publică, lângă aleea principală. Înflorit complet!",
+      "ai_confidence": 0.94,
+      "is_approved": true,
+      "created_at": "2025-06-15T08:30:00Z",
+      "image_url": "/uploads/musetel_gradina.jpg"
+    },
+    {
+      "id": 2,
+      "user_id": 3,
+      "plant_id": 6,
+      "latitude": 45.4375,
+      "longitude": 28.0150,
+      "comment": "Câmp plin de păpădii lângă Parcul Eminescu. Ideale pentru salată de primăvară.",
+      "ai_confidence": 0.98,
+      "is_approved": true,
+      "created_at": "2025-04-20T10:15:00Z",
+      "image_url": "/uploads/papadie_parc.jpg"
+    },
+    {
+      "id": 3,
+      "user_id": 2,
+      "plant_id": 7,
+      "latitude": 45.4200,
+      "longitude": 28.0300,
+      "comment": "Urzici tinere pe malul Dunării, zona Faleza. Perfecte pentru supă.",
+      "ai_confidence": 0.91,
+      "is_approved": true,
+      "created_at": "2025-04-10T07:45:00Z",
+      "image_url": "/uploads/urzica_dunare.jpg"
+    },
+    {
+      "id": 4,
+      "user_id": 4,
+      "plant_id": 4,
+      "latitude": 45.4390,
+      "longitude": 28.0100,
+      "comment": "Tei bătrâni și parfumați în parcul central. Iunie e sezonul perfect.",
+      "ai_confidence": 0.96,
+      "is_approved": true,
+      "created_at": "2025-06-22T17:00:00Z",
+      "image_url": "/uploads/tei_parc.jpg"
+    },
+    {
+      "id": 5,
+      "user_id": 3,
+      "plant_id": 2,
+      "latitude": 45.4833,
+      "longitude": 28.0667,
+      "comment": "Sunătoare la marginea Pădurii Gârboavele. Teren uscat, expunere sudică.",
+      "ai_confidence": 0.87,
+      "is_approved": true,
+      "created_at": "2025-07-05T11:30:00Z",
+      "image_url": "/uploads/sunatoare_padure.jpg"
+    },
+    {
+      "id": 6,
+      "user_id": 4,
+      "plant_id": 14,
+      "latitude": 45.4820,
+      "longitude": 28.0590,
+      "comment": "Soc înflorit la intrarea în pădurea Gârboavele. Miros incredibil!",
+      "ai_confidence": 0.93,
+      "is_approved": true,
+      "created_at": "2025-06-01T09:00:00Z",
+      "image_url": "/uploads/soc_garboavele.jpg"
+    },
+    {
+      "id": 7,
+      "user_id": 2,
+      "plant_id": 3,
+      "latitude": 45.3950,
+      "longitude": 28.0450,
+      "comment": "Coada calului pe malul Lacului Brateș, zonă umedă. Cantități mari.",
+      "ai_confidence": 0.89,
+      "is_approved": true,
+      "created_at": "2025-05-18T14:20:00Z",
+      "image_url": "/uploads/coada_calului_lac.jpg"
+    },
+    {
+      "id": 8,
+      "user_id": 3,
+      "plant_id": 12,
+      "latitude": 45.4850,
+      "longitude": 28.0700,
+      "comment": "Tufișuri de măceș la liziera pădurii. Fructe coapte în octombrie.",
+      "ai_confidence": 0.92,
+      "is_approved": true,
+      "created_at": "2025-10-10T15:00:00Z",
+      "image_url": "/uploads/maces_padure.jpg"
+    },
+    {
+      "id": 9,
+      "user_id": 4,
+      "plant_id": 9,
+      "latitude": 45.4450,
+      "longitude": 28.0250,
+      "comment": "Coada șoricelului pe un teren viran lângă strada Brăilei.",
+      "ai_confidence": 0.85,
+      "is_approved": true,
+      "created_at": "2025-07-20T12:00:00Z",
+      "image_url": "/uploads/coada_soricelului_teren.jpg"
+    },
+    {
+      "id": 10,
+      "user_id": 2,
+      "plant_id": 10,
+      "latitude": 45.4320,
+      "longitude": 28.0050,
+      "comment": "Cicoare cu flori albastre superbe pe marginea drumului spre Brăila.",
+      "ai_confidence": 0.90,
+      "is_approved": true,
+      "created_at": "2025-08-05T08:00:00Z",
+      "image_url": "/uploads/cicoare_drum.jpg"
+    },
+    {
+      "id": 11,
+      "user_id": 3,
+      "plant_id": 8,
+      "latitude": 45.4280,
+      "longitude": 28.0180,
+      "comment": "Pelin pe un teren abandonat. Miros puternic, inconfundabil.",
+      "ai_confidence": 0.88,
+      "is_approved": true,
+      "created_at": "2025-07-28T16:30:00Z",
+      "image_url": "/uploads/pelin_teren.jpg"
+    },
+    {
+      "id": 12,
+      "user_id": 4,
+      "plant_id": 13,
+      "latitude": 45.4810,
+      "longitude": 28.0620,
+      "comment": "Păducel cu fructe roșii la marginea pădurii Gârboavele.",
+      "ai_confidence": 0.91,
+      "is_approved": true,
+      "created_at": "2025-09-25T10:45:00Z",
+      "image_url": "/uploads/paducel_garboavele.jpg"
+    },
+    {
+      "id": 13,
+      "user_id": 2,
+      "plant_id": 11,
+      "latitude": 45.4180,
+      "longitude": 28.0350,
+      "comment": "Tătăneasă pe malul Dunării, lângă zona portuară. Sol umed.",
+      "ai_confidence": 0.86,
+      "is_approved": true,
+      "created_at": "2025-05-05T13:15:00Z",
+      "image_url": "/uploads/tataneasa_dunare.jpg"
+    },
+    {
+      "id": 14,
+      "user_id": 3,
+      "plant_id": 19,
+      "latitude": 45.4410,
+      "longitude": 28.0220,
+      "comment": "Gălbenele cultivate într-o grădină de lângă Grădina Publică. Proprietarul le-a plantat.",
+      "ai_confidence": 0.97,
+      "is_approved": true,
+      "created_at": "2025-08-15T09:30:00Z",
+      "image_url": "/uploads/galbenele_gradina.jpg"
+    },
+    {
+      "id": 15,
+      "user_id": 4,
+      "plant_id": 5,
+      "latitude": 45.4360,
+      "longitude": 28.0120,
+      "comment": "Mentă sălbatică pe un canal de irigație dezafectat, zona industrială.",
+      "ai_confidence": 0.82,
+      "is_approved": false,
+      "created_at": "2025-06-30T11:00:00Z",
+      "image_url": "/uploads/menta_canal.jpg"
+    },
+    {
+      "id": 16,
+      "user_id": 2,
+      "plant_id": 15,
+      "latitude": 45.4420,
+      "longitude": 28.0180,
+      "comment": "Lavandă plantată în fața unui bloc pe strada Domnească. Urbanistică verde!",
+      "ai_confidence": 0.95,
+      "is_approved": true,
+      "created_at": "2025-07-10T18:00:00Z",
+      "image_url": "/uploads/lavanda_bloc.jpg"
+    }
+  ],
+
+  "config": {
+    "map_center": [45.4353, 28.0080],
+    "map_default_zoom": 13,
+    "map_max_zoom": 18,
+    "map_min_zoom": 10,
+    "tile_url": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    "tile_attribution": "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
+    "galati_bounds": {
+      "north": 45.52,
+      "south": 45.37,
+      "east": 28.12,
+      "west": 27.92
+    },
+    "demo_locations": {
+      "centru_galati": [45.4353, 28.0080],
+      "gradina_publica": [45.4400, 28.0200],
+      "padurea_garboavele": [45.4833, 28.0667],
+      "faleza_dunarii": [45.4200, 28.0300],
+      "parcul_eminescu": [45.4390, 28.0100],
+      "lacul_brates": [45.3900, 28.0500]
+    }
+  }
+}
