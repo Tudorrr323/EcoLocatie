@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "mcp__figma-remote-mcp__get_design_context",
-      "Bash(npx tsc:*)",
-      "mcp__figma-remote-mcp__get_screenshot"
-    ]
-  }
-}

@@ -5,7 +5,7 @@ import React, { useRef, useState, useCallback, useEffect, useMemo } from 'react'
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
-import { Crosshair, MessageCircle } from 'lucide-react-native';
+import { Crosshair, MessageCircle, Navigation } from 'lucide-react-native';
 import { Image } from 'react-native';
 import { ImageViewer } from '../../../shared/components/ImageViewer';
 import { HorizontalTabs } from '../../../shared/components/HorizontalTabs';
@@ -51,6 +51,7 @@ const MapScreen: React.FC = () => {
   const imgTouchStartRef = useRef<{ x: number; y: number } | null>(null);
   const [activeTab, setActiveTab] = useState('prezentare');
   const [searchAreaHeight, setSearchAreaHeight] = useState(0);
+  const [bearing, setBearing] = useState(0);
 
   const { filters, setFilters, displayedMarkers, suggestions, allPlants, setSearchQuery, refreshMarkers } = useMapFilters();
 
@@ -153,6 +154,7 @@ const MapScreen: React.FC = () => {
           onUserDrag={handleUserDrag}
           onMarkerTap={handleMarkerTap}
           onMapTap={handleMapTap}
+          onBearingChange={setBearing}
           onMapReady={() => {
             mapReady.current = true;
             if (location) {
@@ -179,6 +181,22 @@ const MapScreen: React.FC = () => {
             fill={centeredOnUser ? colors.primary : 'none'}
           />
         </TouchableOpacity>
+
+        {Math.abs(bearing) > 0.5 && (
+          <TouchableOpacity
+            style={mapStyles.compassButton}
+            onPress={() => mapRef.current?.resetBearing()}
+            activeOpacity={0.8}
+            accessibilityLabel={t.map.compassButton}
+          >
+            <Navigation
+              size={18}
+              color={colors.primary}
+              fill={colors.primary}
+              style={{ transform: [{ rotate: `${-bearing}deg` }] }}
+            />
+          </TouchableOpacity>
+        )}
 
         <TouchableOpacity
           style={mapStyles.chatButton}

@@ -3,6 +3,7 @@ import type { mapRo } from './ro';
 export const mapEn: typeof mapRo = {
   searchPlaceholder: 'Search plants...',
   gpsButton: 'My location',
+  compassButton: 'Reset orientation',
   recenterGalati: 'Recenter on Galati',
   tabs: {
     overview: 'Overview',

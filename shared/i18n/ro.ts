@@ -24,6 +24,8 @@ export const sharedRo = {
   },
   pagination: {
     itemsPerPage: 'elemente/pagină',
+    perPage: 'pe pagină',
+    modalTitle: 'Elemente pe pagină',
   },
   plantFilter: {
     title: 'Filtre plante',

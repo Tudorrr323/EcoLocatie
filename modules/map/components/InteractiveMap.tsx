@@ -13,6 +13,7 @@ import { useSettings, getPlantName } from '../../../shared/context/SettingsConte
 export interface MapRef {
   flyTo: (lat: number, lng: number, zoom?: number) => void;
   updateUserLocation: (lat: number, lng: number) => void;
+  resetBearing: () => void;
 }
 
 interface InteractiveMapProps {
@@ -21,6 +22,7 @@ interface InteractiveMapProps {
   onMarkerTap?: (markerId: number) => void;
   onMapTap?: () => void;
   onMapReady?: () => void;
+  onBearingChange?: (bearing: number) => void;
 }
 
 function buildBaseHtml(isDark: boolean): string {
@@ -39,6 +41,7 @@ function buildBaseHtml(isDark: boolean): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
   <style>
     * { margin: 0; padding: 0; }
     #map { width: 100vw; height: 100vh; background: ${mapBg}; }
@@ -80,7 +83,10 @@ function buildBaseHtml(isDark: boolean): string {
   <div id="map"></div>
   <script>
     var map = L.map('map', {
-      zoomControl: false
+      zoomControl: false,
+      rotate: true,
+      touchRotate: true,
+      rotateControl: false
     }).setView([45.4353, 28.008], 13);
 
     L.tileLayer('${tileUrl}', {
@@ -148,6 +154,7 @@ function buildBaseHtml(isDark: boolean): string {
         if (msg.type === 'flyTo') window.flyTo(msg.lat, msg.lng, msg.zoom);
         if (msg.type === 'userLocation') window.updateUserLocation(msg.lat, msg.lng);
         if (msg.type === 'updateMarkers') updateMarkers(msg.markers);
+        if (msg.type === 'resetBearing') window.resetBearing();
       } catch(err) {}
     }
     document.addEventListener('message', handleMessage);
@@ -169,6 +176,28 @@ function buildBaseHtml(isDark: boolean): string {
       }
     });
 
+    map.on('rotate', function() {
+      var bearing = map.getBearing ? map.getBearing() : 0;
+      window.ReactNativeWebView && window.ReactNativeWebView.postMessage(
+        JSON.stringify({ type: 'bearingChange', bearing: bearing })
+      );
+    });
+
+    window.resetBearing = function() {
+      if (!map.setBearing || !map.getBearing) return;
+      var start = map.getBearing();
+      if (Math.abs(start) < 0.5) { map.setBearing(0); return; }
+      var duration = 300;
+      var t0 = performance.now();
+      function step(now) {
+        var p = Math.min((now - t0) / duration, 1);
+        var ease = 1 - Math.pow(1 - p, 3);
+        map.setBearing(start * (1 - ease));
+        if (p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    };
+
     // Notify that map is ready
     window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'mapReady' }));
   </script>
@@ -177,7 +206,7 @@ function buildBaseHtml(isDark: boolean): string {
 }
 
 const InteractiveMap = forwardRef<MapRef, InteractiveMapProps>(
-  ({ markers, onUserDrag, onMarkerTap, onMapTap, onMapReady }, ref) => {
+  ({ markers, onUserDrag, onMarkerTap, onMapTap, onMapReady, onBearingChange }, ref) => {
     const colors = useThemeColors();
     const { resolvedTheme } = useSettings();
     const isDark = resolvedTheme === 'dark';
@@ -194,6 +223,11 @@ const InteractiveMap = forwardRef<MapRef, InteractiveMapProps>(
       updateUserLocation: (lat: number, lng: number) => {
         webViewRef.current?.postMessage(
           JSON.stringify({ type: 'userLocation', lat, lng })
+        );
+      },
+      resetBearing: () => {
+        webViewRef.current?.postMessage(
+          JSON.stringify({ type: 'resetBearing' })
         );
       },
     }));
@@ -236,6 +270,7 @@ const InteractiveMap = forwardRef<MapRef, InteractiveMapProps>(
         if (msg.type === 'userDrag' && onUserDrag) onUserDrag();
         if (msg.type === 'markerTap' && onMarkerTap) onMarkerTap(msg.id);
         if (msg.type === 'mapTap' && onMapTap) onMapTap();
+        if (msg.type === 'bearingChange' && onBearingChange) onBearingChange(msg.bearing);
       } catch {}
     };
 

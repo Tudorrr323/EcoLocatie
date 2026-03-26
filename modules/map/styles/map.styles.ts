@@ -56,6 +56,29 @@ searchContainer: {
       },
     }),
   },
+  compassButton: {
+    position: 'absolute',
+    left: spacing.sm,
+    top: spacing.sm + 40 + spacing.sm,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 3,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
+  },
+
   chatButton: {
     position: 'absolute',
     right: spacing.md,

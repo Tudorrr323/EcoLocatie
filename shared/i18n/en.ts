@@ -26,6 +26,8 @@ export const sharedEn: typeof sharedRo = {
   },
   pagination: {
     itemsPerPage: 'items/page',
+    perPage: 'per page',
+    modalTitle: 'Items per page',
   },
   plantFilter: {
     title: 'Plant Filters',

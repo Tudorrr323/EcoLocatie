@@ -8,6 +8,7 @@ import { ChevronLeft, ChevronRight, ChevronDown, Check } from 'lucide-react-nati
 import { spacing, borderRadius, fonts } from '../styles/theme';
 import type { ThemeColors } from '../styles/theme';
 import { useThemeColors } from '../hooks/useThemeColors';
+import { useTranslation } from '../i18n';
 import { ConfirmModal } from './ConfirmModal';
 
 const DEFAULT_PAGE_SIZE_OPTIONS = [10, 25, 50];
@@ -30,6 +31,7 @@ export function Pagination({
   pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
 }: PaginationProps) {
   const colors = useThemeColors();
+  const t = useTranslation();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   const [sizeModalVisible, setSizeModalVisible] = useState(false);
@@ -104,8 +106,8 @@ export function Pagination({
       {/* Modal selectie marime */}
       <ConfirmModal
         visible={sizeModalVisible}
-        title="Plante pe pagina"
-        cancelLabel="Inchide"
+        title={t.shared.pagination.modalTitle}
+        cancelLabel={t.shared.common.close}
         onCancel={() => setSizeModalVisible(false)}
       >
         {pageSizeOptions.map((option, index) => {
@@ -122,7 +124,7 @@ export function Pagination({
               activeOpacity={0.7}
             >
               <Text style={[styles.optionText, isActive && styles.optionTextActive]}>
-                {option} plante pe pagina
+                {option} {t.shared.pagination.perPage}
               </Text>
               {isActive && <Check size={18} color={colors.primary} />}
             </TouchableOpacity>

@@ -7,7 +7,6 @@ import { useRouter } from 'expo-router';
 import { MoreVertical, Eye, UserX, UserCheck } from 'lucide-react-native';
 import { Card } from '../../../shared/components/Card';
 import { ConfirmModal } from '../../../shared/components/ConfirmModal';
-import { Snackbar } from '../../../shared/components/Snackbar';
 import { formatDate } from '../../../shared/utils/formatDate';
 import { fonts, spacing, borderRadius } from '../../../shared/styles/theme';
 import type { ThemeColors } from '../../../shared/styles/theme';
@@ -18,9 +17,10 @@ import type { User } from '../../../shared/types/plant.types';
 interface UserRowProps {
   user: User;
   onToggle: (userId: number, reason?: string) => void;
+  onSnackbar?: (message: string) => void;
 }
 
-export function UserRow({ user, onToggle }: UserRowProps) {
+export function UserRow({ user, onToggle, onSnackbar }: UserRowProps) {
   const colors = useThemeColors();
   const t = useTranslation();
   const router = useRouter();
@@ -29,14 +29,13 @@ export function UserRow({ user, onToggle }: UserRowProps) {
   const [menuVisible, setMenuVisible] = useState(false);
   const [confirmVisible, setConfirmVisible] = useState(false);
   const [reason, setReason] = useState('');
-  const [snackbar, setSnackbar] = useState<string | null>(null);
 
   const handleToggleConfirm = () => {
     const msg = user.is_active ? t.admin.snackbar.userDeactivated : t.admin.snackbar.userActivated;
     onToggle(user.id, user.is_active ? reason.trim() || undefined : undefined);
     setConfirmVisible(false);
     setReason('');
-    setSnackbar(msg);
+    onSnackbar?.(msg);
   };
 
   return (
@@ -157,11 +156,6 @@ export function UserRow({ user, onToggle }: UserRowProps) {
         )}
       </ConfirmModal>
 
-      <Snackbar
-        visible={snackbar !== null}
-        message={snackbar ?? ''}
-        onDismiss={() => setSnackbar(null)}
-      />
     </>
   );
 }

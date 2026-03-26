@@ -1,6 +1,7 @@
 export const mapRo = {
   searchPlaceholder: 'Caută plante...',
   gpsButton: 'Locația mea',
+  compassButton: 'Resetează orientarea',
   recenterGalati: 'Recentrează pe Galați',
   tabs: {
     overview: 'Prezentare',

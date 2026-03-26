@@ -358,7 +358,9 @@ export function AdminPOIDetailScreen() {
 
             <View style={styles.sectionCard}>
               <Text style={styles.sectionTitle}>{tPoi.description}</Text>
-              <Text style={styles.sectionText}>{plant.description}</Text>
+              <Text style={styles.sectionText}>
+                {poiText(poi.description, poi.description_en) || plant.description}
+              </Text>
             </View>
 
             {plant.parts_used.length > 0 && (
@@ -373,37 +375,47 @@ export function AdminPOIDetailScreen() {
               </View>
             )}
 
-            {plant.benefits.length > 0 && (
-              <View style={styles.sectionCard}>
-                <Text style={styles.sectionTitle}>{tPoi.benefits}</Text>
-                {plant.benefits.map((b, idx) => (
+            <View style={styles.sectionCard}>
+              <Text style={styles.sectionTitle}>{tPoi.benefits}</Text>
+              {poiText(poi.benefits, poi.benefits_en) ? (
+                <Text style={styles.sectionText}>
+                  {poiText(poi.benefits, poi.benefits_en)}
+                </Text>
+              ) : (
+                plant.benefits.map((b, idx) => (
                   <View key={idx} style={styles.bulletRow}>
                     <View style={styles.bullet} />
                     <Text style={styles.bulletText}>{b}</Text>
                   </View>
-                ))}
-              </View>
-            )}
+                ))
+              )}
+            </View>
 
-            {plant.contraindications.length > 0 && (
-              <View style={styles.sectionCard}>
-                <Text style={[styles.sectionTitle, { color: colors.error, borderBottomColor: colors.error }]}>
-                  {tPoi.contraindications}
+            <View style={styles.sectionCard}>
+              <Text style={[styles.sectionTitle, { color: colors.error, borderBottomColor: colors.error }]}>
+                {tPoi.contraindications}
+              </Text>
+              {poiText(poi.contraindications, poi.contraindications_en) ? (
+                <Text style={[styles.sectionText, { color: colors.error }]}>
+                  {poiText(poi.contraindications, poi.contraindications_en)}
                 </Text>
-                {plant.contraindications.map((c, idx) => (
+              ) : (
+                plant.contraindications.map((c, idx) => (
                   <View key={idx} style={styles.bulletRow}>
                     <View style={[styles.bullet, { backgroundColor: colors.error }]} />
                     <Text style={[styles.bulletText, { color: colors.error }]}>{c}</Text>
                   </View>
-                ))}
-              </View>
-            )}
+                ))
+              )}
+            </View>
 
             <View style={styles.sectionCard}>
               <Text style={styles.sectionTitle}>{tPoi.habitat}</Text>
               <View style={styles.infoRow}>
                 <MapPin size={18} color={colors.primaryLight} style={{ marginTop: 2 }} />
-                <Text style={styles.infoText}>{plant.habitat}</Text>
+                <Text style={styles.infoText}>
+                  {poiText(poi.habitat, poi.habitat_en) || plant.habitat}
+                </Text>
               </View>
             </View>
 
@@ -411,7 +423,9 @@ export function AdminPOIDetailScreen() {
               <Text style={styles.sectionTitle}>{tPoi.harvestPeriod}</Text>
               <View style={styles.infoRow}>
                 <Calendar size={18} color={colors.primaryLight} style={{ marginTop: 2 }} />
-                <Text style={styles.infoText}>{plant.harvest_period}</Text>
+                <Text style={styles.infoText}>
+                  {poiText(poi.harvest_period, poi.harvest_period_en) || plant.harvest_period}
+                </Text>
               </View>
             </View>
 

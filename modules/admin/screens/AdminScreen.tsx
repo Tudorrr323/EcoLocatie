@@ -5,7 +5,9 @@ import { View, Text, ScrollView, FlatList, TouchableOpacity, ActivityIndicator, 
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowLeft, Menu, Users, MapPin, CheckCircle, Clock, UserCheck, XCircle, LayoutDashboard, FileSearch, X } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
+import { useFocusEffect } from 'expo-router';
 import { SearchBar } from '../../../shared/components/SearchBar';
+import { Snackbar } from '../../../shared/components/Snackbar';
 import { FilterButton } from '../../../shared/components/FilterButton';
 import { BottomPanel } from '../../../shared/components/BottomPanel';
 import { EmptyState } from '../../../shared/components/EmptyState';
@@ -391,13 +393,18 @@ export function AdminScreen() {
     stats, users, filteredUsers, allPOIs, filteredPOIs, pendingPOIs, plants, loading,
     statusFilter, searchQuery, userSearchQuery, userStatusFilter,
     setStatusFilter, setSearchQuery, setUserSearchQuery, setUserStatusFilter,
-    toggleUser, moderatePOI, getPlantName, getUserName,
+    toggleUser, moderatePOI, refreshData, getPlantName, getUserName,
   } = useModeration();
+
+  useFocusEffect(useCallback(() => {
+    refreshData();
+  }, [refreshData]));
 
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [menuVisible, setMenuVisible] = useState(false);
   const [obsFilterModalVisible, setObsFilterModalVisible] = useState(false);
   const [userFilterModalVisible, setUserFilterModalVisible] = useState(false);
+  const [snackbar, setSnackbar] = useState<string | null>(null);
 
   const menuItems = [
     { key: 'dashboard', label: t.admin.tabs.dashboard, icon: <LayoutDashboard size={20} color={colors.primary} /> },
@@ -634,7 +641,7 @@ export function AdminScreen() {
               data={paginatedUsers}
               keyExtractor={(item) => String(item.id)}
               renderItem={({ item }) => (
-                <UserRow user={item} onToggle={toggleUser} />
+                <UserRow user={item} onToggle={toggleUser} onSnackbar={setSnackbar} />
               )}
               contentContainerStyle={{ paddingHorizontal: spacing.md, paddingBottom: spacing.xl }}
               showsVerticalScrollIndicator={false}
@@ -717,6 +724,12 @@ export function AdminScreen() {
         onBack={() => { setMenuVisible(false); router.navigate('/(tabs)/settings' as any); }}
         colors={colors}
         t={t}
+      />
+
+      <Snackbar
+        visible={snackbar !== null}
+        message={snackbar ?? ''}
+        onDismiss={() => setSnackbar(null)}
       />
     </SafeAreaView>
   );
