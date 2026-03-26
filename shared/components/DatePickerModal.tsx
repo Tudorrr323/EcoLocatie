@@ -2,13 +2,14 @@
 // Afiseaza un modal cu grid lunar, navigare luna/an, selectie zi.
 // Utilizare: visible, value?: Date, onConfirm(date), onCancel, maxDate?
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Modal,
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
+  FlatList,
 } from 'react-native';
 import { ChevronLeft, ChevronRight } from 'lucide-react-native';
 import { fonts, spacing, borderRadius } from '../styles/theme';
@@ -45,6 +46,17 @@ export function DatePickerModal({
   const [viewYear, setViewYear] = useState(new Date().getFullYear());
   const [viewMonth, setViewMonth] = useState(new Date().getMonth());
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(value);
+  const [showYearPicker, setShowYearPicker] = useState(false);
+  const yearListRef = useRef<FlatList>(null);
+
+  const currentYear = new Date().getFullYear();
+  const minYear = minDate ? minDate.getFullYear() : currentYear - 120;
+  const maxYear = maxDate ? maxDate.getFullYear() : currentYear + 10;
+  const years = useMemo(() => {
+    const arr: number[] = [];
+    for (let y = maxYear; y >= minYear; y--) arr.push(y);
+    return arr;
+  }, [minYear, maxYear]);
 
   // Sincronizeaza starea la fiecare deschidere a modalului
   useEffect(() => {
@@ -53,6 +65,7 @@ export function DatePickerModal({
       setViewYear(ref.getFullYear());
       setViewMonth(ref.getMonth());
       setSelectedDate(value);
+      setShowYearPicker(false);
     }
   }, [visible]);
 
@@ -156,9 +169,11 @@ export function DatePickerModal({
               <ChevronLeft size={20} color={canGoPrev ? colors.text : colors.border} />
             </TouchableOpacity>
 
-            <Text style={styles.monthYearText}>
-              {MONTHS_RO[viewMonth]} {viewYear}
-            </Text>
+            <TouchableOpacity onPress={() => setShowYearPicker((v) => !v)} activeOpacity={0.7}>
+              <Text style={styles.monthYearText}>
+                {MONTHS_RO[viewMonth]} {viewYear}
+              </Text>
+            </TouchableOpacity>
 
             <TouchableOpacity
               style={[styles.navBtn, !canGoNext && styles.navBtnDisabled]}
@@ -170,50 +185,89 @@ export function DatePickerModal({
             </TouchableOpacity>
           </View>
 
-          {/* Antet zile saptamana */}
-          <View style={styles.weekdayRow}>
-            {DAYS_RO.map((d) => (
-              <View key={d} style={styles.weekdayCell}>
-                <Text style={styles.weekdayText}>{d}</Text>
-              </View>
-            ))}
-          </View>
-
-          {/* Grid zile */}
-          <View style={styles.grid}>
-            {cells.map((day, i) => {
-              const selected = day !== null && isDaySelected(day);
-              const today = day !== null && isDayToday(day);
-              const disabled = day !== null && isDayDisabled(day);
-
-              return (
-                <TouchableOpacity
-                  key={i}
-                  style={[
-                    styles.dayCell,
-                    selected && styles.dayCellSelected,
-                    today && !selected && styles.dayCellToday,
-                  ]}
-                  onPress={() => day && handleDayPress(day)}
-                  activeOpacity={day && !disabled ? 0.7 : 1}
-                  disabled={!day || disabled}
-                >
-                  {day !== null && (
-                    <Text
-                      style={[
-                        styles.dayText,
-                        selected && styles.dayTextSelected,
-                        today && !selected && styles.dayTextToday,
-                        disabled && styles.dayTextDisabled,
-                      ]}
-                    >
-                      {day}
+          {showYearPicker ? (
+            /* Grid selectie an */
+            <FlatList
+              ref={yearListRef}
+              data={years}
+              keyExtractor={(item) => String(item)}
+              numColumns={3}
+              style={styles.yearList}
+              contentContainerStyle={styles.yearListContent}
+              showsVerticalScrollIndicator={false}
+              onLayout={() => {
+                const idx = years.indexOf(viewYear);
+                if (idx > 0) {
+                  const rowIndex = Math.floor(idx / 3);
+                  yearListRef.current?.scrollToOffset({ offset: Math.max(0, rowIndex * 52 - 80), animated: false });
+                }
+              }}
+              renderItem={({ item: year }) => {
+                const isActive = year === viewYear;
+                return (
+                  <TouchableOpacity
+                    style={[styles.yearCell, isActive && styles.yearCellActive]}
+                    onPress={() => {
+                      setViewYear(year);
+                      setShowYearPicker(false);
+                    }}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[styles.yearText, isActive && styles.yearTextActive]}>
+                      {year}
                     </Text>
-                  )}
-                </TouchableOpacity>
-              );
-            })}
-          </View>
+                  </TouchableOpacity>
+                );
+              }}
+            />
+          ) : (
+            <>
+              {/* Antet zile saptamana */}
+              <View style={styles.weekdayRow}>
+                {DAYS_RO.map((d) => (
+                  <View key={d} style={styles.weekdayCell}>
+                    <Text style={styles.weekdayText}>{d}</Text>
+                  </View>
+                ))}
+              </View>
+
+              {/* Grid zile */}
+              <View style={styles.grid}>
+                {cells.map((day, i) => {
+                  const selected = day !== null && isDaySelected(day);
+                  const today = day !== null && isDayToday(day);
+                  const disabled = day !== null && isDayDisabled(day);
+
+                  return (
+                    <TouchableOpacity
+                      key={i}
+                      style={[
+                        styles.dayCell,
+                        selected && styles.dayCellSelected,
+                        today && !selected && styles.dayCellToday,
+                      ]}
+                      onPress={() => day && handleDayPress(day)}
+                      activeOpacity={day && !disabled ? 0.7 : 1}
+                      disabled={!day || disabled}
+                    >
+                      {day !== null && (
+                        <Text
+                          style={[
+                            styles.dayText,
+                            selected && styles.dayTextSelected,
+                            today && !selected && styles.dayTextToday,
+                            disabled && styles.dayTextDisabled,
+                          ]}
+                        >
+                          {day}
+                        </Text>
+                      )}
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </>
+          )}
 
           {/* Butoane actiune */}
           <View style={styles.actions}>
@@ -327,6 +381,33 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   },
   dayTextDisabled: {
     color: colors.border,
+  },
+  yearList: {
+    maxHeight: 240,
+  },
+  yearListContent: {
+    paddingVertical: spacing.xs,
+  },
+  yearCell: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: spacing.sm,
+    margin: 2,
+    borderRadius: borderRadius.lg,
+    height: 48,
+  },
+  yearCellActive: {
+    backgroundColor: colors.primary,
+  },
+  yearText: {
+    fontSize: fonts.sizes.md,
+    color: colors.text,
+    fontWeight: '500',
+  },
+  yearTextActive: {
+    color: colors.textLight,
+    fontWeight: '700',
   },
   actions: {
     flexDirection: 'row',

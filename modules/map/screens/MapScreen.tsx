@@ -24,11 +24,11 @@ import { fonts, spacing, borderRadius } from '../../../shared/styles/theme';
 import type { MarkerData } from '../types/map.types';
 import { Keyboard } from 'react-native';
 import { useTranslation } from '../../../shared/i18n';
-import { getPlantById } from '../../../shared/repository/dataProvider';
+import { getPlantById, getPOIById } from '../../../shared/repository/dataProvider';
 import { getPlantName } from '../../../shared/context/SettingsContext';
 import { TranslatableText } from '../../../shared/components/TranslatableText';
 import { FavoriteButton } from '../../../shared/components/FavoriteButton';
-import { useFavorites } from '../../../shared/hooks/useFavorites';
+import { usePOIFavorites } from '../../../shared/context/POIFavoritesContext';
 import { Snackbar } from '../../../shared/components/Snackbar';
 import { ChatScreen } from '../components/ChatScreen';
 import { CommentSection } from '../../../shared/components/CommentSection';
@@ -47,7 +47,7 @@ const MapScreen: React.FC = () => {
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
   const [imgPressed, setImgPressed] = useState(false);
   const [chatVisible, setChatVisible] = useState(false);
-  const { isFavorite, toggleFavorite, lastAction, clearLastAction } = useFavorites();
+  const { isPoiFavorite, togglePoiFavorite, lastAction, clearLastAction } = usePOIFavorites();
   const imgTouchStartRef = useRef<{ x: number; y: number } | null>(null);
   const [activeTab, setActiveTab] = useState('prezentare');
   const [searchAreaHeight, setSearchAreaHeight] = useState(0);
@@ -67,11 +67,12 @@ const MapScreen: React.FC = () => {
     mapRef.current?.flyTo(marker.latitude, marker.longitude, 16);
     setSelectedMarker(marker);
     setActiveTab('prezentare');
-    // Fetch full plant details (list endpoint may omit contraindications/benefits)
-    const fullPlant = await getPlantById(marker.plant.id);
-    if (fullPlant) {
-      setSelectedMarker((prev) => prev?.id === marker.id ? { ...prev, plant: fullPlant } : prev);
-    }
+    // Fetch full POI + plant details (list endpoint may omit user-written fields)
+    const [fullPOI, fullPlant] = await Promise.all([getPOIById(marker.id), getPlantById(marker.plant.id)]);
+    setSelectedMarker((prev) => {
+      if (!prev || prev.id !== marker.id) return prev;
+      return { ...prev, ...(fullPOI ?? {}), plant: fullPlant ?? prev.plant };
+    });
   }, []);
 
   const handleGPS = useCallback(async () => {
@@ -102,11 +103,12 @@ const MapScreen: React.FC = () => {
     if (marker) {
       setSelectedMarker(marker);
       setActiveTab('prezentare');
-      // Fetch full plant details (list endpoint may omit contraindications/benefits)
-      const fullPlant = await getPlantById(marker.plant.id);
-      if (fullPlant) {
-        setSelectedMarker((prev) => prev?.id === marker.id ? { ...prev, plant: fullPlant } : prev);
-      }
+      // Fetch full POI + plant details (list endpoint may omit user-written fields)
+      const [fullPOI, fullPlant] = await Promise.all([getPOIById(marker.id), getPlantById(marker.plant.id)]);
+      setSelectedMarker((prev) => {
+        if (!prev || prev.id !== marker.id) return prev;
+        return { ...prev, ...(fullPOI ?? {}), plant: fullPlant ?? prev.plant };
+      });
     }
   }, [displayedMarkers]);
 
@@ -286,8 +288,8 @@ const MapScreen: React.FC = () => {
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                   <Text style={[poiStyles.nameRo, { flex: 1 }]}>{getPlantName(selectedMarker.plant)}</Text>
                   <FavoriteButton
-                    isFavorite={isFavorite(selectedMarker.plant.id)}
-                    onToggle={() => toggleFavorite(selectedMarker.plant.id)}
+                    isFavorite={isPoiFavorite(selectedMarker.id)}
+                    onToggle={() => togglePoiFavorite(selectedMarker.id)}
                   />
                 </View>
                 <Text style={poiStyles.nameLatin}>{selectedMarker.plant.name_latin}</Text>

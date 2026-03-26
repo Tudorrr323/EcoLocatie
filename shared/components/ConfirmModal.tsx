@@ -26,6 +26,7 @@ interface ConfirmModalProps {
   confirmLabel?: string;
   cancelLabel?: string;
   confirmDestructive?: boolean;
+  confirmDisabled?: boolean;
   icon?: React.ReactNode;
   children?: React.ReactNode;
   onConfirm?: () => void;
@@ -39,6 +40,7 @@ export function ConfirmModal({
   confirmLabel = 'Confirma',
   cancelLabel = 'Anuleaza',
   confirmDestructive = false,
+  confirmDisabled = false,
   icon,
   children,
   onConfirm,
@@ -100,12 +102,17 @@ export function ConfirmModal({
       statusBarTranslucent
       onRequestClose={onCancel}
     >
+      {/* Overlay bg — full screen, outside KeyboardAvoidingView */}
+      <Animated.View style={[styles.overlayBg, { opacity: overlayOpacity }]} />
+      <Pressable style={StyleSheet.absoluteFill} onPress={onCancel} />
+
       <KeyboardAvoidingView
         style={styles.keyboardAvoiding}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior="padding"
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+        pointerEvents="box-none"
       >
-        <Pressable style={styles.overlay} onPress={onCancel}>
-          <Animated.View style={[styles.overlayBg, { opacity: overlayOpacity }]} />
+        <View style={styles.overlay} pointerEvents="box-none">
 
           <Animated.View
             style={[
@@ -144,17 +151,21 @@ export function ConfirmModal({
                       confirmDestructive
                         ? styles.confirmButtonDestructive
                         : styles.confirmButtonPrimary,
+                      confirmDisabled && styles.confirmButtonDisabled,
                     ]}
                     onPress={onConfirm}
                     activeOpacity={0.8}
+                    disabled={!!confirmDisabled}
                   >
-                    <Text style={styles.confirmButtonText}>{confirmLabel}</Text>
+                    <Text style={[styles.confirmButtonText, confirmDisabled && styles.confirmButtonTextDisabled]}>
+                      {confirmLabel}
+                    </Text>
                   </TouchableOpacity>
                 ) : null}
               </View>
             </Pressable>
           </Animated.View>
-        </Pressable>
+        </View>
       </KeyboardAvoidingView>
     </Modal>
   );
@@ -242,9 +253,15 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   confirmButtonDestructive: {
     backgroundColor: colors.error,
   },
+  confirmButtonDisabled: {
+    opacity: 0.4,
+  },
   confirmButtonText: {
     fontSize: fonts.sizes.md,
     fontWeight: '700',
     color: colors.textLight,
+  },
+  confirmButtonTextDisabled: {
+    opacity: 0.7,
   },
 });

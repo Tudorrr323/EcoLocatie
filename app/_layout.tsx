@@ -8,6 +8,8 @@ import { View, ActivityIndicator } from 'react-native';
 import { AuthProvider, useAuthContext } from '../shared/context/AuthContext';
 import { SettingsProvider, useSettings } from '../shared/context/SettingsContext';
 import { NotificationProvider } from '../shared/context/NotificationContext';
+import { FavoritesProvider } from '../shared/context/FavoritesContext';
+import { POIFavoritesProvider } from '../shared/context/POIFavoritesContext';
 
 function RootLayoutNav() {
   const { isAuthenticated, loading } = useAuthContext();
@@ -54,8 +56,23 @@ function RootLayoutNav() {
         <Stack.Screen name="forgot-password" />
         <Stack.Screen name="edit-profile" />
         <Stack.Screen name="account-security" />
+        <Stack.Screen name="notifications" />
         <Stack.Screen
           name="plant/[id]"
+          options={{
+            headerShown: false,
+            presentation: 'card',
+          }}
+        />
+        <Stack.Screen
+          name="admin-poi/[id]"
+          options={{
+            headerShown: false,
+            presentation: 'card',
+          }}
+        />
+        <Stack.Screen
+          name="admin-user/[id]"
           options={{
             headerShown: false,
             presentation: 'card',
@@ -71,7 +88,11 @@ export default function RootLayout() {
     <SettingsProvider>
       <AuthProvider>
         <NotificationProvider>
-          <RootLayoutNav />
+          <FavoritesProvider>
+            <POIFavoritesProvider>
+              <RootLayoutNav />
+            </POIFavoritesProvider>
+          </FavoritesProvider>
         </NotificationProvider>
       </AuthProvider>
     </SettingsProvider>

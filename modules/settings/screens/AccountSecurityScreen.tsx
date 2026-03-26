@@ -14,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, Lock, Eye, EyeOff, ChevronRight, KeyRound, UserX } from 'lucide-react-native';
 import { useAuthContext } from '../../../shared/context/AuthContext';
+import { changePassword as apiChangePassword, deactivateAccount } from '../../auth/repository/authRepository';
 import { useTranslation } from '../../../shared/i18n';
 import { ConfirmModal } from '../../../shared/components/ConfirmModal';
 import { fonts, spacing, borderRadius } from '../../../shared/styles/theme';
@@ -65,7 +66,7 @@ export function AccountSecurityScreen() {
     setSuccessMessage(undefined);
   }
 
-  function handleChangePassword() {
+  async function handleChangePassword() {
     setCurrentError(undefined);
     setNewError(undefined);
     setConfirmError(undefined);
@@ -74,9 +75,6 @@ export function AccountSecurityScreen() {
 
     if (!currentPassword) {
       setCurrentError(t.account.security.currentPasswordRequired);
-      valid = false;
-    } else if (user?.password && currentPassword !== user.password) {
-      setCurrentError(t.account.security.currentPasswordIncorrect);
       valid = false;
     }
 
@@ -98,14 +96,24 @@ export function AccountSecurityScreen() {
 
     if (!valid) return;
 
-    setSuccessMessage(t.account.security.passwordChanged);
-    setCurrentPassword('');
-    setNewPassword('');
-    setConfirmPassword('');
+    try {
+      await apiChangePassword(currentPassword, newPassword);
+      setSuccessMessage(t.account.security.passwordChanged);
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch {
+      setCurrentError(t.account.security.currentPasswordIncorrect);
+    }
   }
 
-  function handleDeactivate() {
+  async function handleDeactivate() {
     setShowDeactivateModal(false);
+    try {
+      await deactivateAccount();
+    } catch {
+      // Continue with logout even if API fails
+    }
     logout();
   }
 

@@ -2,9 +2,8 @@ export const accountRo = {
   settings: {
     title: 'Setări',
     general: 'General',
-    notifications: 'Notificări (TODO)',
+    notifications: 'Notificări',
     security: 'Cont & Securitate',
-    contact: 'Contact & Suport (TODO)',
     adminPanel: 'Panou administrare',
     about: 'Despre',
     aboutEcoLocation: 'Despre EcoLocation',

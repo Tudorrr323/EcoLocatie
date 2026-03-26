@@ -5,6 +5,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { TouchableOpacity, View, Text, Modal, FlatList, StyleSheet } from 'react-native';
 import { Bell, BellOff, X } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { spacing, fonts } from '../styles/theme';
 import type { ThemeColors } from '../styles/theme';
 import { useThemeColors } from '../hooks/useThemeColors';
@@ -12,8 +13,10 @@ import { useTranslation } from '../i18n';
 import { useNotifications } from '../context/NotificationContext';
 import { EmptyState } from './EmptyState';
 import { LoadingSpinner } from './LoadingSpinner';
+import { Pagination } from './Pagination';
+import { usePagination } from '../hooks/usePagination';
 import { NotificationCard } from '../../modules/notifications/components/NotificationCard';
-import type { AppNotification } from '../../modules/notifications/types/notifications.types';
+import type { AppNotification, NotificationType } from '../../modules/notifications/types/notifications.types';
 
 export function NotificationButton() {
   const colors = useThemeColors();
@@ -28,7 +31,13 @@ export function NotificationButton() {
     markAllAsRead,
   } = useNotifications();
 
+  const router = useRouter();
   const [visible, setVisible] = useState(false);
+
+  const {
+    currentPage, totalPages, paginatedItems,
+    onPageChange, pageSize, onPageSizeChange,
+  } = usePagination(notifications, 10);
 
   const handleOpen = useCallback(() => {
     setVisible(true);
@@ -39,11 +48,29 @@ export function NotificationButton() {
     setVisible(false);
   }, []);
 
+  function getRouteForNotification(type: NotificationType): string {
+    switch (type) {
+      case 'poi_created':
+      case 'poi_edited':
+        return '/(tabs)/admin';
+      case 'poi_commented':
+        return '/(tabs)';
+      case 'poi_approved':
+      case 'poi_rejected':
+      case 'poi_pending':
+      default:
+        return '/(tabs)/my-plants';
+    }
+  }
+
   const handleNotificationPress = useCallback(async (notification: AppNotification) => {
     if (!notification.is_read) {
       await markAsRead(notification.id);
     }
-  }, [markAsRead]);
+    setVisible(false);
+    const route = getRouteForNotification(notification.type);
+    router.navigate(route as any);
+  }, [markAsRead, router]);
 
   const handleMarkAllRead = useCallback(async () => {
     await markAllAsRead();
@@ -110,10 +137,22 @@ export function NotificationButton() {
             />
           ) : (
             <FlatList
-              data={notifications}
+              data={paginatedItems}
               renderItem={renderNotification}
               keyExtractor={keyExtractor}
               style={styles.list}
+              contentContainerStyle={{ paddingBottom: spacing.xl }}
+              ListFooterComponent={
+                totalPages > 0 ? (
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={onPageChange}
+                    pageSize={pageSize}
+                    onPageSizeChange={onPageSizeChange}
+                  />
+                ) : null
+              }
             />
           )}
         </SafeAreaView>

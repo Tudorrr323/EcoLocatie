@@ -18,3 +18,7 @@ export interface HistoryEntry {
 }
 
 export type MyPlantsTab = 'plants' | 'history';
+
+export type PlantTabItem =
+  | { kind: 'poi'; entry: HistoryEntry }
+  | { kind: 'plant'; plant: Plant };

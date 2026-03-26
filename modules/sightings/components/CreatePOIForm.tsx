@@ -314,7 +314,17 @@ export const CreatePOIForm = forwardRef<CreatePOIFormRef, CreatePOIFormProps>(fu
             <PhotoCapture
               imageUri={draft.imageUri}
               onOpenCamera={() => setShowCamera(true)}
-              onClear={() => setDraft((prev) => ({ ...prev, imageUri: null }))}
+              onClear={() => {
+                setDraft({ ...EMPTY_DRAFT, aiResults: [] });
+                setStep(1);
+                setMaxStepReached(1);
+                setShowManualSelector(false);
+                setManualQuery('');
+                setDetailLang('ro');
+                setFieldErrors({});
+                resetAI();
+                sightingGuard.hasProgress = false;
+              }}
             />
           </View>
         );
@@ -495,8 +505,8 @@ export const CreatePOIForm = forwardRef<CreatePOIFormRef, CreatePOIFormProps>(fu
             ) : (
               <View>
                 <Input
-                  label={t.sightings.details.description}
-                  placeholder={t.sightings.details.descriptionPlaceholder}
+                  label={t.sightings.details.description_en}
+                  placeholder={t.sightings.details.descriptionPlaceholder_en}
                   value={draft.description_en}
                   onChangeText={(v) => handleFieldChange('description_en', v)}
                   error={fieldErrors.description_en}
@@ -504,8 +514,8 @@ export const CreatePOIForm = forwardRef<CreatePOIFormRef, CreatePOIFormProps>(fu
                   numberOfLines={3}
                 />
                 <Input
-                  label={t.sightings.details.habitat}
-                  placeholder={t.sightings.details.habitatPlaceholder}
+                  label={t.sightings.details.habitat_en}
+                  placeholder={t.sightings.details.habitatPlaceholder_en}
                   value={draft.habitat_en}
                   onChangeText={(v) => handleFieldChange('habitat_en', v)}
                   error={fieldErrors.habitat_en}
@@ -513,15 +523,15 @@ export const CreatePOIForm = forwardRef<CreatePOIFormRef, CreatePOIFormProps>(fu
                   numberOfLines={2}
                 />
                 <Input
-                  label={t.sightings.details.harvestPeriod}
-                  placeholder={t.sightings.details.harvestPeriodPlaceholder}
+                  label={t.sightings.details.harvestPeriod_en}
+                  placeholder={t.sightings.details.harvestPeriodPlaceholder_en}
                   value={draft.harvestPeriod_en}
                   onChangeText={(v) => handleFieldChange('harvestPeriod_en', v)}
                   error={fieldErrors.harvestPeriod_en}
                 />
                 <Input
-                  label={t.sightings.details.benefits}
-                  placeholder={t.sightings.details.benefitsPlaceholder}
+                  label={t.sightings.details.benefits_en}
+                  placeholder={t.sightings.details.benefitsPlaceholder_en}
                   value={draft.benefits_en}
                   onChangeText={(v) => handleFieldChange('benefits_en', v)}
                   error={fieldErrors.benefits_en}
@@ -529,8 +539,8 @@ export const CreatePOIForm = forwardRef<CreatePOIFormRef, CreatePOIFormProps>(fu
                   numberOfLines={3}
                 />
                 <Input
-                  label={t.sightings.details.contraindications}
-                  placeholder={t.sightings.details.contraindicationsPlaceholder}
+                  label={t.sightings.details.contraindications_en}
+                  placeholder={t.sightings.details.contraindicationsPlaceholder_en}
                   value={draft.contraindications_en}
                   onChangeText={(v) => handleFieldChange('contraindications_en', v)}
                   error={fieldErrors.contraindications_en}
@@ -538,8 +548,8 @@ export const CreatePOIForm = forwardRef<CreatePOIFormRef, CreatePOIFormProps>(fu
                   numberOfLines={2}
                 />
                 <Input
-                  label={t.sightings.details.comment}
-                  placeholder={t.sightings.details.commentPlaceholder}
+                  label={t.sightings.details.comment_en}
+                  placeholder={t.sightings.details.commentPlaceholder_en}
                   value={draft.comment_en}
                   onChangeText={(v) => handleFieldChange('comment_en', v)}
                   error={fieldErrors.comment_en}

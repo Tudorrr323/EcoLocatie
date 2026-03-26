@@ -23,6 +23,8 @@ ecolocatie/
 │   │   └── admin.tsx                       # → admin module → AdminScreen [href: null, ascuns]
 │   ├── plant/[id].tsx                      # → plants module → PlantDetailScreen
 │   ├── my-plant/[id].tsx                   # → myplants module → MyPlantDetailScreen
+│   ├── admin-poi/[id].tsx                  # → admin module → AdminPOIDetailScreen
+│   ├── admin-user/[id].tsx                 # → admin module → AdminUserDetailScreen
 │   ├── login.tsx                           # → auth module → LoginScreen
 │   ├── register.tsx                        # → auth module → RegisterScreen
 │   ├── privacy-policy.tsx                  # → auth module → PrivacyPolicyScreen [publica]
@@ -92,17 +94,24 @@ ecolocatie/
 │   ├── admin/
 │   │   ├── components/
 │   │   │   ├── UserRow.tsx
-│   │   │   └── ModerationCard.tsx
+│   │   │   ├── ObservationCard.tsx            # card observație cu navigare la detalii
+│   │   │   ├── ModerationCard.tsx
+│   │   │   └── StatChart.tsx
 │   │   ├── hooks/
 │   │   │   └── useModeration.ts
 │   │   ├── repository/
 │   │   │   └── adminRepository.ts
 │   │   ├── screens/
-│   │   │   └── AdminScreen.tsx
+│   │   │   ├── AdminScreen.tsx
+│   │   │   ├── AdminPOIDetailScreen.tsx       # detalii observație: hero, tabs, approve/reject, diff editare
+│   │   │   └── AdminUserDetailScreen.tsx      # detalii utilizator: profil, info, dezactivare/activare
 │   │   ├── styles/
 │   │   │   └── admin.styles.ts
 │   │   ├── types/
 │   │   │   └── admin.types.ts
+│   │   ├── i18n/
+│   │   │   ├── ro.ts
+│   │   │   └── en.ts
 │   │   └── index.ts
 │   │
 │   ├── myplants/

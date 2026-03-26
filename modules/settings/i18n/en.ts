@@ -4,9 +4,8 @@ export const accountEn: typeof accountRo = {
   settings: {
     title: 'Settings',
     general: 'General',
-    notifications: 'Notifications (TODO)',
+    notifications: 'Notifications',
     security: 'Account & Security',
-    contact: 'Contact & Support (TODO)',
     adminPanel: 'Admin panel',
     about: 'About',
     aboutEcoLocation: 'About EcoLocation',

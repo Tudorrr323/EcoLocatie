@@ -24,7 +24,10 @@ export const myPlantsEn: typeof myPlantsRo = {
     scientificName: 'Scientific Name',
     tabs: {
       observations: 'Observations',
-      plantInfo: 'Plant Info',
+      overview: 'Overview',
+      benefits: 'Benefits',
+      contraindications: 'Contraindications',
+      details: 'Details',
     },
     removeTitle: 'Remove from My Plants',
     removeMessage: 'Are you sure you want to remove this plant from your list?',
@@ -45,6 +48,12 @@ export const myPlantsEn: typeof myPlantsRo = {
   },
   menu: {
     remove: 'Remove from My Plants',
+    edit: 'Edit observation',
+  },
+  edit: {
+    title: 'Edit observation',
+    saved: 'Observation updated successfully!',
+    save: 'Save',
   },
   dateToday: 'Today',
   dateYesterday: 'Yesterday',

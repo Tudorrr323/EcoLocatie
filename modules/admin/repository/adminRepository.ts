@@ -5,15 +5,17 @@ import { apiGet, apiPut } from '../../../shared/services/apiClient';
 import type { User, PointOfInterest, Plant } from '../../../shared/types/plant.types';
 import type { AdminStats, ModerationAction } from '../types/admin.types';
 import { buildImageUrl } from '../../../shared/repository/dataProvider';
-import { MOCK_ADMIN_STATS, MOCK_USERS, MOCK_POIS } from '../../../shared/mock/mockData';
 
 // --- API response types ---
 
 interface ApiAdminStats {
   totalUsers: number;
+  activeUsers: number;
   totalPlants: number;
   totalPois: number;
+  approvedPois: number;
   pendingPois: number;
+  rejectedPois: number;
   totalComments: number;
 }
 
@@ -38,6 +40,17 @@ interface ApiPOI {
   latitude: number;
   longitude: number;
   comment: string;
+  comment_en?: string;
+  description?: string;
+  description_en?: string;
+  habitat?: string;
+  habitat_en?: string;
+  harvest_period?: string;
+  harvest_period_en?: string;
+  benefits?: string;
+  benefits_en?: string;
+  contraindications?: string;
+  contraindications_en?: string;
   ai_confidence: number;
   status: string;
   plant_name?: string;
@@ -81,6 +94,17 @@ function normalizePOI(api: ApiPOI): PointOfInterest {
     latitude: Number(api.latitude) || 0,
     longitude: Number(api.longitude) || 0,
     comment: api.comment ?? '',
+    comment_en: api.comment_en,
+    description: api.description,
+    description_en: api.description_en,
+    habitat: api.habitat,
+    habitat_en: api.habitat_en,
+    harvest_period: api.harvest_period,
+    harvest_period_en: api.harvest_period_en,
+    benefits: api.benefits,
+    benefits_en: api.benefits_en,
+    contraindications: api.contraindications,
+    contraindications_en: api.contraindications_en,
     ai_confidence: api.ai_confidence != null ? Number(api.ai_confidence) : 0,
     status: (api.status as import('../../../shared/types/plant.types').POIStatus) ?? 'pending',
     created_at: api.created_at,
@@ -92,19 +116,17 @@ function normalizePOI(api: ApiPOI): PointOfInterest {
 export async function getAdminStats(): Promise<AdminStats> {
   try {
     const api = await apiGet<ApiAdminStats>('/api/admin/stats', true);
-    const pending = api.pendingPois ?? 0;
-    const total = api.totalPois ?? 0;
     return {
       totalUsers: api.totalUsers ?? 0,
-      activeUsers: api.totalUsers ?? 0,
-      totalPOIs: total,
-      approvedPOIs: total - pending,
-      pendingPOIs: pending,
-      rejectedPOIs: 0,
+      activeUsers: api.activeUsers ?? api.totalUsers ?? 0,
+      totalPOIs: api.totalPois ?? 0,
+      approvedPOIs: api.approvedPois ?? 0,
+      pendingPOIs: api.pendingPois ?? 0,
+      rejectedPOIs: api.rejectedPois ?? 0,
       totalPlants: api.totalPlants ?? 0,
     };
   } catch {
-    return MOCK_ADMIN_STATS;
+    return { totalUsers: 0, activeUsers: 0, totalPOIs: 0, approvedPOIs: 0, pendingPOIs: 0, rejectedPOIs: 0, totalPlants: 0 };
   }
 }
 
@@ -114,7 +136,7 @@ export async function getAllUsers(): Promise<User[]> {
     const users = Array.isArray(response) ? response : (response.data ?? []);
     return users.map(normalizeUser);
   } catch {
-    return MOCK_USERS;
+    return [];
   }
 }
 
@@ -149,7 +171,7 @@ export async function getPendingPOIsAdmin(): Promise<PointOfInterest[]> {
     const pois = Array.isArray(response) ? response : (response.data ?? []);
     return pois.map(normalizePOI);
   } catch {
-    return MOCK_POIS.filter((p) => p.status === 'pending');
+    return [];
   }
 }
 
@@ -171,6 +193,6 @@ export async function getAllPOIsAdmin(pendingPOIs?: PointOfInterest[]): Promise<
     }
     return merged;
   } catch {
-    return MOCK_POIS;
+    return [];
   }
 }

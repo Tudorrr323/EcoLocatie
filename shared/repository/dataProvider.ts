@@ -6,7 +6,6 @@ import { apiGet } from '../services/apiClient';
 import type { Plant, PointOfInterest, User, MapConfig } from '../types/plant.types';
 import { API_BASE_URL } from '../constants/config';
 import { getCurrentLanguage } from '../context/SettingsContext';
-import { MOCK_PLANTS, MOCK_POIS } from '../mock/mockData';
 
 // --- Response types from backend ---
 
@@ -52,10 +51,23 @@ interface ApiPOI {
   longitude: number;
   address?: string;
   comment: string;
+  comment_en?: string;
+  description?: string;
+  description_en?: string;
+  habitat?: string;
+  habitat_en?: string;
+  harvest_period?: string;
+  harvest_period_en?: string;
+  benefits?: string;
+  benefits_en?: string;
+  contraindications?: string;
+  contraindications_en?: string;
   ai_confidence: number;
   status: 'approved' | 'pending' | 'rejected';
   plant_name?: string;
   name_latin?: string;
+  plant_name_en?: string;
+  icon_color?: string;
   author?: string;
   primary_image?: string;
   images?: string[];
@@ -94,13 +106,13 @@ function normalizePlant(api: ApiPlant): Plant {
     family: api.family,
     description: api.description ?? '',
     parts_used: Array.isArray(api.usable_parts)
-      ? api.usable_parts.map((p) => (typeof p === 'string' ? p : p.part))
+      ? api.usable_parts.map((p) => (typeof p === 'string' ? p : p.part)).filter(Boolean)
       : [],
     benefits: Array.isArray(api.benefits)
-      ? api.benefits.map((b) => (typeof b === 'string' ? b : b.benefit))
+      ? api.benefits.map((b) => (typeof b === 'string' ? b : b.benefit)).filter(Boolean)
       : [],
     contraindications: Array.isArray(api.contraindications)
-      ? api.contraindications.map((c) => (typeof c === 'string' ? c : c.contraindication))
+      ? api.contraindications.map((c) => (typeof c === 'string' ? c : c.contraindication)).filter(Boolean)
       : [],
     habitat: api.habitat ?? '',
     harvest_period: api.harvest_period ?? '',
@@ -120,6 +132,17 @@ function normalizePOI(api: ApiPOI): PointOfInterest {
     longitude: api.longitude,
     address: api.address,
     comment: api.comment ?? '',
+    comment_en: api.comment_en,
+    description: api.description,
+    description_en: api.description_en,
+    habitat: api.habitat,
+    habitat_en: api.habitat_en,
+    harvest_period: api.harvest_period,
+    harvest_period_en: api.harvest_period_en,
+    benefits: api.benefits,
+    benefits_en: api.benefits_en,
+    contraindications: api.contraindications,
+    contraindications_en: api.contraindications_en,
     ai_confidence: api.ai_confidence ?? 0,
     status: api.status,
     created_at: api.created_at,
@@ -137,7 +160,7 @@ export async function getPlants(): Promise<Plant[]> {
     const response = await apiGet<PlantsListResponse>(`/api/plants?limit=200&lang=${lang}`);
     return response.data.map(normalizePlant);
   } catch {
-    return MOCK_PLANTS;
+    return [];
   }
 }
 
@@ -147,7 +170,16 @@ export async function getPlantById(id: number): Promise<Plant | undefined> {
     const api = await apiGet<ApiPlant>(`/api/plants/${id}?lang=${lang}`);
     return normalizePlant(api);
   } catch {
-    return MOCK_PLANTS.find((p) => p.id === id);
+    return undefined;
+  }
+}
+
+export async function getPlantByIdWithLang(id: number, lang: 'ro' | 'en'): Promise<Plant | undefined> {
+  try {
+    const api = await apiGet<ApiPlant>(`/api/plants/${id}?lang=${lang}`);
+    return normalizePlant(api);
+  } catch {
+    return undefined;
   }
 }
 
@@ -156,7 +188,7 @@ export async function getApprovedPOIs(): Promise<PointOfInterest[]> {
     const response = await apiGet<POIsListResponse>('/api/pois?status=approved&limit=500');
     return response.data.map(normalizePOI);
   } catch {
-    return MOCK_POIS.filter((p) => p.status === 'approved');
+    return [];
   }
 }
 
@@ -165,7 +197,7 @@ export async function getPendingPOIs(): Promise<PointOfInterest[]> {
     const response = await apiGet<POIsListResponse>('/api/pois?status=pending&limit=500');
     return response.data.map(normalizePOI);
   } catch {
-    return MOCK_POIS.filter((p) => p.status === 'pending');
+    return [];
   }
 }
 
@@ -174,7 +206,7 @@ export async function getPOIs(): Promise<PointOfInterest[]> {
     const response = await apiGet<POIsListResponse>('/api/pois?limit=500');
     return response.data.map(normalizePOI);
   } catch {
-    return MOCK_POIS;
+    return [];
   }
 }
 
@@ -183,7 +215,19 @@ export async function getPOIById(id: number): Promise<PointOfInterest | undefine
     const api = await apiGet<ApiPOI>(`/api/pois/${id}`);
     return normalizePOI(api);
   } catch {
-    return MOCK_POIS.find((p) => p.id === id);
+    return undefined;
+  }
+}
+
+export async function getUserPOIs(userId: number): Promise<PointOfInterest[]> {
+  try {
+    const response = await apiGet<POIsListResponse>(`/api/pois?user_id=${userId}&status=approved&limit=500`);
+    const pendingRes = await apiGet<POIsListResponse>(`/api/pois?user_id=${userId}&status=pending&limit=500`).catch(() => ({ data: [], total: 0, limit: 0, offset: 0 }));
+    const rejectedRes = await apiGet<POIsListResponse>(`/api/pois?user_id=${userId}&status=rejected&limit=500`).catch(() => ({ data: [], total: 0, limit: 0, offset: 0 }));
+    response.data = [...response.data, ...(pendingRes.data || []), ...(rejectedRes.data || [])];
+    return response.data.map(normalizePOI);
+  } catch {
+    return [];
   }
 }
 

@@ -10,6 +10,7 @@ import {
   Dimensions,
   Pressable,
   Platform,
+  Keyboard,
 } from 'react-native';
 import { spacing, borderRadius } from '../styles/theme';
 import type { ThemeColors } from '../styles/theme';
@@ -85,6 +86,18 @@ export function SwipeableBottomSheet({
     prevVisibleRef.current = visible;
   }, [visible, colY]);
 
+  // Keyboard: shrink content so ScrollView can scroll input into view
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  useEffect(() => {
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const sub1 = Keyboard.addListener(showEvent, (e) => setKeyboardHeight(e.endCoordinates.height));
+    const sub2 = Keyboard.addListener(hideEvent, () => setKeyboardHeight(0));
+    return () => { sub1.remove(); sub2.remove(); };
+  }, []);
+
   const pan = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => false,
@@ -141,7 +154,7 @@ export function SwipeableBottomSheet({
           </View>
           {header}
         </View>
-        <View style={styles.content}>
+        <View style={[styles.content, keyboardHeight > 0 && { paddingBottom: keyboardHeight + spacing.md }]}>
           {children}
           {!expanded && (
             <Pressable style={styles.tapOverlay} onPress={expand} />

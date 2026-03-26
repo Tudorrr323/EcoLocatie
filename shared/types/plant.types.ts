@@ -29,11 +29,17 @@ export interface PointOfInterest {
   longitude: number;
   address?: string;
   description?: string;
+  description_en?: string;
   habitat?: string;
+  habitat_en?: string;
   harvest_period?: string;
+  harvest_period_en?: string;
   benefits?: string;
+  benefits_en?: string;
   contraindications?: string;
+  contraindications_en?: string;
   comment: string;
+  comment_en?: string;
   ai_confidence: number;
   status: POIStatus;
   created_at: string;

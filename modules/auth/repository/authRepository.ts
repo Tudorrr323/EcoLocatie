@@ -2,11 +2,10 @@
 // Login si register prin API backend. JWT token salvat in AsyncStorage.
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { apiPost, apiGet, apiRequest, saveToken, clearToken, getToken } from '../../../shared/services/apiClient';
+import { apiPost, apiGet, apiPut, apiRequest, saveToken, clearToken, getToken } from '../../../shared/services/apiClient';
 import { buildImageUrl } from '../../../shared/repository/dataProvider';
 import type { User } from '../../../shared/types/plant.types';
 import type { RegisterData } from '../types/auth.types';
-import { MOCK_USERS } from '../../../shared/mock/mockData';
 
 const STORAGE_KEY = '@ecolocatie_user';
 
@@ -22,17 +21,22 @@ function normalizeUser(user: User): User {
   };
 }
 
-export async function login(email: string, password: string): Promise<User> {
-  try {
-    const response = await apiPost<AuthResponse>('/api/auth/login', { email, password });
-    await saveToken(response.token);
-    return normalizeUser(response.user);
-  } catch {
-    // Mock fallback — accepta orice email cu parola "123456" sau userul admin
-    const mockUser = MOCK_USERS.find((u) => u.email === email) ?? MOCK_USERS[1];
-    await saveToken('mock-jwt-token');
-    return mockUser;
+export class AccountDeactivatedError extends Error {
+  constructor() {
+    super('ACCOUNT_DEACTIVATED');
+    this.name = 'AccountDeactivatedError';
   }
+}
+
+export async function login(email: string, password: string): Promise<User> {
+  const response = await apiPost<AuthResponse>('/api/auth/login', { email, password });
+  const user = normalizeUser(response.user);
+  if (user.is_active === false) {
+    await clearToken();
+    throw new AccountDeactivatedError();
+  }
+  await saveToken(response.token);
+  return user;
 }
 
 export async function register(data: RegisterData): Promise<User> {
@@ -51,37 +55,25 @@ export async function register(data: RegisterData): Promise<User> {
     body.birth_date = data.birthDate.trim();
   }
 
-  try {
-    const response = await apiPost<AuthResponse>('/api/auth/register', body);
-    await saveToken(response.token);
-    return normalizeUser(response.user);
-  } catch {
-    // Mock fallback — creeaza user local
-    const mockUser: User = {
-      id: Date.now(),
-      username: body.username as string,
-      email: body.email as string,
-      role: 'user',
-      created_at: new Date().toISOString(),
-      is_active: true,
-      first_name: data.firstName.trim(),
-      last_name: data.lastName.trim(),
-      phone: data.phone?.trim(),
-      birth_date: data.birthDate?.trim(),
-    };
-    await saveToken('mock-jwt-token');
-    return mockUser;
-  }
+  const response = await apiPost<AuthResponse>('/api/auth/register', body);
+  await saveToken(response.token);
+  return normalizeUser(response.user);
 }
 
 export async function fetchCurrentUser(): Promise<User> {
   try {
     const user = await apiGet<User>('/api/auth/me', true);
-    return normalizeUser(user);
-  } catch {
+    const normalized = normalizeUser(user);
+    if (normalized.is_active === false) {
+      await clearToken();
+      throw new AccountDeactivatedError();
+    }
+    return normalized;
+  } catch (err) {
+    if (err instanceof AccountDeactivatedError) throw err;
     const stored = await getUserFromStorage();
     if (stored) return stored;
-    return MOCK_USERS[1];
+    throw new Error('No authenticated user');
   }
 }
 
@@ -134,6 +126,27 @@ export async function clearUserFromStorage(): Promise<void> {
 export async function hasStoredToken(): Promise<boolean> {
   const token = await getToken();
   return token !== null;
+}
+
+export async function updateProfile(updates: {
+  first_name?: string;
+  last_name?: string;
+  phone?: string;
+  birth_date?: string;
+}): Promise<User> {
+  const user = await apiPut<User>('/api/auth/profile', updates as Record<string, unknown>, true);
+  return normalizeUser(user);
+}
+
+export async function changePassword(currentPassword: string, newPassword: string): Promise<void> {
+  await apiPut<{ message: string }>('/api/auth/password', {
+    current_password: currentPassword,
+    new_password: newPassword,
+  }, true);
+}
+
+export async function deactivateAccount(): Promise<void> {
+  await apiPut<{ message: string }>('/api/auth/deactivate', {}, true);
 }
 
 // Forgot password — backend-ul nu are endpoint dedicat, acceptam orice email pentru flow-ul UI

@@ -68,6 +68,7 @@ export const authEn: typeof authRo = {
     firstNameRequired: 'First name is required.',
     lastNameRequired: 'Last name is required.',
     genericError: 'An error occurred. Please try again.',
+    accountDeactivated: 'Your account has been deactivated. Contact an administrator.',
   },
   terms: {
     headerTitle: 'Terms and Conditions',

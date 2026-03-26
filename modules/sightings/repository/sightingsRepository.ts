@@ -1,7 +1,7 @@
 // sightingsRepository — stratul de acces la date pentru modulul de observatii.
 // Trimite observatia noua la API backend cu upload imagine.
 
-import { apiUpload } from '../../../shared/services/apiClient';
+import { apiUpload, apiPut } from '../../../shared/services/apiClient';
 import type { PointOfInterest } from '../../../shared/types/plant.types';
 import type { SightingDraft } from '../types/sightings.types';
 import { buildImageUrl } from '../../../shared/repository/dataProvider';
@@ -19,7 +19,7 @@ interface CreatePOIResponse {
   primary_image?: string;
 }
 
-export async function saveSighting(draft: SightingDraft, userId: number): Promise<PointOfInterest | null> {
+export async function saveSighting(draft: SightingDraft, userId: number, isAdmin = false): Promise<PointOfInterest | null> {
   if (draft.plantId === null || draft.location === null) {
     return null;
   }
@@ -31,6 +31,39 @@ export async function saveSighting(draft: SightingDraft, userId: number): Promis
 
   if (draft.comment) {
     formData.append('comment', draft.comment);
+  }
+  if (draft.comment_en) {
+    formData.append('comment_en', draft.comment_en);
+  }
+  if (draft.description) {
+    formData.append('description', draft.description);
+  }
+  if (draft.description_en) {
+    formData.append('description_en', draft.description_en);
+  }
+  if (draft.habitat) {
+    formData.append('habitat', draft.habitat);
+  }
+  if (draft.habitat_en) {
+    formData.append('habitat_en', draft.habitat_en);
+  }
+  if (draft.harvestPeriod) {
+    formData.append('harvest_period', draft.harvestPeriod);
+  }
+  if (draft.harvestPeriod_en) {
+    formData.append('harvest_period_en', draft.harvestPeriod_en);
+  }
+  if (draft.benefits) {
+    formData.append('benefits', draft.benefits);
+  }
+  if (draft.benefits_en) {
+    formData.append('benefits_en', draft.benefits_en);
+  }
+  if (draft.contraindications) {
+    formData.append('contraindications', draft.contraindications);
+  }
+  if (draft.contraindications_en) {
+    formData.append('contraindications_en', draft.contraindications_en);
   }
 
   // Add image if available
@@ -51,6 +84,16 @@ export async function saveSighting(draft: SightingDraft, userId: number): Promis
   }
 
   const response = await apiUpload<CreatePOIResponse>('/api/pois', formData, true);
+
+  // Auto-approve for admin
+  if (isAdmin && response.id) {
+    try {
+      await apiPut<unknown>(`/api/pois/${response.id}/status`, { status: 'approved' }, true);
+      response.status = 'approved';
+    } catch {
+      // silently fail — stays as pending
+    }
+  }
 
   return {
     id: response.id,

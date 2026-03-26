@@ -14,6 +14,7 @@ import {
   saveUserToStorage,
   clearUserFromStorage,
   hasStoredToken,
+  AccountDeactivatedError,
 } from '../../modules/auth/repository/authRepository';
 
 interface AuthContextType {
@@ -43,13 +44,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const freshUser = await fetchCurrentUser();
             await saveUserToStorage(freshUser);
             setUser(freshUser);
-          } catch {
-            // Token expired or invalid — fallback to cached user or clear
-            const stored = await getUserFromStorage();
-            if (stored) {
-              setUser(stored);
-            } else {
+          } catch (err) {
+            if (err instanceof AccountDeactivatedError) {
+              // Account deactivated — force logout
               await clearUserFromStorage();
+              setUser(null);
+            } else {
+              // Token expired or invalid — fallback to cached user or clear
+              const stored = await getUserFromStorage();
+              if (stored) {
+                setUser(stored);
+              } else {
+                await clearUserFromStorage();
+              }
             }
           }
         } else {
@@ -70,12 +77,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const loggedIn = await repoLogin(email, password);
     await saveUserToStorage(loggedIn);
     setUser(loggedIn);
+    // Fetch complete profile (login response may omit phone, birth_date, etc.)
+    try {
+      const fullProfile = await fetchCurrentUser();
+      await saveUserToStorage(fullProfile);
+      setUser(fullProfile);
+    } catch { /* keep login response user */ }
   }, []);
 
   const register = useCallback(async (data: RegisterData) => {
     const newUser = await repoRegister(data);
     await saveUserToStorage(newUser);
     setUser(newUser);
+    // Fetch complete profile (register response may omit phone, birth_date, etc.)
+    try {
+      const fullProfile = await fetchCurrentUser();
+      await saveUserToStorage(fullProfile);
+      setUser(fullProfile);
+    } catch { /* keep register response user */ }
   }, []);
 
   const updateUser = useCallback(async (updates: Partial<User>) => {

@@ -2,10 +2,12 @@
 
 import React, { useMemo, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
 import { CheckCircle, XCircle, Clock, MapPin } from 'lucide-react-native';
 import { Card } from '../../../shared/components/Card';
 import { Button } from '../../../shared/components/Button';
 import { ConfirmModal } from '../../../shared/components/ConfirmModal';
+import { Snackbar } from '../../../shared/components/Snackbar';
 import { formatDate } from '../../../shared/utils/formatDate';
 import { fonts, spacing, borderRadius } from '../../../shared/styles/theme';
 import type { ThemeColors } from '../../../shared/styles/theme';
@@ -25,19 +27,21 @@ interface ObservationCardProps {
 export function ObservationCard({ poi, plantName, userName, onModerate }: ObservationCardProps) {
   const colors = useThemeColors();
   const t = useTranslation();
+  const router = useRouter();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [rejectModalVisible, setRejectModalVisible] = useState(false);
   const [approveModalVisible, setApproveModalVisible] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
+  const [snackbar, setSnackbar] = useState<string | null>(null);
 
   const isPending = poi.status === 'pending';
   const confidencePercent = Math.round((poi.ai_confidence ?? 0) * 100);
   const confidenceColor = poi.ai_confidence >= 0.85 ? colors.success : poi.ai_confidence >= 0.6 ? colors.warning : colors.error;
 
   const statusConfig = {
-    approved: { color: colors.success, icon: <CheckCircle size={14} color={colors.success} />, label: t.admin.charts.approved },
-    pending: { color: colors.warning, icon: <Clock size={14} color={colors.warning} />, label: t.admin.charts.pending },
-    rejected: { color: colors.error, icon: <XCircle size={14} color={colors.error} />, label: t.admin.charts.rejected },
+    approved: { color: colors.success, icon: <CheckCircle size={14} color={colors.success} />, label: t.admin.status.approved },
+    pending: { color: colors.warning, icon: <Clock size={14} color={colors.warning} />, label: t.admin.status.pending },
+    rejected: { color: colors.error, icon: <XCircle size={14} color={colors.error} />, label: t.admin.status.rejected },
   };
 
   const status = statusConfig[poi.status] ?? statusConfig.pending;
@@ -46,16 +50,23 @@ export function ObservationCard({ poi, plantName, userName, onModerate }: Observ
     onModerate(poi.id, 'reject', rejectReason.trim() || undefined);
     setRejectModalVisible(false);
     setRejectReason('');
+    setSnackbar(t.admin.snackbar.poiRejected);
   };
 
   const handleApproveConfirm = () => {
     onModerate(poi.id, 'approve');
     setApproveModalVisible(false);
+    setSnackbar(t.admin.snackbar.poiApproved);
+  };
+
+  const handleNavigateToDetail = () => {
+    router.push(`/admin-poi/${poi.id}` as any);
   };
 
   return (
     <>
       <Card style={styles.card}>
+        <TouchableOpacity activeOpacity={0.7} onPress={handleNavigateToDetail}>
         <View style={styles.topRow}>
           {poi.image_url ? (
             <Image source={{ uri: poi.image_url }} style={styles.thumbnail} resizeMode="cover" />
@@ -99,6 +110,7 @@ export function ObservationCard({ poi, plantName, userName, onModerate }: Observ
             <TranslatableText text={poi.comment} style={styles.commentText} numberOfLines={2} />
           </View>
         ) : null}
+        </TouchableOpacity>
 
         {isPending && (
           <View style={styles.actions}>
@@ -137,6 +149,7 @@ export function ObservationCard({ poi, plantName, userName, onModerate }: Observ
         confirmLabel={t.admin.moderation.rejectConfirm}
         cancelLabel={t.shared.common.cancel}
         confirmDestructive
+        confirmDisabled={rejectReason.trim().length < 5}
         onConfirm={handleRejectConfirm}
         onCancel={() => { setRejectModalVisible(false); setRejectReason(''); }}
       >
@@ -151,6 +164,12 @@ export function ObservationCard({ poi, plantName, userName, onModerate }: Observ
           textAlignVertical="top"
         />
       </ConfirmModal>
+
+      <Snackbar
+        visible={snackbar !== null}
+        message={snackbar ?? ''}
+        onDismiss={() => setSnackbar(null)}
+      />
     </>
   );
 }

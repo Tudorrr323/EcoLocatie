@@ -85,7 +85,7 @@ export function CameraScreen({ visible, onCapture, onClose }: CameraScreenProps)
     }
   }, [visible]);
 
-  // Scanning animation + progress counter
+  // Scanning animation — progress is tied to AI response
   useEffect(() => {
     if (!isScanning) return;
 
@@ -109,42 +109,50 @@ export function CameraScreen({ visible, onCapture, onClose }: CameraScreenProps)
     scanAnimRef.current = anim;
     anim.start();
 
-    // Helper: complete when both animation and AI are done
-    const tryComplete = () => {
-      if (animDoneRef.current && aiDoneRef.current && capturedUriRef.current) {
-        onCapture(capturedUriRef.current, aiResultsRef.current ?? undefined);
-      }
-    };
-
-    // Start AI identification in parallel with animation
+    // Slow progress toward 90% — never reaches 100% until AI responds
     aiDoneRef.current = false;
     animDoneRef.current = false;
+    let p = 0;
+    let cancelled = false;
+    const slowStep = () => {
+      if (cancelled || p >= 90) return;
+      // Decelerating: smaller increments as we approach 90%
+      const increment = Math.max(0.3, (90 - p) * 0.04);
+      p = Math.min(90, p + increment);
+      setScanProgress(Math.round(p));
+      setTimeout(slowStep, 120);
+    };
+    slowStep();
+
+    // Start AI identification in parallel
     if (capturedUriRef.current) {
       identify(capturedUriRef.current).then((results) => {
+        if (cancelled) return;
         aiResultsRef.current = results;
         aiDoneRef.current = true;
-        tryComplete();
+
+        // Jump to 100% quickly, then complete
+        const jumpTo100 = () => {
+          if (cancelled) return;
+          p = Math.min(p + 4, 100);
+          setScanProgress(Math.round(p));
+          if (p < 100) {
+            setTimeout(jumpTo100, 20);
+          } else {
+            scanLineY.stopAnimation();
+            setTimeout(() => {
+              if (!cancelled && capturedUriRef.current) {
+                onCapture(capturedUriRef.current, aiResultsRef.current ?? undefined);
+              }
+            }, 300);
+          }
+        };
+        jumpTo100();
       });
     }
 
-    // Progress counter (animation side)
-    let p = 0;
-    const stepMs = SCAN_DURATION / 50;
-    const interval = setInterval(() => {
-      p += 2;
-      if (p > 100) p = 100;
-      setScanProgress(p);
-      if (p >= 100) {
-        clearInterval(interval);
-        scanLineY.stopAnimation();
-        animDoneRef.current = true;
-        // If AI already done, complete. Otherwise wait for AI.
-        setTimeout(() => tryComplete(), 350);
-      }
-    }, stepMs);
-
     return () => {
-      clearInterval(interval);
+      cancelled = true;
       scanLineY.stopAnimation();
       scanAnimRef.current = null;
     };

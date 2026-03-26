@@ -22,7 +22,10 @@ export const myPlantsRo = {
     scientificName: 'Nume științific',
     tabs: {
       observations: 'Observații',
-      plantInfo: 'Info plantă',
+      overview: 'Prezentare',
+      benefits: 'Beneficii',
+      contraindications: 'Contraindicații',
+      details: 'Detalii',
     },
     removeTitle: 'Elimină din plantele mele',
     removeMessage: 'Ești sigur că vrei să elimini această plantă din lista ta?',
@@ -43,6 +46,12 @@ export const myPlantsRo = {
   },
   menu: {
     remove: 'Elimină din plantele mele',
+    edit: 'Editează observația',
+  },
+  edit: {
+    title: 'Editează observația',
+    saved: 'Observația a fost actualizată!',
+    save: 'Salvează',
   },
   dateToday: 'Astăzi',
   dateYesterday: 'Ieri',

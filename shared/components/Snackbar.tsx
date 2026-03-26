@@ -24,6 +24,8 @@ export function Snackbar({ visible, message, onDismiss, duration = 2500 }: Snack
   const translateY = useRef(new Animated.Value(100)).current;
   const opacity = useRef(new Animated.Value(0)).current;
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const onDismissRef = useRef(onDismiss);
+  onDismissRef.current = onDismiss;
 
   useEffect(() => {
     if (visible) {
@@ -38,14 +40,14 @@ export function Snackbar({ visible, message, onDismiss, duration = 2500 }: Snack
         Animated.parallel([
           Animated.timing(translateY, { toValue: 100, duration: 250, useNativeDriver: true }),
           Animated.timing(opacity, { toValue: 0, duration: 200, useNativeDriver: true }),
-        ]).start(() => onDismiss());
+        ]).start(() => onDismissRef.current());
       }, duration);
     }
 
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [visible, duration, onDismiss]);
+  }, [visible, duration]);
 
   if (!visible) return null;
 

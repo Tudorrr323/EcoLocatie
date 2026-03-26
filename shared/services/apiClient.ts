@@ -80,7 +80,9 @@ export async function apiRequest<T>(endpoint: string, options: RequestOptions = 
     let message = `Eroare ${response.status}`;
     try {
       const errorData = await response.json();
-      if (errorData.message) {
+      if (errorData.error) {
+        message = errorData.error;
+      } else if (errorData.message) {
         message = errorData.message;
       }
     } catch {

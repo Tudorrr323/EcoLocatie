@@ -23,7 +23,7 @@ import type { ThemeColors } from '../../../shared/styles/theme';
 
 export function AddSightingScreen() {
   const colors = useThemeColors();
-  const { user } = useAuthContext();
+  const { user, isAdmin } = useAuthContext();
   const t = useTranslation();
   const sightingsStyles = useMemo(() => createSightingsStyles(colors), [colors]);
   const formRef = useRef<CreatePOIFormRef>(null);
@@ -87,7 +87,7 @@ export function AddSightingScreen() {
 
   const handleSubmit = useCallback(async (draft: SightingDraft) => {
     try {
-      const saved = await saveSighting(draft, user?.id ?? 0);
+      const saved = await saveSighting(draft, user?.id ?? 0, isAdmin);
 
       if (saved) {
         formRef.current?.reset();

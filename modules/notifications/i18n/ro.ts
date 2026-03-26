@@ -1,7 +1,7 @@
 export const notificationsRo = {
-  title: 'Notificari',
-  empty: 'Nu ai notificari noi.',
-  markAllRead: 'Marcheaza toate ca citite',
+  title: 'Notificări',
+  empty: 'Nu ai notificări noi.',
+  markAllRead: 'Marchează toate ca citite',
   timeAgo: {
     justNow: 'Chiar acum',
     minutesAgo: 'acum {{count}} min',
@@ -10,29 +10,29 @@ export const notificationsRo = {
   },
   types: {
     poi_created: {
-      title: 'Observatie noua',
-      message: '{{userName}} a adaugat o observatie noua pentru {{plantName}}.',
+      title: 'Observație nouă',
+      message: '{{userName}} a adăugat o observație nouă pentru {{plantName}}.',
     },
     poi_approved: {
-      title: 'Observatie aprobata',
-      message: 'Observatia ta pentru {{plantName}} a fost aprobata.',
+      title: 'Observație aprobată',
+      message: 'Observația ta pentru {{plantName}} a fost aprobată.',
     },
     poi_rejected: {
-      title: 'Observatie refuzata',
-      message: 'Observatia ta pentru {{plantName}} a fost refuzata.',
+      title: 'Observație refuzată',
+      message: 'Observația ta pentru {{plantName}} a fost refuzată.',
       reason: 'Motiv: {{reason}}',
     },
     poi_pending: {
-      title: 'Observatie in asteptare',
-      message: 'Observatia ta pentru {{plantName}} este in curs de verificare.',
+      title: 'Observație în așteptare',
+      message: 'Observația ta pentru {{plantName}} este în curs de verificare.',
     },
     poi_edited: {
-      title: 'Observatie editata',
-      message: '{{userName}} a editat o observatie pentru {{plantName}}. Necesita re-verificare.',
+      title: 'Observație editată',
+      message: '{{userName}} a editat o observație pentru {{plantName}}. Necesită re-verificare.',
     },
     poi_commented: {
       title: 'Comentariu nou',
-      message: '{{userName}} a comentat la observatia ta pentru {{plantName}}.',
+      message: '{{userName}} a comentat la observația ta pentru {{plantName}}.',
     },
   },
 };

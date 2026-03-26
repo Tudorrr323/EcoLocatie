@@ -2,13 +2,14 @@
 // Gestioneaza tab-ul activ, lista de plante, istoric si stergerea plantelor.
 // Datele sunt incarcate async de la API.
 
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useFocusEffect } from 'expo-router';
 import { useAuthContext } from '../../../shared/context/AuthContext';
-import { getUserHistory } from '../repository/myPlantsRepository';
-import { getPlants } from '../../../shared/repository/dataProvider';
-import { useFavorites } from '../../../shared/hooks/useFavorites';
+import { getUserHistory, getFavoritePOIEntries, getPlantsByIds } from '../repository/myPlantsRepository';
+import { usePOIFavorites } from '../../../shared/context/POIFavoritesContext';
+import { useFavoritesContext } from '../../../shared/context/FavoritesContext';
 import type { Plant } from '../../../shared/types/plant.types';
-import type { MyPlantsTab, HistoryGroup, HistoryEntry } from '../types/myplants.types';
+import type { MyPlantsTab, HistoryGroup, HistoryEntry, PlantTabItem } from '../types/myplants.types';
 import { useTranslation } from '../../../shared/i18n';
 
 function groupHistoryByDate(entries: HistoryEntry[], t: ReturnType<typeof useTranslation>): HistoryGroup[] {
@@ -47,15 +48,16 @@ function groupHistoryByDate(entries: HistoryEntry[], t: ReturnType<typeof useTra
 export function useMyPlants() {
   const { user } = useAuthContext();
   const t = useTranslation();
-  const { favoriteIds, isFavorite, toggleFavorite } = useFavorites();
+  const { favoritePoiIds, isPoiFavorite, togglePoiFavorite } = usePOIFavorites();
+  const { favoriteIds: favoritePlantIds, isFavorite: isPlantFavorite, toggleFavorite: togglePlantFavorite, refreshFavorites } = useFavoritesContext();
   const [activeTab, setActiveTab] = useState<MyPlantsTab>('plants');
-  const [allPlants, setAllPlants] = useState<Plant[]>([]);
   const [allHistory, setAllHistory] = useState<HistoryEntry[]>([]);
+  const [favoritePOIEntries, setFavoritePOIEntries] = useState<HistoryEntry[]>([]);
+  const [favoritePlants, setFavoritePlants] = useState<Plant[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const loadData = useCallback(() => {
     if (!user) {
-      setAllPlants([]);
       setAllHistory([]);
       setLoading(false);
       return;
@@ -64,12 +66,9 @@ export function useMyPlants() {
     let cancelled = false;
     setLoading(true);
 
-    Promise.all([getPlants(), getUserHistory(user.id)])
-      .then(([plants, history]) => {
-        if (!cancelled) {
-          setAllPlants(plants);
-          setAllHistory(history);
-        }
+    getUserHistory(user.id)
+      .then((history) => {
+        if (!cancelled) setAllHistory(history);
       })
       .catch(() => {})
       .finally(() => {
@@ -79,28 +78,84 @@ export function useMyPlants() {
     return () => { cancelled = true; };
   }, [user]);
 
-  // Plants tab = favorite plants
-  const favoritePlants = useMemo(() => {
-    return allPlants.filter((p) => favoriteIds.includes(p.id));
-  }, [allPlants, favoriteIds]);
+  // Load on mount
+  useEffect(loadData, [loadData]);
 
-  // History tab = user's own observations (unchanged)
-  const history = useMemo(() => {
-    return groupHistoryByDate(allHistory, t);
-  }, [allHistory, t]);
+  // Reload when screen gains focus (e.g. after adding a new observation or toggling favorites)
+  useFocusEffect(useCallback(() => {
+    loadData();
+    refreshFavorites();
+  }, [loadData, refreshFavorites]));
 
-  const plantCount = favoritePlants.length;
+  // Load favorited POIs (observations)
+  useEffect(() => {
+    if (favoritePoiIds.length === 0) {
+      setFavoritePOIEntries([]);
+      return;
+    }
+    let cancelled = false;
+    getFavoritePOIEntries(favoritePoiIds)
+      .then((entries) => { if (!cancelled) setFavoritePOIEntries(entries); })
+      .catch(() => { if (!cancelled) setFavoritePOIEntries([]); });
+    return () => { cancelled = true; };
+  }, [favoritePoiIds]);
+
+  // Load favorited plants (from encyclopedia)
+  useEffect(() => {
+    console.log('[DEBUG useMyPlants] favoritePlantIds changed:', favoritePlantIds);
+    if (favoritePlantIds.length === 0) {
+      setFavoritePlants([]);
+      return;
+    }
+    let cancelled = false;
+    getPlantsByIds(favoritePlantIds)
+      .then((plants) => {
+        console.log('[DEBUG useMyPlants] loaded plants:', plants.length, plants.map(p => p.id));
+        if (!cancelled) setFavoritePlants(plants);
+      })
+      .catch((err) => {
+        console.log('[DEBUG useMyPlants] error loading plants:', err);
+        if (!cancelled) setFavoritePlants([]);
+      });
+    return () => { cancelled = true; };
+  }, [favoritePlantIds]);
+
+  // Combine POI favorites + plant favorites into a single list, deduplicating by plant_id
+  const plantTabItems: PlantTabItem[] = useMemo(() => {
+    const items: PlantTabItem[] = [];
+    const seenPlantIds = new Set<number>();
+
+    // POI favorites first
+    for (const entry of favoritePOIEntries) {
+      items.push({ kind: 'poi', entry });
+      seenPlantIds.add(entry.plant.id);
+    }
+
+    // Plant favorites that don't already appear via POI favorites
+    for (const plant of favoritePlants) {
+      if (!seenPlantIds.has(plant.id)) {
+        items.push({ kind: 'plant', plant });
+      }
+    }
+
+    return items;
+  }, [favoritePOIEntries, favoritePlants]);
+
+  const plantCount = plantTabItems.length;
   const historyCount = allHistory.length;
 
   return {
     activeTab,
     setActiveTab,
-    favoritePlants,
-    history,
+    plantTabItems,
+    allHistory,
     plantCount,
     historyCount,
-    isFavorite,
-    toggleFavorite,
+    isPoiFavorite,
+    togglePoiFavorite,
+    isPlantFavorite,
+    togglePlantFavorite,
     loading,
+    groupHistoryByDate: (entries: HistoryEntry[]) => groupHistoryByDate(entries, t),
   };
 }

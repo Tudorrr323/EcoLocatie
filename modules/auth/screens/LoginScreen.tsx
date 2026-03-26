@@ -67,8 +67,12 @@ export function LoginScreen() {
     try {
       await login(email.trim(), password);
       router.replace('/(tabs)');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t.auth.validation.genericError);
+    } catch (err: any) {
+      if (err?.name === 'AccountDeactivatedError') {
+        setError(t.auth.validation.accountDeactivated);
+      } else {
+        setError(err instanceof Error ? err.message : t.auth.validation.genericError);
+      }
     } finally {
       setLoading(false);
     }

@@ -3,9 +3,11 @@
 
 import React, { useMemo, useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
-import { MoreVertical } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
+import { MoreVertical, Eye, UserX, UserCheck } from 'lucide-react-native';
 import { Card } from '../../../shared/components/Card';
 import { ConfirmModal } from '../../../shared/components/ConfirmModal';
+import { Snackbar } from '../../../shared/components/Snackbar';
 import { formatDate } from '../../../shared/utils/formatDate';
 import { fonts, spacing, borderRadius } from '../../../shared/styles/theme';
 import type { ThemeColors } from '../../../shared/styles/theme';
@@ -21,22 +23,31 @@ interface UserRowProps {
 export function UserRow({ user, onToggle }: UserRowProps) {
   const colors = useThemeColors();
   const t = useTranslation();
+  const router = useRouter();
   const styles = useMemo(() => createUserRowStyles(colors), [colors]);
   const isAdmin = user.role === 'admin';
-  const [modalVisible, setModalVisible] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [confirmVisible, setConfirmVisible] = useState(false);
   const [reason, setReason] = useState('');
+  const [snackbar, setSnackbar] = useState<string | null>(null);
 
-  const handleConfirm = () => {
+  const handleToggleConfirm = () => {
+    const msg = user.is_active ? t.admin.snackbar.userDeactivated : t.admin.snackbar.userActivated;
     onToggle(user.id, user.is_active ? reason.trim() || undefined : undefined);
-    setModalVisible(false);
+    setConfirmVisible(false);
     setReason('');
+    setSnackbar(msg);
   };
 
   return (
     <>
       <Card style={{ ...styles.card, ...(!user.is_active ? styles.inactiveCard : {}) }}>
         <View style={styles.row}>
-          <View style={styles.info}>
+          <TouchableOpacity
+            style={styles.info}
+            activeOpacity={0.7}
+            onPress={() => router.push(`/admin-user/${user.id}` as any)}
+          >
             <View style={styles.nameRow}>
               <Text
                 style={[styles.username, !user.is_active && styles.inactiveText]}
@@ -65,10 +76,10 @@ export function UserRow({ user, onToggle }: UserRowProps) {
                 </Text>
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
           <TouchableOpacity
             style={styles.menuBtn}
-            onPress={() => setModalVisible(true)}
+            onPress={() => setMenuVisible(true)}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             activeOpacity={0.6}
           >
@@ -77,16 +88,60 @@ export function UserRow({ user, onToggle }: UserRowProps) {
         </View>
       </Card>
 
-      {/* Deactivate with reason / Activate confirmation */}
+      {/* Menu modal — 2 options */}
       <ConfirmModal
-        visible={modalVisible}
+        visible={menuVisible}
+        title={user.first_name ? `${user.first_name} ${user.last_name ?? ''}`.trim() : user.username}
+        onCancel={() => setMenuVisible(false)}
+      >
+        <View style={{ marginTop: spacing.sm }}>
+          {/* Option 1: View details */}
+          <TouchableOpacity
+            style={styles.menuOption}
+            activeOpacity={0.7}
+            onPress={() => {
+              setMenuVisible(false);
+              router.push(`/admin-user/${user.id}` as any);
+            }}
+          >
+            <Eye size={18} color={colors.primary} />
+            <Text style={styles.menuOptionText}>{t.admin.users.viewDetails}</Text>
+          </TouchableOpacity>
+
+          {/* Option 2: Deactivate / Activate */}
+          <TouchableOpacity
+            style={[styles.menuOption, styles.menuOptionLast]}
+            activeOpacity={0.7}
+            onPress={() => {
+              setMenuVisible(false);
+              setConfirmVisible(true);
+            }}
+          >
+            {user.is_active
+              ? <UserX size={18} color={colors.error} />
+              : <UserCheck size={18} color={colors.success} />
+            }
+            <Text style={[
+              styles.menuOptionText,
+              { color: user.is_active ? colors.error : colors.success },
+            ]}>
+              {user.is_active ? t.admin.users.deactivateConfirm : t.admin.users.activateConfirm}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ConfirmModal>
+
+      {/* Confirm deactivate/activate modal */}
+      <ConfirmModal
+        visible={confirmVisible}
         title={user.is_active ? t.admin.users.deactivateTitle : t.admin.users.activateTitle}
         message={user.is_active ? t.admin.users.deactivateMessage : t.admin.users.activateMessage}
         confirmLabel={user.is_active ? t.admin.users.deactivateConfirm : t.admin.users.activateConfirm}
         cancelLabel={t.shared.common.cancel}
         confirmDestructive={user.is_active}
-        onConfirm={handleConfirm}
-        onCancel={() => { setModalVisible(false); setReason(''); }}
+        confirmDisabled={user.is_active && reason.trim().length < 5}
+        onConfirm={handleToggleConfirm}
+        onCancel={() => { setConfirmVisible(false); setReason(''); }}
       >
         {user.is_active && (
           <TextInput
@@ -101,6 +156,12 @@ export function UserRow({ user, onToggle }: UserRowProps) {
           />
         )}
       </ConfirmModal>
+
+      <Snackbar
+        visible={snackbar !== null}
+        message={snackbar ?? ''}
+        onDismiss={() => setSnackbar(null)}
+      />
     </>
   );
 }
@@ -189,6 +250,22 @@ const createUserRowStyles = (colors: ThemeColors) => StyleSheet.create({
     justifyContent: 'center',
     borderRadius: borderRadius.full,
     backgroundColor: colors.background,
+  },
+  menuOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingVertical: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  menuOptionLast: {
+    borderBottomWidth: 0,
+  },
+  menuOptionText: {
+    fontSize: fonts.sizes.md,
+    fontWeight: '600',
+    color: colors.text,
   },
   reasonInput: {
     backgroundColor: colors.background,

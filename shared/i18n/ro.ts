@@ -44,9 +44,9 @@ export const sharedRo = {
     observationSaved: 'Observația a fost salvată și va fi verificată curând',
   },
   notifications: {
-    title: 'Notificari',
-    empty: 'Nu ai notificari noi.',
-    markAllRead: 'Marcheaza toate ca citite',
+    title: 'Notificări',
+    empty: 'Nu ai notificări noi.',
+    markAllRead: 'Marchează toate ca citite',
   },
   comments: {
     title: 'Comentarii',

@@ -86,7 +86,8 @@ export function ChatScreen({ visible, onClose }: ChatScreenProps) {
   const [loading, setLoading] = useState(false);
   const [view, setView] = useState<'history' | 'chat'>('history');
 
-  // Edit/delete modals
+  // Menu / Edit / Delete modals
+  const [menuVisible, setMenuVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [menuConvoId, setMenuConvoId] = useState<string | null>(null);
@@ -293,7 +294,7 @@ export function ChatScreen({ visible, onClose }: ChatScreenProps) {
           onPress={() => {
             setMenuConvoId(item.id);
             setEditTitle(item.title);
-            setEditModalVisible(true);
+            setMenuVisible(true);
           }}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
@@ -363,11 +364,11 @@ export function ChatScreen({ visible, onClose }: ChatScreenProps) {
                   onPress={() => {
                     setMenuConvoId(activeConvo.id);
                     setEditTitle(activeConvo.title);
-                    setEditModalVisible(true);
+                    setMenuVisible(true);
                   }}
                   activeOpacity={0.7}
                 >
-                  <Pencil size={18} color={colors.textSecondary} />
+                  <MoreVertical size={18} color={colors.textSecondary} />
                 </TouchableOpacity>
               </View>
 
@@ -420,18 +421,47 @@ export function ChatScreen({ visible, onClose }: ChatScreenProps) {
           )}
         </View>
 
-      {/* Edit title / Delete modal */}
+      {/* Menu modal — 2 options (like admin UserRow) */}
+      <ConfirmModal
+        visible={menuVisible}
+        title={conversations.find((c) => c.id === menuConvoId)?.title ?? ''}
+        onCancel={() => { setMenuVisible(false); setMenuConvoId(null); }}
+      >
+        <View style={{ marginTop: spacing.sm }}>
+          <TouchableOpacity
+            style={styles.menuOption}
+            activeOpacity={0.7}
+            onPress={() => {
+              setMenuVisible(false);
+              setEditModalVisible(true);
+            }}
+          >
+            <Pencil size={18} color={colors.primary} />
+            <Text style={styles.menuOptionText}>{t.map.chat.editTitle}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.menuOption, styles.menuOptionLast]}
+            activeOpacity={0.7}
+            onPress={() => {
+              setMenuVisible(false);
+              setDeleteModalVisible(true);
+            }}
+          >
+            <Trash2 size={18} color={colors.error} />
+            <Text style={[styles.menuOptionText, { color: colors.error }]}>{t.map.chat.deleteChat}</Text>
+          </TouchableOpacity>
+        </View>
+      </ConfirmModal>
+
+      {/* Edit title modal */}
       <ConfirmModal
         visible={editModalVisible}
         title={t.map.chat.editTitle}
         confirmLabel={t.shared.common.save}
-        cancelLabel={t.map.chat.deleteChat}
-        confirmDestructive={false}
+        cancelLabel={t.shared.common.cancel}
         onConfirm={handleEditTitle}
-        onCancel={() => {
-          setEditModalVisible(false);
-          setDeleteModalVisible(true);
-        }}
+        onCancel={() => { setEditModalVisible(false); setMenuConvoId(null); setEditTitle(''); }}
       >
         <TextInput
           style={styles.editTitleInput}
@@ -443,6 +473,7 @@ export function ChatScreen({ visible, onClose }: ChatScreenProps) {
         />
       </ConfirmModal>
 
+      {/* Delete confirmation modal */}
       <ConfirmModal
         visible={deleteModalVisible}
         title={t.map.chat.deleteChat}
@@ -548,4 +579,10 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     borderWidth: 1, borderColor: colors.border, padding: spacing.sm,
     fontSize: fonts.sizes.md, color: colors.text, marginTop: spacing.sm,
   },
+  menuOption: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.sm,
+    paddingVertical: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.border,
+  },
+  menuOptionLast: { borderBottomWidth: 0 },
+  menuOptionText: { fontSize: fonts.sizes.md, fontWeight: '600', color: colors.text },
 });

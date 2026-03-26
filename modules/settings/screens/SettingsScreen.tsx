@@ -18,7 +18,6 @@ import {
   Info,
   ChevronRight,
   LogOut,
-  Mail,
   Sun,
   Moon,
   Smartphone,
@@ -99,7 +98,7 @@ export function SettingsScreen() {
           <MenuItem
             icon={<Bell size={20} color={colors.primary} />}
             label={t.account.settings.notifications}
-            onPress={() => {}}
+            onPress={() => router.push('/notifications')}
             styles={styles}
             colors={colors}
           />
@@ -108,14 +107,6 @@ export function SettingsScreen() {
             icon={<Shield size={20} color={colors.primary} />}
             label={t.account.settings.security}
             onPress={() => router.push('/account-security')}
-            styles={styles}
-            colors={colors}
-          />
-          <MenuDivider styles={styles} />
-          <MenuItem
-            icon={<Mail size={20} color={colors.primary} />}
-            label={t.account.settings.contact}
-            onPress={() => {}}
             styles={styles}
             colors={colors}
           />

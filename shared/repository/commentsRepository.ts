@@ -3,7 +3,6 @@
 
 import { apiGet, apiPost, apiDelete } from '../services/apiClient';
 import type { Comment } from '../types/plant.types';
-import { getMockCommentsForPOI } from '../mock/mockData';
 
 interface CommentsListResponse {
   data: ApiComment[];
@@ -61,7 +60,7 @@ export async function getComments(
 ): Promise<{ comments: Comment[]; total: number; page: number }> {
   try {
     const response = await apiGet<CommentsListResponse>(
-      `/api/comments/poi/${poiId}?page=${page}&limit=${limit}`,
+      `/api/pois/${poiId}/comments?page=${page}&limit=${limit}`,
     );
     const flat = response.data.map(normalizeComment);
     return {
@@ -70,8 +69,7 @@ export async function getComments(
       page: response.page,
     };
   } catch {
-    const mock = getMockCommentsForPOI(poiId);
-    return { comments: buildTree(mock), total: mock.length, page: 1 };
+    return { comments: [], total: 0, page: 1 };
   }
 }
 
@@ -83,7 +81,7 @@ export async function addComment(
   try {
     const body: Record<string, unknown> = { content };
     if (parentId) body.parent_id = parentId;
-    const api = await apiPost<ApiComment>(`/api/comments/${poiId}`, body, true);
+    const api = await apiPost<ApiComment>(`/api/pois/${poiId}/comments`, body, true);
     return normalizeComment(api);
   } catch {
     return null;

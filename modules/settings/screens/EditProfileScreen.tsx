@@ -2,7 +2,7 @@
 // Afiseaza avatar cu buton de schimbare poza, campuri editabile (nume, telefon, data nasterii),
 // email read-only. Salveaza modificarile in AuthContext.
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import {
   View,
   Text,
@@ -19,7 +19,7 @@ import { useRouter } from 'expo-router';
 import { ArrowLeft, Mail, Pencil, Phone, Calendar, User, Trash2 } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useAuthContext } from '../../../shared/context/AuthContext';
-import { uploadProfileImage, deleteProfileImage } from '../../auth/repository/authRepository';
+import { uploadProfileImage, deleteProfileImage, updateProfile } from '../../auth/repository/authRepository';
 import { useTranslation } from '../../../shared/i18n';
 import { DatePickerModal } from '../../../shared/components/DatePickerModal';
 import { Snackbar } from '../../../shared/components/Snackbar';
@@ -41,6 +41,7 @@ export function EditProfileScreen() {
   const [profileImage, setProfileImage] = useState(user?.profile_image ?? '');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [snackbarVisible, setSnackbarVisible] = useState(false);
+  const scrollRef = useRef<ScrollView>(null);
 
   const displayName = firstName || lastName
     ? `${firstName} ${lastName}`.trim()
@@ -88,13 +89,29 @@ export function EditProfileScreen() {
       }
     }
 
-    await updateUser({
-      first_name: firstName.trim() || undefined,
-      last_name: lastName.trim() || undefined,
-      phone: phone.trim() || undefined,
-      birth_date: birthDate || undefined,
-      profile_image: finalProfileImage || undefined,
-    });
+    // Save profile fields to backend via API
+    try {
+      const updatedUser = await updateProfile({
+        first_name: firstName.trim() || undefined,
+        last_name: lastName.trim() || undefined,
+        phone: phone.trim() || undefined,
+        birth_date: birthDate || undefined,
+      });
+      // Update local context with the API response
+      await updateUser({
+        ...updatedUser,
+        profile_image: finalProfileImage || undefined,
+      });
+    } catch {
+      // Fallback: update only local context
+      await updateUser({
+        first_name: firstName.trim() || undefined,
+        last_name: lastName.trim() || undefined,
+        phone: phone.trim() || undefined,
+        birth_date: birthDate || undefined,
+        profile_image: finalProfileImage || undefined,
+      });
+    }
     setSnackbarVisible(true);
     setTimeout(() => router.back(), 1500);
   }
@@ -110,10 +127,12 @@ export function EditProfileScreen() {
       </View>
 
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior="padding"
         style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
       >
         <ScrollView
+          ref={scrollRef}
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
@@ -216,7 +235,7 @@ export function EditProfileScreen() {
         value={birthDate ? new Date(birthDate) : undefined}
         maxDate={new Date()}
         onConfirm={(date) => {
-          setBirthDate(date.toISOString());
+          setBirthDate(date.toISOString().split('T')[0]);
           setShowDatePicker(false);
         }}
         onCancel={() => setShowDatePicker(false)}
@@ -257,7 +276,7 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   scrollContent: {
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
-    paddingBottom: spacing.lg,
+    paddingBottom: 120,
   },
 
   // Avatar

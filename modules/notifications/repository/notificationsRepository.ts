@@ -2,7 +2,6 @@
 
 import { apiGet, apiPut } from '../../../shared/services/apiClient';
 import type { AppNotification } from '../types/notifications.types';
-import { MOCK_NOTIFICATIONS } from '../../../shared/mock/mockData';
 
 interface NotificationsListResponse {
   data: AppNotification[];
@@ -22,10 +21,7 @@ export async function getNotifications(): Promise<{ notifications: AppNotificati
       unreadCount: response.unread_count,
     };
   } catch {
-    // Mock fallback — returneaza notificari pentru user 2 (Tudor)
-    const mock = MOCK_NOTIFICATIONS;
-    const unread = mock.filter((n) => !n.is_read).length;
-    return { notifications: mock, unreadCount: unread };
+    return { notifications: [], unreadCount: 0 };
   }
 }
 
@@ -34,7 +30,7 @@ export async function getUnreadCount(): Promise<number> {
     const response = await apiGet<UnreadCountResponse>('/api/notifications/unread-count', true);
     return response.unread_count;
   } catch {
-    return MOCK_NOTIFICATIONS.filter((n) => !n.is_read).length;
+    return 0;
   }
 }
 

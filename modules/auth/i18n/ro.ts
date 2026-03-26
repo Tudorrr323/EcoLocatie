@@ -66,6 +66,7 @@ export const authRo = {
     firstNameRequired: 'Prenumele este obligatoriu.',
     lastNameRequired: 'Numele este obligatoriu.',
     genericError: 'A apărut o eroare. Încearcă din nou.',
+    accountDeactivated: 'Contul tău a fost dezactivat. Contactează un administrator.',
   },
   terms: {
     headerTitle: 'Termeni și Condiții',

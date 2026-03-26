@@ -1,7 +1,7 @@
 // FavoriteButton — buton inimă pentru adăugarea/eliminarea plantelor la favorite.
 // Inima goală = nu e favorită, inima plină = favorită.
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import { TouchableOpacity, StyleSheet } from 'react-native';
 import { Heart } from 'lucide-react-native';
 import { spacing } from '../styles/theme';
@@ -19,8 +19,7 @@ export function FavoriteButton({ isFavorite, onToggle, size = 22 }: FavoriteButt
   return (
     <TouchableOpacity
       onPress={onToggle}
-      activeOpacity={0.7}
-      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+      activeOpacity={0.6}
       style={styles.btn}
     >
       <Heart
@@ -34,6 +33,10 @@ export function FavoriteButton({ isFavorite, onToggle, size = 22 }: FavoriteButt
 
 const styles = StyleSheet.create({
   btn: {
-    padding: spacing.xs,
+    padding: spacing.sm,
+    minWidth: 44,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
