@@ -1,4 +1,4 @@
-import { AccountSecurityScreen } from '../modules/account/screens/AccountSecurityScreen';
+import { AccountSecurityScreen } from '../modules/settings/screens/AccountSecurityScreen';
 
 export default function AccountSecurity() {
   return <AccountSecurityScreen />;

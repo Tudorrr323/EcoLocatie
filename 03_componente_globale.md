@@ -1,4 +1,4 @@
-# EcoLocație — Componente și Resurse Globale (shared/)
+# EcoLocation — Componente și Resurse Globale (shared/)
 
 > **NOTĂ PENTRU CLAUDE/GEMINI:** Actualizează OBLIGATORIU acest fișier ori de câte ori creezi un modul, componentă, hook sau orice resursă nouă semnificativă, pentru a menține documentația sincronizată cu codul.
 
@@ -42,13 +42,19 @@ Folderul `shared/` conține tot ce e reutilizat de 2 sau mai multe module. Niciu
 
 **CustomTabBar.tsx** — bara de navigare inferioară personalizată. Tab-uri: Hartă (`Home`), Enciclopedie (`HeartPulse`), Adaugă (`Camera` — buton circular teal ridicat), Plantele mele (`Flower2`), Setări (`Settings`). Interceptează navigarea de pe `add-sighting` dacă `sightingGuard.hasProgress` și afișează `ConfirmModal` de confirmare. Tab-urile `account` și `admin` sunt absente din `TAB_CONFIG` (ascunse).
 
-**FilterButton.tsx** & **NotificationButton.tsx** — butoane specializate cu design consistent pentru header-ul aplicației.
+**CommentSection.tsx** — sectiune completa de comentarii reutilizabila. Props: `poiId` (obligatoriu), `compact?` (pentru integrare in spatii mici). Functionalitati: lista comentarii cu avatar + username + timp relativ, input comentariu nou, reply la comentariu (cu indicator vizual si linie de conectare), stergere comentariu (autor sau admin cu `ConfirmModal`), paginare (buton "Incarca mai multe"), thread-uri (parent_id — raspunsuri apar indentate sub comentariul parinte cu linie verticala). Foloseste `commentsRepository` pentru API calls. Integrata in MapScreen (tab Comentarii) si MyPlantDetailScreen (sub fiecare observatie).
+
+**FilterButton.tsx** — buton specializat pentru deschiderea panoului de filtre.
+
+**NotificationButton.tsx** — buton Bell cu badge roșu care afișează numărul de notificări necitite. La apăsare deschide modal full-screen cu lista notificărilor (FlatList de `NotificationCard`). Header-ul modal-ului conține titlu, buton „Marchează toate ca citite" (vizibil doar când există necitite) și buton close. Folosește `useNotifications()` din `NotificationContext` pentru stare și acțiuni. Empty state cu `BellOff` când nu există notificări.
 
 ## CONTEXT (shared/context/)
 
 **SettingsContext.tsx** — context global pentru preferintele aplicatiei. Gestioneaza limba (`ro`/`en`) si tema (`light`/`dark`/`system`) cu persistare in AsyncStorage. Expune `language`, `themePreference`, `resolvedTheme` (tema efectiva dupa rezolvarea 'system'), `setLanguage()`, `setThemePreference()`. Wrapat in `app/_layout.tsx` prin `<SettingsProvider>`. Accesat prin `useSettings()`.
 
 **AuthContext.tsx** — context global pentru starea de autentificare. Oferă `user`, `loading`, `isAuthenticated`, `isAdmin`, `login(email, password)`, `register(data: RegisterData)`, `logout()`, `updateUser(updates: Partial<User>)`. Wrapat în `app/_layout.tsx` prin `<AuthProvider>`. Accesat prin `useAuthContext()` direct sau prin `useAuth()` din `modules/auth/hooks/useAuth.ts` (re-export pentru compatibilitate cu componentele existente). **Nu crea instanțe locale de useAuth în afara contextului** — starea de auth e globală și unică.
+
+**NotificationContext.tsx** — context global pentru notificările in-app. Polling automat la 30s pentru `unreadCount` + refresh la revenirea din background (`AppState`). Oferă `notifications`, `unreadCount`, `loading`, `fetchNotifications()` (fetch complet lista), `markAsRead(id)`, `markAllAsRead()`, `refreshUnreadCount()`. Wrapat în `app/_layout.tsx` prin `<NotificationProvider>` (între `AuthProvider` și `RootLayoutNav`). Accesat prin `useNotifications()`. Se resetează automat la logout (când `isAuthenticated` devine false).
 
 ## HOOKS (shared/hooks/)
 
@@ -58,9 +64,15 @@ Folderul `shared/` conține tot ce e reutilizat de 2 sau mai multe module. Niciu
 
 **usePagination.ts** — hook generic reutilizabil pentru orice listă paginată. Acceptă `items: T[]` și `initialPageSize = 10`. Returnează `{ currentPage, pageSize, totalPages, paginatedItems, onPageChange, onPageSizeChange }`. Resetează automat la pagina 1 când referința listei `items` se schimbă (detecție prin `useRef`). Folosit în `EncyclopediaScreen` și `PlantSelector`.
 
+## SERVICES (shared/services/)
+
+**apiClient.ts** — HTTP client pentru comunicarea cu backend-ul. Funcții: `apiGet()`, `apiPost()`, `apiPut()`, `apiDelete()`, `apiUpload()` (FormData). Gestionează automat token-ul JWT (salvat în AsyncStorage) și header-ul `Authorization`. `apiRequest()` e core-ul — face fetch cu error handling.
+
 ## REPOSITORY (shared/repository/)
 
-**dataProvider.ts** — punctul unic de acces la date. Importă `ecolocatie_data.json` și expune funcții: getPlants(), getUsers(), getPOIs(), getConfig(). Fiecare repository de modul (mapRepository, plantsRepository etc.) importă de aici.
+**dataProvider.ts** — punctul unic de acces la date. Folosește `apiClient` pentru a comunica cu API-ul backend. Funcții async: `getPlants()`, `getPlantById()`, `getPOIs()`, `getApprovedPOIs()`, `getPendingPOIs()`, `getPOIById()`, `getConfig()`. Normalizează response-urile API (tabele relaționale → obiecte flat): `ApiPlant` → `Plant`, `ApiPOI` → `PointOfInterest` (include `comment_count`). Fiecare repository de modul importă de aici.
+
+**commentsRepository.ts** — acces la comentariile observațiilor via API. Funcții: `getComments(poiId, page?, limit?)` (listare paginată cu tree-building pentru replies), `addComment(poiId, content, parentId?)` (adaugare comentariu sau reply), `deleteComment(commentId)` (ștergere — owner sau admin). Folosit de `CommentSection`.
 
 ## STYLES (shared/styles/)
 
@@ -79,6 +91,8 @@ Folderul `shared/` conține tot ce e reutilizat de 2 sau mai multe module. Niciu
 - `filterDotBorder` — bordura punctelor colorate din filter panel
 - `errorBackground` (#FFEBEE) — fundal roșu deschis pentru mesaje de eroare
 - `placeholderText` (#BDBDBD) — culoarea placeholder-elor din TextInput
+- `notificationBadge` (#EF4444) — fundal badge notificări necitite
+- `notificationUnread` (#F0F7EB light / #1A2E14 dark) — fundal card notificare necitită
 
 **Orice culoare nouă se adaugă OBLIGATORIU în theme.ts ca variabilă — nu se scriu culori hardcodate în stiluri.**
 
@@ -87,10 +101,12 @@ Folderul `shared/` conține tot ce e reutilizat de 2 sau mai multe module. Niciu
 ## TYPES (shared/types/)
 
 **plant.types.ts** — tipurile globale:
-- `Plant` — plantă medicinală completă
-- `PointOfInterest` — observație pe hartă
+- `POIStatus` — type alias: `'pending' | 'approved' | 'rejected'`
+- `Plant` — plantă medicinală completă (include `name_en`, `images[]`)
+- `PointOfInterest` — observație pe hartă (folosește `status: POIStatus`, include `address?`, `images?[]`, `comment_count?`)
+- `Comment` — comentariu pe o observație (`id`, `user_id`, `poi_id`, `content`, `username`, `profile_image?`, `parent_id?`, `replies?`, `created_at`)
 - `User` — utilizator cu câmpuri: `id`, `username`, `email`, `password?`, `role`, `created_at`, `is_active`, `first_name?`, `last_name?`, `phone?`, `birth_date?`, `profile_image?`
-- `MapConfig`, `EcolocatieData`
+- `MapConfig`, `EcoLocationData`
 
 **api.types.ts** — tipuri pentru viitoarele response-uri API (ApiResponse, PaginatedResponse).
 
@@ -99,6 +115,16 @@ Folderul `shared/` conține tot ce e reutilizat de 2 sau mai multe module. Niciu
 - `AuthState` — `{ user, isAuthenticated, isAdmin }`
 - `LoginCredentials` — `{ email, password }`
 - `RegisterData` — `{ firstName, lastName, email, password, phone?, birthDate? }`
+
+## I18N (shared/i18n/) — MULTILANGUAGE
+
+Aplicația suportă română și engleză. Folderul `shared/i18n/` conține traducerile globale (taburi, butoane comune, paginare, mesaje shared). Fiecare modul are propriul folder `i18n/` cu `ro.ts` și `en.ts` pentru textele specifice.
+
+**Regulă obligatorie:** Orice text nou vizibil utilizatorului (label, placeholder, titlu, mesaj, buton etc.) se adaugă **OBLIGATORIU** în fișierele de traduceri — nu se scrie hardcodat în componente. Dacă textul e specific unui modul → `modules/<modul>/i18n/ro.ts` + `en.ts`. Dacă e folosit de 2+ module → `shared/i18n/ro.ts` + `en.ts`. Adaugă **întotdeauna în ambele limbi**.
+
+**ro.ts** — traducerile în română (structura master — tipul `Translations` se derivă din ea)
+**en.ts** — traducerile în engleză (trebuie să respecte exact aceeași structură ca `ro.ts`)
+**index.ts** — hook-ul `useTranslation()` care returnează traducerile corecte bazat pe limba selectată + funcția de merge a traducerilor din toate modulele
 
 ## UTILS (shared/utils/)
 

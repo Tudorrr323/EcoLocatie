@@ -6,6 +6,7 @@ import { View, Text } from 'react-native';
 import type { MarkerData } from '../types/map.types';
 import { createMapStyles } from '../styles/map.styles';
 import { useThemeColors } from '../../../shared/hooks/useThemeColors';
+import { getPlantName } from '../../../shared/context/SettingsContext';
 
 interface PlantMarkerProps {
   marker: MarkerData;
@@ -29,7 +30,7 @@ const PlantMarker: React.FC<PlantMarkerProps> = ({ marker }) => {
         numberOfLines={2}
         ellipsizeMode="tail"
       >
-        {plant.name_ro}
+        {getPlantName(plant)}
       </Text>
     </View>
   );

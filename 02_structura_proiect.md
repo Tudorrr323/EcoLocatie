@@ -1,4 +1,4 @@
-# EcoLocație — Structura Proiectului
+# EcoLocation — Structura Proiectului
 
 > **NOTĂ PENTRU CLAUDE/GEMINI:** Actualizează OBLIGATORIU acest fișier ori de câte ori creezi un modul, componentă, hook sau orice resursă nouă semnificativă, pentru a menține documentația sincronizată cu codul.
 
@@ -17,19 +17,20 @@ ecolocatie/
 │   │   ├── index.tsx                       # → map module → MapScreen
 │   │   ├── encyclopedia.tsx                # → plants module → EncyclopediaScreen
 │   │   ├── add-sighting.tsx                # → sightings module → AddSightingScreen
-│   │   ├── my-plants.tsx                   # → account module → MyPlantsScreen
-│   │   ├── settings.tsx                    # → account module → SettingsScreen [TAB ACTIV]
-│   │   ├── account.tsx                     # → account module → AccountScreen [href: null, ascuns]
+│   │   ├── my-plants.tsx                   # → myplants module → MyPlantsScreen
+│   │   ├── settings.tsx                    # → settings module → SettingsScreen [TAB ACTIV]
+│   │   ├── account.tsx                     # → settings module → AccountScreen [href: null, ascuns]
 │   │   └── admin.tsx                       # → admin module → AdminScreen [href: null, ascuns]
 │   ├── plant/[id].tsx                      # → plants module → PlantDetailScreen
+│   ├── my-plant/[id].tsx                   # → myplants module → MyPlantDetailScreen
 │   ├── login.tsx                           # → auth module → LoginScreen
 │   ├── register.tsx                        # → auth module → RegisterScreen
 │   ├── privacy-policy.tsx                  # → auth module → PrivacyPolicyScreen [publica]
 │   ├── terms.tsx                           # → auth module → TermsScreen [publica]
-│   ├── about.tsx                           # → account module → AboutScreen [publica]
+│   ├── about.tsx                           # → settings module → AboutScreen [publica]
 │   ├── forgot-password.tsx                 # → auth module → ForgotPasswordScreen [publica]
-│   ├── edit-profile.tsx                    # → account module → EditProfileScreen
-│   ├── account-security.tsx                # → account module → AccountSecurityScreen
+│   ├── edit-profile.tsx                    # → settings module → EditProfileScreen
+│   ├── account-security.tsx                # → settings module → AccountSecurityScreen
 │   └── _layout.tsx                         # AuthProvider + guard navigare
 │
 ├── modules/
@@ -104,7 +105,28 @@ ecolocatie/
 │   │   │   └── admin.types.ts
 │   │   └── index.ts
 │   │
-│   ├── account/
+│   ├── myplants/
+│   │   ├── components/
+│   │   │   ├── MyPlantCard.tsx             # card orizontal planta (imagine, nume, latin, dot colorat, nr observatii)
+│   │   │   ├── HistoryCard.tsx             # card orizontal observatie (imagine POI, nume planta, familie)
+│   │   │   └── MyPlantFAB.tsx              # FAB expandabil (adauga observatie, cauta plante)
+│   │   ├── hooks/
+│   │   │   └── useMyPlants.ts              # state management (tab, plante, istoric, remove)
+│   │   ├── repository/
+│   │   │   └── myPlantsRepository.ts       # getUserMyPlants, getUserHistory, getMyPlantById
+│   │   ├── screens/
+│   │   │   ├── MyPlantsScreen.tsx           # ecran principal cu tab-uri Plante/Istoric
+│   │   │   └── MyPlantDetailScreen.tsx      # detalii planta cu observatii timeline + info
+│   │   ├── styles/
+│   │   │   └── myplants.styles.ts
+│   │   ├── types/
+│   │   │   └── myplants.types.ts           # MyPlant, HistoryGroup, HistoryEntry, MyPlantsTab
+│   │   ├── i18n/
+│   │   │   ├── ro.ts
+│   │   │   └── en.ts
+│   │   └── index.ts
+│   │
+│   ├── settings/                            # (fost account)
 │   │   ├── screens/
 │   │   │   ├── AccountScreen.tsx           # profil simplu (ascuns din navigare)
 │   │   │   ├── SettingsScreen.tsx          # tab Setări activ — profil + setări + legal + logout
@@ -113,6 +135,23 @@ ecolocatie/
 │   │   │   └── AboutScreen.tsx             # pagina Despre EcoLocation
 │   │   ├── styles/
 │   │   │   └── account.styles.ts
+│   │   ├── i18n/
+│   │   │   ├── ro.ts
+│   │   │   └── en.ts
+│   │   └── index.ts
+│   │
+│   ├── notifications/
+│   │   ├── components/
+│   │   │   └── NotificationCard.tsx          # card notificare cu icon per tip, titlu, mesaj, timp relativ
+│   │   ├── repository/
+│   │   │   └── notificationsRepository.ts    # getNotifications, getUnreadCount, markAsRead, markAllAsRead
+│   │   ├── styles/
+│   │   │   └── notifications.styles.ts
+│   │   ├── types/
+│   │   │   └── notifications.types.ts        # AppNotification, NotificationType
+│   │   ├── i18n/
+│   │   │   ├── ro.ts
+│   │   │   └── en.ts
 │   │   └── index.ts
 │   │
 │   └── auth/
@@ -142,7 +181,8 @@ ecolocatie/
 │   │   ├── ro.ts                           # Traduceri romana (tabs, common, pagination, etc.)
 │   │   ├── en.ts                           # Traduceri engleza
 │   │   └── index.ts                        # Hook useTranslation() + merge toate traducerile
-│   ├── repository/                         # Centralized data (dataProvider)
+│   ├── repository/                         # Centralized data (dataProvider — async, API-based)
+│   ├── services/                           # HTTP client (apiClient — fetch + JWT auth)
 │   ├── styles/                             # Theme (colors, fonts, spacing, borderRadius)
 │   ├── types/                              # Global interfaces (Plant, User, POI)
 │   ├── utils/                              # Helpers (formatDate, coordinates, sightingGuard)
@@ -150,8 +190,6 @@ ecolocatie/
 │
 ├── assets/
 │   └── SmallLogoEcoLocation.png            # Logo aplicatie (folosit in AppHeader, SettingsScreen)
-├── data/
-│   └── ecolocatie_data.json
 ├── app.json
 ├── package.json
 └── tsconfig.json
@@ -195,6 +233,8 @@ Restul (repository, hooks interne, componente helper) rămân interne — alte m
 **hooks** conțin logica stateful specifică modulului. Dacă un hook e necesar în 2+ module, se mută în `shared/hooks/`.
 
 **screens** sunt compuneri de componente — importă din components/ propriu și din shared/components/.
+
+**i18n** conține traducerile specifice modulului în `ro.ts` și `en.ts`. Aplicația este multilanguage — orice text nou vizibil utilizatorului se adaugă aici (sau în `shared/i18n/` dacă e folosit de 2+ module), **obligatoriu în ambele limbi**. Nu se scriu texte hardcodate în componente.
 
 **styles** folosesc tema din `shared/styles/theme.ts` ca bază.
 

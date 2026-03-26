@@ -1,4 +1,4 @@
-// TermsScreen — Termenii si Conditiile de utilizare ale aplicatiei EcoLocation.
+// TermsScreen — Termenii și Condițiile de utilizare ale aplicației EcoLocation.
 
 import React, { useMemo } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
@@ -7,12 +7,15 @@ import { ArrowLeft } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { fonts, spacing } from '../../../shared/styles/theme';
 import { useThemeColors } from '../../../shared/hooks/useThemeColors';
+import { useTranslation } from '../../../shared/i18n';
 import type { ThemeColors } from '../../../shared/styles/theme';
 
 export function TermsScreen() {
   const colors = useThemeColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const router = useRouter();
+  const t = useTranslation();
+  const terms = t.auth.terms;
 
   function Section({ title, children }: { title: string; children: React.ReactNode }) {
     return (
@@ -45,7 +48,7 @@ export function TermsScreen() {
         <TouchableOpacity style={styles.backBtn} onPress={() => router.back()} activeOpacity={0.7}>
           <ArrowLeft size={22} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Termeni si Conditii</Text>
+        <Text style={styles.headerTitle}>{terms.headerTitle}</Text>
         <View style={styles.backBtn} />
       </View>
 
@@ -53,90 +56,90 @@ export function TermsScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.updated}>Ultima actualizare: 25 martie 2026</Text>
+        <Text style={styles.updated}>{terms.lastUpdated}</Text>
 
-        <Section title="1. Acceptarea termenilor">
-          <P>Prin descarcarea, instalarea sau utilizarea aplicatiei EcoLocation, confirmati ca ati citit, inteles si acceptat in totalitate prezentii Termeni si Conditii. Daca nu sunteti de acord cu acesti termeni, va rugam sa nu utilizati aplicatia.</P>
+        <Section title={terms.section1Title}>
+          <P>{terms.section1Text}</P>
         </Section>
 
-        <Section title="2. Descrierea serviciului">
-          <P>EcoLocation este o aplicatie mobila care permite utilizatorilor sa identifice, sa cartografieze si sa documenteze plante medicinale din judetul Galati. Aplicatia ofera:</P>
-          <P>• Harta interactiva cu observatii botanice verificate</P>
-          <P>• Identificare automata a plantelor prin tehnologie AI</P>
-          <P>• Enciclopedie cu informatii despre plante medicinale locale</P>
-          <P>• Posibilitatea de a adauga observatii proprii</P>
+        <Section title={terms.section2Title}>
+          <P>{terms.section2Text}</P>
+          <P>{terms.section2Item1}</P>
+          <P>{terms.section2Item2}</P>
+          <P>{terms.section2Item3}</P>
+          <P>{terms.section2Item4}</P>
         </Section>
 
-        <Section title="3. Eligibilitatea utilizatorilor">
-          <P>Aplicatia este destinata persoanelor cu varsta de minimum 13 ani. Utilizatorii cu varsta intre 13 si 18 ani trebuie sa aiba acordul unui parinte sau tutore legal pentru utilizarea aplicatiei.</P>
-          <P>Prin crearea unui cont, confirmati ca aveti varsta minima necesara sau ca detineti acordul parental corespunzator.</P>
+        <Section title={terms.section3Title}>
+          <P>{terms.section3Text1}</P>
+          <P>{terms.section3Text2}</P>
         </Section>
 
-        <Section title="4. Contul de utilizator">
-          <P>• Sunteti responsabil pentru mentinerea confidentialitatii credentialelor de acces (email si parola)</P>
-          <P>• Nu permiteti accesul tertilor la contul dumneavoastra</P>
-          <P>• Informatiile furnizate la inregistrare trebuie sa fie reale si exacte</P>
-          <P>• Ne rezervam dreptul de a suspenda sau sterge conturile care incalca prezentii termeni</P>
-          <P>• Notificati-ne imediat la ecolocation.galati@gmail.com in cazul unui acces neautorizat la contul dumneavoastra</P>
+        <Section title={terms.section4Title}>
+          <P>{terms.section4Item1}</P>
+          <P>{terms.section4Item2}</P>
+          <P>{terms.section4Item3}</P>
+          <P>{terms.section4Item4}</P>
+          <P>{terms.section4Item5}</P>
         </Section>
 
-        <Section title="5. Continut generat de utilizatori">
-          <P>Prin adaugarea de observatii, fotografii sau alte informatii in aplicatie, acordati EcoLocation o licenta neexclusiva, gratuita, pentru a afisa, distribui si utiliza acel continut in scopul functionarii serviciului.</P>
-          <P>Va angajati sa nu publicati continut care:</P>
-          <P>• Este fals, inexact sau inselator</P>
-          <P>• Incalca drepturile de proprietate intelectuala ale tertilor</P>
-          <P>• Contine materiale ofensatoare, abuzive sau ilegale</P>
-          <P>• Promoveaza utilizarea necorespunzatoare sau periculoasa a plantelor</P>
-          <P>Echipa EcoLocation isi rezerva dreptul de a modera si elimina orice continut care incalca aceste reguli.</P>
+        <Section title={terms.section5Title}>
+          <P>{terms.section5Text1}</P>
+          <P>{terms.section5Text2}</P>
+          <P>{terms.section5Item1}</P>
+          <P>{terms.section5Item2}</P>
+          <P>{terms.section5Item3}</P>
+          <P>{terms.section5Item4}</P>
+          <P>{terms.section5Text3}</P>
         </Section>
 
-        <Section title="6. Avertisment medical important">
-          <Warning>ATENTIE: Informatiile despre plante medicinale furnizate de aceasta aplicatie au exclusiv scop educational si informativ. Ele NU constituie sfaturi medicale, diagnostic sau recomandari terapeutice.</Warning>
-          <P>Inainte de a utiliza orice planta medicinala, consultati obligatoriu un medic sau farmacist autorizat. EcoLocation nu isi asuma responsabilitatea pentru:</P>
-          <P>• Identificari incorecte ale plantelor realizate prin intermediul aplicatiei</P>
-          <P>• Efecte adverse, alergii sau intoxicatii rezultate din utilizarea plantelor</P>
-          <P>• Interactiuni medicamentoase ale plantelor medicinale</P>
-          <P>Unele plante pot fi toxice sau daunatoare daca sunt identificate gresit sau utilizate incorect. Utilizati intotdeauna discernamantul propriu si sfatul specialistilor.</P>
+        <Section title={terms.section6Title}>
+          <Warning>{terms.section6Warning}</Warning>
+          <P>{terms.section6Text}</P>
+          <P>{terms.section6Item1}</P>
+          <P>{terms.section6Item2}</P>
+          <P>{terms.section6Item3}</P>
+          <P>{terms.section6Text2}</P>
         </Section>
 
-        <Section title="7. Permisiuni si acces la dispozitiv">
-          <P>Pentru a functiona corect, aplicatia poate solicita urmatoarele permisiuni:</P>
-          <P>• <Bold>Localizare:</Bold> pentru marcarea observatiilor pe harta si activarea functiei GPS</P>
-          <P>• <Bold>Camera:</Bold> pentru fotografierea plantelor in vederea identificarii</P>
-          <P>• <Bold>Galerie foto:</Bold> pentru selectarea imaginilor existente</P>
-          <P>Fiecare permisiune este solicitata explicit si poate fi revocata din setarile dispozitivului. Refuzul unor permisiuni poate limita anumite functionalitati.</P>
+        <Section title={terms.section7Title}>
+          <P>{terms.section7Text}</P>
+          <P>• <Bold>{terms.section7Item1Location}</Bold>{terms.section7Item1Text}</P>
+          <P>• <Bold>{terms.section7Item2Camera}</Bold>{terms.section7Item2Text}</P>
+          <P>• <Bold>{terms.section7Item3Gallery}</Bold>{terms.section7Item3Text}</P>
+          <P>{terms.section7Text2}</P>
         </Section>
 
-        <Section title="8. Proprietate intelectuala">
-          <P>Aplicatia EcoLocation, inclusiv interfata, grafica, textele, logoul si codul sursa, sunt protejate de drepturile de autor si alte drepturi de proprietate intelectuala apartinand echipei de dezvoltare.</P>
-          <P>Este interzisa copierea, modificarea, distribuirea sau utilizarea comerciala a oricarui element al aplicatiei fara acordul scris prealabil al proprietarilor.</P>
-          <P>Continutul stiintific despre plante (descrieri, proprietati, contraindicatii) a fost compilat din surse publice si verificat de specialisti in botanica.</P>
+        <Section title={terms.section8Title}>
+          <P>{terms.section8Text1}</P>
+          <P>{terms.section8Text2}</P>
+          <P>{terms.section8Text3}</P>
         </Section>
 
-        <Section title="9. Limitarea raspunderii">
-          <P>EcoLocation este furnizata "ca atare", fara garantii explicite sau implicite privind acuratetea, disponibilitatea sau potrivirea pentru un anumit scop.</P>
-          <P>In masura maxima permisa de lege, echipa EcoLocation nu raspunde pentru:</P>
-          <P>• Daune directe sau indirecte rezultate din utilizarea sau incapacitatea de utilizare a aplicatiei</P>
-          <P>• Pierderi de date sau intreruperi ale serviciului</P>
-          <P>• Informatii inexacte despre plante sau locatii</P>
-          <P>• Actiunile altor utilizatori in cadrul aplicatiei</P>
+        <Section title={terms.section9Title}>
+          <P>{terms.section9Text1}</P>
+          <P>{terms.section9Text2}</P>
+          <P>{terms.section9Item1}</P>
+          <P>{terms.section9Item2}</P>
+          <P>{terms.section9Item3}</P>
+          <P>{terms.section9Item4}</P>
         </Section>
 
-        <Section title="10. Disponibilitatea serviciului">
-          <P>Ne rezervam dreptul de a modifica, suspenda sau intrerupe partial sau total serviciul EcoLocation, temporar sau permanent, cu sau fara notificare prealabila, pentru motive tehnice, de securitate sau comerciale.</P>
+        <Section title={terms.section10Title}>
+          <P>{terms.section10Text}</P>
         </Section>
 
-        <Section title="11. Modificari ale termenilor">
-          <P>Ne rezervam dreptul de a actualiza prezentii Termeni si Conditii. Modificarile vor fi publicate in aplicatie, iar data actualizarii va fi revizuita. Continuarea utilizarii aplicatiei dupa publicarea modificarilor constituie acceptul noilor termeni.</P>
+        <Section title={terms.section11Title}>
+          <P>{terms.section11Text}</P>
         </Section>
 
-        <Section title="12. Legea aplicabila">
-          <P>Prezentii Termeni si Conditii sunt guvernati de legislatia romana. Orice dispute vor fi solutionate pe cale amiabila sau, in lipsa unui acord, de instantele judecatoresti competente din Romania.</P>
+        <Section title={terms.section12Title}>
+          <P>{terms.section12Text}</P>
         </Section>
 
-        <Section title="13. Contact">
-          <P>Pentru orice intrebari sau solicitari legate de acesti termeni:</P>
-          <P>Email: <Bold>ecolocation.galati@gmail.com</Bold></P>
+        <Section title={terms.section13Title}>
+          <P>{terms.section13Text}</P>
+          <P>{terms.section13Email}<Bold>{terms.section13EmailAddress}</Bold></P>
         </Section>
       </ScrollView>
     </SafeAreaView>

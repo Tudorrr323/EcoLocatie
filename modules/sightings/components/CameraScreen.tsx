@@ -22,6 +22,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { fonts, spacing } from '../../../shared/styles/theme';
 import type { ThemeColors } from '../../../shared/styles/theme';
 import { useThemeColors } from '../../../shared/hooks/useThemeColors';
+import { useTranslation } from '../../../shared/i18n';
+import { useMockIdentify } from '../hooks/useMockIdentify';
+import type { AIResult } from '../types/sightings.types';
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
 
@@ -39,12 +42,13 @@ const CAM_TEXT_DIM = 'rgba(255,255,255,0.7)';
 
 interface CameraScreenProps {
   visible: boolean;
-  onCapture: (uri: string) => void;
+  onCapture: (uri: string, aiResults?: AIResult[]) => void;
   onClose: () => void;
 }
 
 export function CameraScreen({ visible, onCapture, onClose }: CameraScreenProps) {
   const colors = useThemeColors();
+  const t = useTranslation();
   const ACCENT = colors.logoTeal;
   const CAM_WHITE = colors.textLight;
   const cs = useMemo(() => createCameraStyles(colors), [colors]);
@@ -57,6 +61,10 @@ export function CameraScreen({ visible, onCapture, onClose }: CameraScreenProps)
   const [scanProgress, setScanProgress] = useState(0);
   const cameraRef = useRef<CameraView>(null);
   const capturedUriRef = useRef<string | null>(null);
+  const { identify, reset: resetIdentify } = useMockIdentify();
+  const aiResultsRef = useRef<AIResult[] | null>(null);
+  const animDoneRef = useRef(false);
+  const aiDoneRef = useRef(false);
 
   // Animated value for the scanning line
   const scanLineY = useRef(new Animated.Value(0)).current;
@@ -67,9 +75,13 @@ export function CameraScreen({ visible, onCapture, onClose }: CameraScreenProps)
     if (visible) {
       setCapturedUri(null);
       capturedUriRef.current = null;
+      aiResultsRef.current = null;
+      animDoneRef.current = false;
+      aiDoneRef.current = false;
       setIsScanning(false);
       setScanProgress(0);
       scanLineY.setValue(0);
+      resetIdentify();
     }
   }, [visible]);
 
@@ -97,7 +109,25 @@ export function CameraScreen({ visible, onCapture, onClose }: CameraScreenProps)
     scanAnimRef.current = anim;
     anim.start();
 
-    // Progress counter
+    // Helper: complete when both animation and AI are done
+    const tryComplete = () => {
+      if (animDoneRef.current && aiDoneRef.current && capturedUriRef.current) {
+        onCapture(capturedUriRef.current, aiResultsRef.current ?? undefined);
+      }
+    };
+
+    // Start AI identification in parallel with animation
+    aiDoneRef.current = false;
+    animDoneRef.current = false;
+    if (capturedUriRef.current) {
+      identify(capturedUriRef.current).then((results) => {
+        aiResultsRef.current = results;
+        aiDoneRef.current = true;
+        tryComplete();
+      });
+    }
+
+    // Progress counter (animation side)
     let p = 0;
     const stepMs = SCAN_DURATION / 50;
     const interval = setInterval(() => {
@@ -107,11 +137,9 @@ export function CameraScreen({ visible, onCapture, onClose }: CameraScreenProps)
       if (p >= 100) {
         clearInterval(interval);
         scanLineY.stopAnimation();
-        setTimeout(() => {
-          if (capturedUriRef.current) {
-            onCapture(capturedUriRef.current);
-          }
-        }, 350);
+        animDoneRef.current = true;
+        // If AI already done, complete. Otherwise wait for AI.
+        setTimeout(() => tryComplete(), 350);
       }
     }, stepMs);
 
@@ -176,14 +204,14 @@ const handleGallery = useCallback(async () => {
       <Modal visible={visible} animationType="slide" statusBarTranslucent>
         <View style={cs.permissionWrap}>
           <Text style={cs.permissionText}>
-            Permite accesul la camera pentru a identifica plantele.
+            {t.sightings.camera.permissionText}
           </Text>
           <TouchableOpacity style={cs.permissionBtn} onPress={requestPermission}>
-            <Text style={cs.permissionBtnText}>Permite accesul</Text>
+            <Text style={cs.permissionBtnText}>{t.sightings.camera.permissionButton}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={onClose} style={{ marginTop: spacing.md }}>
             <Text style={[cs.permissionText, { fontSize: fonts.sizes.md, marginBottom: 0 }]}>
-              Inchide
+              {t.sightings.camera.close}
             </Text>
           </TouchableOpacity>
         </View>
@@ -225,7 +253,7 @@ const handleGallery = useCallback(async () => {
             >
               <X color={CAM_WHITE} size={26} />
             </TouchableOpacity>
-            <Text style={cs.topTitle}>Identificare</Text>
+            <Text style={cs.topTitle}>{t.sightings.camera.title}</Text>
             <TouchableOpacity
               onPress={() => setFlash((f) => f === 'off' ? 'on' : f === 'on' ? 'torch' : 'off')}
               hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
@@ -262,7 +290,7 @@ const handleGallery = useCallback(async () => {
                   <View style={[cs.progBarFill, { width: `${scanProgress}%` }]} />
                 </View>
                 <Text style={cs.progPct}>{scanProgress}%</Text>
-                <Text style={cs.progLabel}>Se identifica planta...</Text>
+                <Text style={cs.progLabel}>{t.sightings.camera.scanning}</Text>
               </View>
             ) : (
               <View style={{ height: 80 }} />

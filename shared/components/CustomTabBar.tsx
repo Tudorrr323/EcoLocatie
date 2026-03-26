@@ -86,7 +86,7 @@ export function CustomTabBar({ state, navigation }: any) {
               activeOpacity={0.8}
             >
               <View style={styles.centerButton}>
-                <Icon size={30} color={colors.textLight} />
+                <Icon size={30} color={colors.cameraButtonIcon} />
               </View>
             </TouchableOpacity>
           );
@@ -160,14 +160,14 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     width: 62,
     height: 62,
     borderRadius: 31,
-    backgroundColor: colors.logoTeal,
+    backgroundColor: colors.cameraButton,
     alignItems: 'center',
     justifyContent: 'center',
     ...Platform.select({
       ios: {
-        shadowColor: colors.logoTeal,
+        shadowColor: colors.cameraButtonShadow,
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
+        shadowOpacity: 1,
         shadowRadius: 8,
       },
       android: {

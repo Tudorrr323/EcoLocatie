@@ -1,7 +1,7 @@
 // EncyclopediaScreen — ecranul principal al enciclopediei de plante medicinale.
 // Afiseaza o lista de carduri cu plante, bara de cautare si navigare la pagina de detalii.
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SearchBar } from '../../../shared/components/SearchBar';
@@ -16,15 +16,24 @@ import { getAllPlants } from '../repository/plantsRepository';
 import { createPlantsStyles } from '../styles/plants.styles';
 import { useThemeColors } from '../../../shared/hooks/useThemeColors';
 import { useTranslation } from '../../../shared/i18n';
-
-const ALL_PLANTS = getAllPlants();
+import { useSettings } from '../../../shared/context/SettingsContext';
+import { useFavorites } from '../../../shared/hooks/useFavorites';
+import { Snackbar } from '../../../shared/components/Snackbar';
+import type { Plant } from '../../../shared/types/plant.types';
 
 export function EncyclopediaScreen() {
   const colors = useThemeColors();
   const t = useTranslation();
+  const { language } = useSettings();
   const plantsStyles = useMemo(() => createPlantsStyles(colors), [colors]);
   const { plants, setQuery, selectedPlantIds, setSelectedPlantIds } = usePlantSearch();
+  const { isFavorite, toggleFavorite, lastAction, clearLastAction } = useFavorites();
   const [filterVisible, setFilterVisible] = useState(false);
+  const [allPlants, setAllPlants] = useState<Plant[]>([]);
+
+  useEffect(() => {
+    getAllPlants().then(setAllPlants).catch(() => {});
+  }, [language]);
 
   const { currentPage, pageSize, totalPages, paginatedItems, onPageChange, onPageSizeChange } =
     usePagination(plants);
@@ -42,6 +51,8 @@ export function EncyclopediaScreen() {
       </View>
       <PlantList
         plants={paginatedItems}
+        isFavorite={isFavorite}
+        onToggleFavorite={toggleFavorite}
         listFooter={
           <Pagination
             currentPage={currentPage}
@@ -54,10 +65,15 @@ export function EncyclopediaScreen() {
       />
       <PlantFilterPanel
         visible={filterVisible}
-        allPlants={ALL_PLANTS}
+        allPlants={allPlants}
         selectedPlantIds={selectedPlantIds}
         onApply={setSelectedPlantIds}
         onClose={() => setFilterVisible(false)}
+      />
+      <Snackbar
+        visible={lastAction !== null}
+        message={lastAction === 'added' ? t.shared.snackbar.addedToFavorites : t.shared.snackbar.removedFromFavorites}
+        onDismiss={clearLastAction}
       />
     </SafeAreaView>
   );

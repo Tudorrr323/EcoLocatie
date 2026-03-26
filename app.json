@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/LogoEcoLocation.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "scheme": "ecolocatie",
     "splash": {
       "image": "./assets/SmallLogoEcoLocation.png",

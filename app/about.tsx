@@ -1,2 +1,2 @@
-import { AboutScreen } from '../modules/account/screens/AboutScreen';
+import { AboutScreen } from '../modules/settings/screens/AboutScreen';
 export default AboutScreen;

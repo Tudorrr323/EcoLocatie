@@ -1,4 +1,4 @@
-# EcoLocație — Brief Frontend (Aplicație Mobilă)
+# EcoLocation — Brief Frontend (Aplicație Mobilă)
 
 ## CE E PROIECTUL
 

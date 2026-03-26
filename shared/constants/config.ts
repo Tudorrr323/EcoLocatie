@@ -20,4 +20,4 @@ export const MAP_BOUNDS = {
   west: 27.92,
 } as const;
 
-export const API_BASE_URL = 'https://api.ecolocatie.ro';
+export const API_BASE_URL = 'https://martha-cropless-criticisingly.ngrok-free.dev';

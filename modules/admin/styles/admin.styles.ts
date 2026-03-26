@@ -1,5 +1,4 @@
-// admin.styles — stilurile pentru ecranul si componentele modulului admin.
-// Include stiluri pentru statistici, lista utilizatori, carduri de moderare.
+// admin.styles — stilurile pentru ecranul și componentele modulului admin.
 
 import { StyleSheet } from 'react-native';
 import { fonts, spacing, borderRadius } from '../../../shared/styles/theme';
@@ -10,19 +9,6 @@ export const createAdminStyles = (colors: ThemeColors) => StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: colors.background,
-  },
-
-  // ── Header ───────────────────────────────────────────────
-  header: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: spacing.md,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.lg,
-  },
-  headerTitle: {
-    fontSize: fonts.sizes.title,
-    fontWeight: '700',
-    color: colors.textLight,
   },
 
   // ── Scroll content ───────────────────────────────────────
@@ -66,7 +52,8 @@ export const createAdminStyles = (colors: ThemeColors) => StyleSheet.create({
   statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: spacing.sm,
+    justifyContent: 'space-between',
+    rowGap: spacing.sm,
   },
   statCard: {
     backgroundColor: colors.surface,
@@ -79,9 +66,7 @@ export const createAdminStyles = (colors: ThemeColors) => StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 2,
-    // Each card takes up ~48% of row width (2 per row with gap)
-    minWidth: '47%',
-    flex: 1,
+    width: '48%',
   },
   statValue: {
     fontSize: fonts.sizes.xxl,
@@ -99,7 +84,7 @@ export const createAdminStyles = (colors: ThemeColors) => StyleSheet.create({
     color: colors.error,
   },
   statLabel: {
-    fontSize: fonts.sizes.sm,
+    fontSize: fonts.sizes.xs,
     color: colors.textSecondary,
     textAlign: 'center',
     fontWeight: '500',
@@ -112,5 +97,20 @@ export const createAdminStyles = (colors: ThemeColors) => StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.sm,
+  },
+
+  // ── Legacy header (unused now, kept for compat) ──────────
+  header: {
+    backgroundColor: colors.surface,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  headerTitle: {
+    fontSize: fonts.sizes.title,
+    fontWeight: '700',
+    color: colors.text,
   },
 });

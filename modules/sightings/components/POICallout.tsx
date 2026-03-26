@@ -3,9 +3,12 @@
 
 import React, { useMemo } from 'react';
 import { View, Text } from 'react-native';
+import { MessageCircle } from 'lucide-react-native';
 import { formatDate } from '../../../shared/utils/formatDate';
 import { createSightingsStyles } from '../styles/sightings.styles';
 import { useThemeColors } from '../../../shared/hooks/useThemeColors';
+import { useTranslation } from '../../../shared/i18n';
+import { TranslatableText } from '../../../shared/components/TranslatableText';
 
 interface POICalloutProps {
   plantName: string;
@@ -13,10 +16,12 @@ interface POICalloutProps {
   createdAt: string;
   confidence: number;
   comment: string;
+  commentCount?: number;
 }
 
-export function POICallout({ plantName, username, createdAt, confidence, comment }: POICalloutProps) {
+export function POICallout({ plantName, username, createdAt, confidence, comment, commentCount }: POICalloutProps) {
   const colors = useThemeColors();
+  const t = useTranslation();
   const sightingsStyles = useMemo(() => createSightingsStyles(colors), [colors]);
 
   function getConfidenceColor(conf: number): string {
@@ -35,12 +40,12 @@ export function POICallout({ plantName, username, createdAt, confidence, comment
       <Text style={sightingsStyles.calloutPlantName}>{plantName}</Text>
 
       <View style={sightingsStyles.calloutRow}>
-        <Text style={sightingsStyles.calloutLabel}>Utilizator:</Text>
+        <Text style={sightingsStyles.calloutLabel}>{t.sightings.callout.user}</Text>
         <Text style={sightingsStyles.calloutValue}>{username}</Text>
       </View>
 
       <View style={sightingsStyles.calloutRow}>
-        <Text style={sightingsStyles.calloutLabel}>Data:</Text>
+        <Text style={sightingsStyles.calloutLabel}>{t.sightings.callout.date}</Text>
         <Text style={sightingsStyles.calloutValue}>{formattedDate}</Text>
       </View>
 
@@ -50,12 +55,23 @@ export function POICallout({ plantName, username, createdAt, confidence, comment
           { backgroundColor: confidenceColor },
         ]}
       >
-        <Text style={sightingsStyles.calloutConfidenceText}>AI: {pct}% incredere</Text>
+        <Text style={sightingsStyles.calloutConfidenceText}>AI: {pct}% {t.sightings.callout.aiConfidence}</Text>
       </View>
 
       {commentSnippet ? (
-        <Text style={sightingsStyles.calloutComment}>"{commentSnippet}"</Text>
+        <TranslatableText text={`"${commentSnippet}"`} style={sightingsStyles.calloutComment} />
       ) : null}
+
+      {commentCount != null && commentCount > 0 && (
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 }}>
+          <MessageCircle size={12} color={colors.textSecondary} />
+          <Text style={sightingsStyles.calloutLabel}>
+            {commentCount === 1
+              ? t.shared.comments.countOne
+              : t.shared.comments.count.replace('{{count}}', String(commentCount))}
+          </Text>
+        </View>
+      )}
     </View>
   );
 }

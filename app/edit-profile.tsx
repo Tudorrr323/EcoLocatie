@@ -1,4 +1,4 @@
-import { EditProfileScreen } from '../modules/account/screens/EditProfileScreen';
+import { EditProfileScreen } from '../modules/settings/screens/EditProfileScreen';
 
 export default function EditProfile() {
   return <EditProfileScreen />;

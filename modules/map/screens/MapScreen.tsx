@@ -5,7 +5,7 @@ import React, { useRef, useState, useCallback, useEffect, useMemo } from 'react'
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
-import { Crosshair } from 'lucide-react-native';
+import { Crosshair, MessageCircle } from 'lucide-react-native';
 import { Image } from 'react-native';
 import { ImageViewer } from '../../../shared/components/ImageViewer';
 import { HorizontalTabs } from '../../../shared/components/HorizontalTabs';
@@ -24,6 +24,14 @@ import { fonts, spacing, borderRadius } from '../../../shared/styles/theme';
 import type { MarkerData } from '../types/map.types';
 import { Keyboard } from 'react-native';
 import { useTranslation } from '../../../shared/i18n';
+import { getPlantById } from '../../../shared/repository/dataProvider';
+import { getPlantName } from '../../../shared/context/SettingsContext';
+import { TranslatableText } from '../../../shared/components/TranslatableText';
+import { FavoriteButton } from '../../../shared/components/FavoriteButton';
+import { useFavorites } from '../../../shared/hooks/useFavorites';
+import { Snackbar } from '../../../shared/components/Snackbar';
+import { ChatScreen } from '../components/ChatScreen';
+import { CommentSection } from '../../../shared/components/CommentSection';
 
 const MapScreen: React.FC = () => {
   const colors = useThemeColors();
@@ -38,6 +46,9 @@ const MapScreen: React.FC = () => {
   const [selectedMarker, setSelectedMarker] = useState<MarkerData | null>(null);
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
   const [imgPressed, setImgPressed] = useState(false);
+  const [chatVisible, setChatVisible] = useState(false);
+  const { isFavorite, toggleFavorite, lastAction, clearLastAction } = useFavorites();
+  const imgTouchStartRef = useRef<{ x: number; y: number } | null>(null);
   const [activeTab, setActiveTab] = useState('prezentare');
   const [searchAreaHeight, setSearchAreaHeight] = useState(0);
 
@@ -48,7 +59,7 @@ const MapScreen: React.FC = () => {
   }, [refreshMarkers]));
   const { location, getLocation, loading: locationLoading, watching, startWatching } = useLocation();
 
-  const handleSuggestionPress = useCallback((marker: MarkerData) => {
+  const handleSuggestionPress = useCallback(async (marker: MarkerData) => {
     setSearchQuery('');
     searchBarRef.current?.clear();
     searchBarRef.current?.blur();
@@ -56,6 +67,11 @@ const MapScreen: React.FC = () => {
     mapRef.current?.flyTo(marker.latitude, marker.longitude, 16);
     setSelectedMarker(marker);
     setActiveTab('prezentare');
+    // Fetch full plant details (list endpoint may omit contraindications/benefits)
+    const fullPlant = await getPlantById(marker.plant.id);
+    if (fullPlant) {
+      setSelectedMarker((prev) => prev?.id === marker.id ? { ...prev, plant: fullPlant } : prev);
+    }
   }, []);
 
   const handleGPS = useCallback(async () => {
@@ -81,11 +97,16 @@ const MapScreen: React.FC = () => {
     setCenteredOnUser(false);
   }, []);
 
-  const handleMarkerTap = useCallback((markerId: number) => {
+  const handleMarkerTap = useCallback(async (markerId: number) => {
     const marker = displayedMarkers.find((m) => m.id === markerId);
     if (marker) {
       setSelectedMarker(marker);
       setActiveTab('prezentare');
+      // Fetch full plant details (list endpoint may omit contraindications/benefits)
+      const fullPlant = await getPlantById(marker.plant.id);
+      if (fullPlant) {
+        setSelectedMarker((prev) => prev?.id === marker.id ? { ...prev, plant: fullPlant } : prev);
+      }
     }
   }, [displayedMarkers]);
 
@@ -94,13 +115,7 @@ const MapScreen: React.FC = () => {
   }, []);
 
   const hasInitiallyLocated = useRef(false);
-
-  useEffect(() => {
-    if (!hasInitiallyLocated.current) {
-      hasInitiallyLocated.current = true;
-      handleGPS();
-    }
-  }, [handleGPS]);
+  const mapReady = useRef(false);
 
   useEffect(() => {
     if (location) {
@@ -137,10 +152,15 @@ const MapScreen: React.FC = () => {
           onMarkerTap={handleMarkerTap}
           onMapTap={handleMapTap}
           onMapReady={() => {
+            mapReady.current = true;
             if (location) {
               setTimeout(() => {
                 mapRef.current?.updateUserLocation(location.latitude, location.longitude);
               }, 300);
+            }
+            if (!hasInitiallyLocated.current) {
+              hasInitiallyLocated.current = true;
+              handleGPS();
             }
           }}
         />
@@ -152,10 +172,18 @@ const MapScreen: React.FC = () => {
           disabled={locationLoading}
         >
           <Crosshair
-            size={24}
+            size={18}
             color={centeredOnUser ? colors.primary : colors.text}
             fill={centeredOnUser ? colors.primary : 'none'}
           />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={mapStyles.chatButton}
+          onPress={() => setChatVisible(true)}
+          activeOpacity={0.8}
+        >
+          <MessageCircle size={26} color={colors.textLight} fill={colors.textLight} />
         </TouchableOpacity>
         </View>
 
@@ -184,7 +212,7 @@ const MapScreen: React.FC = () => {
                 />
                 <View style={suggestionStyles.info}>
                   <Text style={suggestionStyles.name} numberOfLines={1}>
-                    {marker.plant.name_ro}
+                    {getPlantName(marker.plant)}
                   </Text>
                   <Text style={suggestionStyles.latin} numberOfLines={1}>
                     {marker.plant.name_latin}
@@ -216,13 +244,36 @@ const MapScreen: React.FC = () => {
           <View style={poiStyles.headerDrag}>
             <View style={poiStyles.headerRow}>
               <View
-                onTouchStart={() => setImgPressed(true)}
+                onTouchStart={(e) => {
+                  imgTouchStartRef.current = { x: e.nativeEvent.pageX, y: e.nativeEvent.pageY };
+                  setImgPressed(true);
+                }}
+                onTouchMove={(e) => {
+                  if (imgTouchStartRef.current) {
+                    const dx = Math.abs(e.nativeEvent.pageX - imgTouchStartRef.current.x);
+                    const dy = Math.abs(e.nativeEvent.pageY - imgTouchStartRef.current.y);
+                    if (dx > 10 || dy > 10) {
+                      setImgPressed(false);
+                      imgTouchStartRef.current = null;
+                    }
+                  }
+                }}
                 onTouchEnd={(e) => {
                   e.stopPropagation();
                   setImgPressed(false);
-                  setFullscreenImage(selectedMarker.image_url || selectedMarker.plant.image_url);
+                  if (imgTouchStartRef.current) {
+                    const dx = Math.abs(e.nativeEvent.pageX - imgTouchStartRef.current.x);
+                    const dy = Math.abs(e.nativeEvent.pageY - imgTouchStartRef.current.y);
+                    if (dx < 10 && dy < 10) {
+                      setFullscreenImage(selectedMarker.image_url || selectedMarker.plant.image_url);
+                    }
+                  }
+                  imgTouchStartRef.current = null;
                 }}
-                onTouchCancel={() => setImgPressed(false)}
+                onTouchCancel={() => {
+                  setImgPressed(false);
+                  imgTouchStartRef.current = null;
+                }}
                 style={poiStyles.headerImageTouchable}
               >
                 <Image
@@ -232,7 +283,13 @@ const MapScreen: React.FC = () => {
                 />
               </View>
               <View style={poiStyles.headerInfo}>
-                <Text style={poiStyles.nameRo}>{selectedMarker.plant.name_ro}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Text style={[poiStyles.nameRo, { flex: 1 }]}>{getPlantName(selectedMarker.plant)}</Text>
+                  <FavoriteButton
+                    isFavorite={isFavorite(selectedMarker.plant.id)}
+                    onToggle={() => toggleFavorite(selectedMarker.plant.id)}
+                  />
+                </View>
                 <Text style={poiStyles.nameLatin}>{selectedMarker.plant.name_latin}</Text>
                 <View style={poiStyles.metaRow}>
                   <View style={[poiStyles.badge, { backgroundColor: colors.primary }]}>
@@ -258,6 +315,7 @@ const MapScreen: React.FC = () => {
                 { key: 'beneficii', label: t.map.tabs.benefits, content: null },
                 { key: 'contraindicatii', label: t.map.tabs.contraindications, content: null },
                 { key: 'detalii', label: t.map.tabs.details, content: null },
+                { key: 'comentarii', label: t.map.tabs.comments, content: null },
               ]}
               activeKey={activeTab}
               onTabChange={setActiveTab}
@@ -267,6 +325,7 @@ const MapScreen: React.FC = () => {
               contentContainerStyle={poiStyles.scrollContent}
               showsVerticalScrollIndicator={false}
               nestedScrollEnabled
+              keyboardShouldPersistTaps="handled"
             >
               {activeTab === 'prezentare' && (
                 <>
@@ -276,7 +335,7 @@ const MapScreen: React.FC = () => {
                   {selectedMarker.comment ? (
                     <>
                       <Text style={poiStyles.sectionTitle}>{t.map.sections.comment}</Text>
-                      <Text style={poiStyles.sectionText}>{selectedMarker.comment}</Text>
+                      <TranslatableText text={selectedMarker.comment} style={poiStyles.sectionText} />
                     </>
                   ) : null}
                 </>
@@ -332,12 +391,24 @@ const MapScreen: React.FC = () => {
                   </Text>
                 </>
               )}
+
+              {activeTab === 'comentarii' && (
+                <CommentSection poiId={selectedMarker.id} />
+              )}
             </ScrollView>
           </View>
         ) : null}
       </SwipeableBottomSheet>
 
       <ImageViewer uri={fullscreenImage} onClose={() => setFullscreenImage(null)} />
+
+      <ChatScreen visible={chatVisible} onClose={() => setChatVisible(false)} />
+
+      <Snackbar
+        visible={lastAction !== null}
+        message={lastAction === 'added' ? t.shared.snackbar.addedToFavorites : t.shared.snackbar.removedFromFavorites}
+        onDismiss={clearLastAction}
+      />
 
     </SafeAreaView>
   );

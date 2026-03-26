@@ -36,11 +36,11 @@ searchContainer: {
 
   gpsButton: {
     position: 'absolute',
-    right: spacing.md,
-    bottom: spacing.xl,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    left: spacing.sm,
+    top: spacing.sm,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
@@ -48,11 +48,33 @@ searchContainer: {
       ios: {
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
+        shadowOpacity: 0.2,
+        shadowRadius: 3,
       },
       android: {
-        elevation: 4,
+        elevation: 3,
+      },
+    }),
+  },
+  chatButton: {
+    position: 'absolute',
+    right: spacing.md,
+    bottom: spacing.xl,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: colors.chatAccent,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: colors.chatButtonShadow,
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 1,
+        shadowRadius: 5,
+      },
+      android: {
+        elevation: 5,
       },
     }),
   },

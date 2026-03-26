@@ -1,18 +1,21 @@
-// AboutScreen — pagina "Despre EcoLocation" cu informatii despre aplicatie.
+// AboutScreen — pagina "Despre EcoLocation" cu informații despre aplicație.
 
 import React, { useMemo } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, MapPin, Leaf, Users, ShieldCheck } from 'lucide-react-native';
+import { ArrowLeft, MapPin, Leaf, Users, ShieldCheck, Trophy, Mail, User } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { fonts, spacing, borderRadius } from '../../../shared/styles/theme';
 import { useThemeColors } from '../../../shared/hooks/useThemeColors';
+import { useTranslation } from '../../../shared/i18n';
 import type { ThemeColors } from '../../../shared/styles/theme';
 
 export function AboutScreen() {
   const colors = useThemeColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const router = useRouter();
+  const t = useTranslation();
+  const about = t.account.about;
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -20,12 +23,12 @@ export function AboutScreen() {
         <TouchableOpacity style={styles.backBtn} onPress={() => router.back()} activeOpacity={0.7}>
           <ArrowLeft size={22} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Despre EcoLocation</Text>
+        <Text style={styles.headerTitle}>{about.headerTitle}</Text>
         <View style={styles.backBtn} />
       </View>
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Logo si versiune */}
+        {/* Logo și versiune */}
         <View style={styles.logoSection}>
           <Image
             source={require('../../../assets/SmallLogoEcoLocation.png')}
@@ -33,69 +36,99 @@ export function AboutScreen() {
             resizeMode="contain"
           />
           <Text style={styles.appName}>EcoLocation</Text>
-          <Text style={styles.version}>Versiunea 1.0.0</Text>
+          <Text style={styles.version}>{about.version}</Text>
         </View>
 
         {/* Descriere */}
         <View style={styles.card}>
           <Text style={styles.cardText}>
-            EcoLocation este o aplicatie mobila dedicata identificarii si cartografierii plantelor medicinale din judetul Galati. Misiunea noastra este sa conectam comunitatea locala cu natura si sa promovam cunoasterea patrimoniului floristic al regiunii.
+            {about.description}
           </Text>
         </View>
 
         {/* Caracteristici */}
-        <Text style={styles.sectionLabel}>Ce ofera aplicatia</Text>
+        <Text style={styles.sectionLabel}>{about.featuresTitle}</Text>
         <View style={styles.card}>
           <Feature
             icon={<MapPin size={20} color={colors.primary} />}
-            title="Harta interactiva"
-            desc="Vizualizeaza observatii botanice pe o harta a judetului Galati, filtrate dupa planta."
+            title={about.featureMapTitle}
+            desc={about.featureMapDesc}
             styles={styles}
           />
           <FeatureDivider styles={styles} />
           <Feature
             icon={<Leaf size={20} color={colors.primary} />}
-            title="Identificare AI"
-            desc="Fotografiaza o planta si primeste sugestii de identificare bazate pe inteligenta artificiala."
+            title={about.featureAITitle}
+            desc={about.featureAIDesc}
             styles={styles}
           />
           <FeatureDivider styles={styles} />
           <Feature
             icon={<Users size={20} color={colors.primary} />}
-            title="Comunitate"
-            desc="Contribuie cu observatii proprii si ajuta la completarea hartii botanice a Galatiului."
+            title={about.featureCommunityTitle}
+            desc={about.featureCommunityDesc}
             styles={styles}
           />
           <FeatureDivider styles={styles} />
           <Feature
             icon={<ShieldCheck size={20} color={colors.primary} />}
-            title="Continut verificat"
-            desc="Observatiile sunt moderate de administratori pentru a asigura acuratetea informatiilor."
+            title={about.featureVerifiedTitle}
+            desc={about.featureVerifiedDesc}
             styles={styles}
           />
         </View>
 
+        {/* Echipa */}
+        <Text style={styles.sectionLabel}>{about.teamTitle}</Text>
+        <View style={styles.card}>
+          <View style={styles.teamDescription}>
+            <Trophy size={18} color={colors.secondary} />
+            <Text style={styles.teamDescText}>{about.teamDescription}</Text>
+          </View>
+          <View style={styles.divider} />
+          <View style={styles.teamMember}>
+            <User size={18} color={colors.primary} />
+            <Text style={styles.teamMemberName}>{about.teamMember1}</Text>
+          </View>
+          <View style={styles.teamMember}>
+            <User size={18} color={colors.primary} />
+            <Text style={styles.teamMemberName}>{about.teamMember2}</Text>
+          </View>
+        </View>
+
         {/* Avertisment */}
         <View style={styles.warningCard}>
-          <Text style={styles.warningTitle}>Avertisment important</Text>
+          <Text style={styles.warningTitle}>{about.warningTitle}</Text>
           <Text style={styles.warningText}>
-            Informatiile despre plante medicinale din aceasta aplicatie au scop exclusiv educational. Nu constituie sfaturi medicale. Consultati intotdeauna un specialist inainte de a utiliza plante medicinale.
+            {about.warningText}
           </Text>
         </View>
 
         {/* Info tehnic */}
-        <Text style={styles.sectionLabel}>Informatii tehnice</Text>
+        <Text style={styles.sectionLabel}>{about.technicalTitle}</Text>
         <View style={styles.card}>
-          <InfoRow label="Versiune" value="1.0.0" styles={styles} />
+          <InfoRow label={about.versionLabel} value="1.0.0" styles={styles} />
           <InfoDivider styles={styles} />
-          <InfoRow label="Platforma" value="iOS & Android" styles={styles} />
+          <InfoRow label={about.platformLabel} value={about.platformValue} styles={styles} />
           <InfoDivider styles={styles} />
-          <InfoRow label="Dezvoltat cu" value="React Native + Expo" styles={styles} />
-          <InfoDivider styles={styles} />
-          <InfoRow label="Contact" value="ecolocation.galati@gmail.com" styles={styles} />
+          <InfoRow label={about.builtWithLabel} value={about.builtWithValue} styles={styles} />
         </View>
 
-        <Text style={styles.copyright}>© 2026 EcoLocation. Toate drepturile rezervate.</Text>
+        {/* Contact */}
+        <Text style={styles.sectionLabel}>{about.contactTitle}</Text>
+        <View style={styles.card}>
+          <View style={styles.contactRow}>
+            <Mail size={16} color={colors.primary} />
+            <Text style={styles.contactEmail}>{about.contactEmail1}</Text>
+          </View>
+          <View style={styles.divider} />
+          <View style={styles.contactRow}>
+            <Mail size={16} color={colors.primary} />
+            <Text style={styles.contactEmail}>{about.contactEmail2}</Text>
+          </View>
+        </View>
+
+        <Text style={styles.copyright}>{about.copyright}</Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -264,6 +297,40 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
   divider: {
     height: StyleSheet.hairlineWidth,
     backgroundColor: colors.border,
+  },
+  teamDescription: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.sm,
+    paddingVertical: spacing.sm,
+  },
+  teamDescText: {
+    flex: 1,
+    fontSize: fonts.sizes.md,
+    color: colors.text,
+    lineHeight: 22,
+  },
+  teamMember: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingVertical: spacing.sm,
+  },
+  teamMemberName: {
+    fontSize: fonts.sizes.md,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  contactRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingVertical: spacing.sm,
+  },
+  contactEmail: {
+    fontSize: fonts.sizes.md,
+    color: colors.primary,
+    fontWeight: '500',
   },
   copyright: {
     fontSize: fonts.sizes.sm,

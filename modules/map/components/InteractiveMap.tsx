@@ -8,7 +8,7 @@ import { WebView } from 'react-native-webview';
 import type { MarkerData } from '../types/map.types';
 import { createMapStyles } from '../styles/map.styles';
 import { useThemeColors } from '../../../shared/hooks/useThemeColors';
-import { useSettings } from '../../../shared/context/SettingsContext';
+import { useSettings, getPlantName } from '../../../shared/context/SettingsContext';
 
 export interface MapRef {
   flyTo: (lat: number, lng: number, zoom?: number) => void;
@@ -207,7 +207,7 @@ const InteractiveMap = forwardRef<MapRef, InteractiveMapProps>(
           lat: m.latitude,
           lng: m.longitude,
           color: m.plant.icon_color || '#4CAF50',
-          name: m.plant.name_ro,
+          name: getPlantName(m.plant),
         }));
         webViewRef.current?.postMessage(
           JSON.stringify({ type: 'updateMarkers', markers: markersJson })
@@ -226,7 +226,7 @@ const InteractiveMap = forwardRef<MapRef, InteractiveMapProps>(
             lat: m.latitude,
             lng: m.longitude,
             color: m.plant.icon_color || '#4CAF50',
-            name: m.plant.name_ro,
+            name: getPlantName(m.plant),
           }));
           webViewRef.current?.postMessage(
             JSON.stringify({ type: 'updateMarkers', markers: markersJson })

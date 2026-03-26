@@ -13,6 +13,7 @@ export const sightingsEn: typeof sightingsRo = {
     chooseGallery: 'Choose from gallery',
     noImage: 'Tap to take a photo',
     retake: 'Retake',
+    previewAlt: 'Captured image preview',
   },
   ai: {
     title: 'AI identification results',
@@ -22,7 +23,7 @@ export const sightingsEn: typeof sightingsRo = {
     select: 'Select',
     manualSelect: 'Choose manually',
     backToResults: 'Back to AI results',
-    searchPlaceholder: 'Search plant...',
+    searchPlaceholder: 'Search for a plant...',
   },
   location: {
     title: 'Observation location',
@@ -36,7 +37,7 @@ export const sightingsEn: typeof sightingsRo = {
   details: {
     title: 'Observation details',
     selectedPlant: 'Selected plant',
-    comment: 'Comment (optional)',
+    comment: 'Comment',
     commentPlaceholder: 'Other observations or details...',
     submit: 'Save',
     description: 'Description',
@@ -49,9 +50,38 @@ export const sightingsEn: typeof sightingsRo = {
     benefitsPlaceholder: 'Plant benefits, separated by commas...',
     contraindications: 'Contraindications',
     contraindicationsPlaceholder: 'Known contraindications, separated by commas...',
+    langRo: 'Romanian',
+    langEn: 'English',
+    requiredField: 'This field is required.',
   },
   nav: {
     back: 'Back',
     next: 'Next',
+  },
+  camera: {
+    title: 'Identification',
+    permissionText: 'Allow camera access to identify plants.',
+    permissionButton: 'Allow access',
+    close: 'Close',
+    scanning: 'Identifying plant...',
+  },
+  callout: {
+    user: 'User:',
+    date: 'Date:',
+    aiConfidence: 'confidence',
+  },
+  alerts: {
+    successTitle: 'Success!',
+    successMessage: 'Your observation has been saved and will be reviewed soon.',
+    errorTitle: 'Error',
+    errorNoPlant: 'Could not save observation. Make sure you have selected a plant and a location.',
+    errorNetwork: 'Could not save observation. Check your internet connection.',
+    ok: 'OK',
+  },
+  exitModal: {
+    title: 'Leave observation?',
+    message: 'If you leave now, your observation progress will be lost and cannot be recovered.',
+    confirm: 'Leave',
+    cancel: 'Stay',
   },
 };

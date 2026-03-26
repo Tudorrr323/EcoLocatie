@@ -4,11 +4,12 @@
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { X } from 'lucide-react-native';
-import { FullScreenPanel } from './FullScreenPanel';
+import { BottomPanel } from './BottomPanel';
 import { spacing, borderRadius, fonts } from '../styles/theme';
 import type { ThemeColors } from '../styles/theme';
 import { useThemeColors } from '../hooks/useThemeColors';
 import { useTranslation } from '../i18n';
+import { getPlantName } from '../context/SettingsContext';
 import type { Plant } from '../types/plant.types';
 
 interface PlantFilterPanelProps {
@@ -64,7 +65,7 @@ const PlantFilterPanel: React.FC<PlantFilterPanelProps> = ({
   }, [localSelectedIds, onApply, onClose]);
 
   return (
-    <FullScreenPanel visible={visible} onClose={onClose}>
+    <BottomPanel visible={visible} onClose={onClose}>
       {/* Header */}
       <View style={styles.filterPanelHeader}>
         <Text style={styles.filterPanelTitle}>{t.shared.plantFilter.title}</Text>
@@ -111,7 +112,7 @@ const PlantFilterPanel: React.FC<PlantFilterPanelProps> = ({
                 ]}
               />
               <Text style={styles.filterItemLabel} numberOfLines={1}>
-                {plant.name_ro}
+                {getPlantName(plant)}
               </Text>
               <View
                 style={[
@@ -145,7 +146,7 @@ const PlantFilterPanel: React.FC<PlantFilterPanelProps> = ({
           <Text style={styles.filterApplyButtonText}>{t.shared.plantFilter.apply}</Text>
         </TouchableOpacity>
       </View>
-    </FullScreenPanel>
+    </BottomPanel>
   );
 };
 

@@ -16,11 +16,13 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, Mail, Pencil, Phone, Calendar, User } from 'lucide-react-native';
+import { ArrowLeft, Mail, Pencil, Phone, Calendar, User, Trash2 } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useAuthContext } from '../../../shared/context/AuthContext';
+import { uploadProfileImage, deleteProfileImage } from '../../auth/repository/authRepository';
 import { useTranslation } from '../../../shared/i18n';
 import { DatePickerModal } from '../../../shared/components/DatePickerModal';
+import { Snackbar } from '../../../shared/components/Snackbar';
 import { fonts, spacing, borderRadius } from '../../../shared/styles/theme';
 import { useThemeColors } from '../../../shared/hooks/useThemeColors';
 import type { ThemeColors } from '../../../shared/styles/theme';
@@ -38,6 +40,7 @@ export function EditProfileScreen() {
   const [birthDate, setBirthDate] = useState(user?.birth_date ?? '');
   const [profileImage, setProfileImage] = useState(user?.profile_image ?? '');
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
 
   const displayName = firstName || lastName
     ? `${firstName} ${lastName}`.trim()
@@ -57,6 +60,15 @@ export function EditProfileScreen() {
     }
   }
 
+  async function handleDeleteImage() {
+    try {
+      await deleteProfileImage();
+    } catch {
+      // ignore — backend may not have an image to delete
+    }
+    setProfileImage('');
+  }
+
   function formatDateForDisplay(isoString: string): string {
     if (!isoString) return '';
     const date = new Date(isoString);
@@ -65,14 +77,26 @@ export function EditProfileScreen() {
   }
 
   async function handleSave() {
+    // Upload image to backend if changed (local file URI, not already an http URL)
+    let finalProfileImage = profileImage;
+    if (profileImage && !profileImage.startsWith('http')) {
+      try {
+        const updatedUser = await uploadProfileImage(profileImage);
+        finalProfileImage = updatedUser.profile_image ?? profileImage;
+      } catch {
+        // Silently fail — keep local URI as fallback
+      }
+    }
+
     await updateUser({
       first_name: firstName.trim() || undefined,
       last_name: lastName.trim() || undefined,
       phone: phone.trim() || undefined,
       birth_date: birthDate || undefined,
-      profile_image: profileImage || undefined,
+      profile_image: finalProfileImage || undefined,
     });
-    router.back();
+    setSnackbarVisible(true);
+    setTimeout(() => router.back(), 1500);
   }
 
   return (
@@ -94,7 +118,7 @@ export function EditProfileScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* Avatar cu buton de editare */}
+          {/* Avatar cu buton de editare și ștergere */}
           <View style={styles.avatarSection}>
             <TouchableOpacity onPress={handlePickImage} activeOpacity={0.8} style={styles.avatarWrapper}>
               {profileImage ? (
@@ -108,6 +132,11 @@ export function EditProfileScreen() {
                 <Pencil size={14} color={colors.textLight} />
               </View>
             </TouchableOpacity>
+            {profileImage ? (
+              <TouchableOpacity onPress={handleDeleteImage} activeOpacity={0.7} style={styles.deleteBadge}>
+                <Trash2 size={14} color={colors.textLight} />
+              </TouchableOpacity>
+            ) : null}
           </View>
 
           {/* Nume complet */}
@@ -192,6 +221,12 @@ export function EditProfileScreen() {
         }}
         onCancel={() => setShowDatePicker(false)}
       />
+
+      <Snackbar
+        visible={snackbarVisible}
+        message={t.shared.snackbar.profileSaved}
+        onDismiss={() => setSnackbarVisible(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -261,6 +296,19 @@ const createStyles = (colors: ThemeColors) => StyleSheet.create({
     height: 30,
     borderRadius: 15,
     backgroundColor: colors.logoTeal,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: colors.surface,
+  },
+  deleteBadge: {
+    position: 'absolute',
+    top: 0,
+    right: '25%',
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: colors.error,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,

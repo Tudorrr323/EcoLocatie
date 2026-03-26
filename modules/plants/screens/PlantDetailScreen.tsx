@@ -1,7 +1,7 @@
 // PlantDetailScreen — ecranul de detalii complet al unei plante medicinale.
 // Afiseaza descrierea, partile utilizabile, beneficiile, contraindicatiile,
-// habitatul, perioada de recoltare si modul de preparare.
-import React, { useMemo, useState } from 'react';
+// habitatul, perioada de recoltare, modul de preparare, observatii cu comentarii si buton favorit.
+import React, { useMemo, useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -16,24 +16,45 @@ import { Badge } from '../../../shared/components/Badge';
 import { LoadingSpinner } from '../../../shared/components/LoadingSpinner';
 import { HorizontalTabs } from '../../../shared/components/HorizontalTabs';
 import { ImageViewer } from '../../../shared/components/ImageViewer';
-import { spacing } from '../../../shared/styles/theme';
+import { FavoriteButton } from '../../../shared/components/FavoriteButton';
+import { Snackbar } from '../../../shared/components/Snackbar';
+import { CommentSection } from '../../../shared/components/CommentSection';
+import { EmptyState } from '../../../shared/components/EmptyState';
+import { spacing, fonts, borderRadius } from '../../../shared/styles/theme';
 import { useThemeColors } from '../../../shared/hooks/useThemeColors';
-import type { ThemeColors } from '../../../shared/styles/theme';
+import { useFavorites } from '../../../shared/hooks/useFavorites';
+import type { Plant, PointOfInterest } from '../../../shared/types/plant.types';
 import { getPlantById } from '../repository/plantsRepository';
+import { getApprovedPOIs } from '../../../shared/repository/dataProvider';
 import { createPlantsStyles } from '../styles/plants.styles';
 import { useTranslation } from '../../../shared/i18n';
+import { useSettings, getPlantName } from '../../../shared/context/SettingsContext';
 
 export function PlantDetailScreen() {
   const colors = useThemeColors();
   const t = useTranslation();
+  const { language } = useSettings();
   const plantsStyles = useMemo(() => createPlantsStyles(colors), [colors]);
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState('prezentare');
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
+  const [plant, setPlant] = useState<Plant | null>(null);
+  const [plantPOIs, setPlantPOIs] = useState<PointOfInterest[]>([]);
+  const { isFavorite, toggleFavorite, lastAction, clearLastAction } = useFavorites();
+  const plantId = Number(id);
 
-  const plant = getPlantById(Number(id));
+  useEffect(() => {
+    let cancelled = false;
+    getPlantById(plantId).then((result) => {
+      if (!cancelled && result) setPlant(result);
+    });
+    getApprovedPOIs().then((pois) => {
+      if (!cancelled) setPlantPOIs(pois.filter((p) => p.plant_id === plantId));
+    });
+    return () => { cancelled = true; };
+  }, [plantId, language]);
 
   if (!plant) {
     return <LoadingSpinner />;
@@ -48,29 +69,41 @@ export function PlantDetailScreen() {
             source={{ uri: plant.image_url }}
             style={plantsStyles.detailHeroImage}
             resizeMode="cover"
-            accessibilityLabel={plant.name_ro}
+            accessibilityLabel={getPlantName(plant)}
           />
         </TouchableOpacity>
 
-        {/* Back button — pozitionat sub status bar */}
+        {/* Back button */}
         <TouchableOpacity
           style={[plantsStyles.detailBackButton, { top: insets.top + spacing.sm }]}
           onPress={() => router.back()}
           activeOpacity={0.8}
-          accessibilityLabel="Inapoi"
         >
           <ArrowLeft size={22} color={colors.textLight} />
         </TouchableOpacity>
 
+        {/* Favorite button */}
+        <View style={{
+          position: 'absolute', top: insets.top + spacing.sm, right: spacing.md,
+          width: 38, height: 38, borderRadius: 19,
+          backgroundColor: 'rgba(0,0,0,0.35)', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <FavoriteButton
+            isFavorite={isFavorite(plantId)}
+            onToggle={() => toggleFavorite(plantId)}
+            size={20}
+          />
+        </View>
+
         {/* Name overlay */}
         <View style={plantsStyles.detailHeaderOverlay}>
-          <Text style={plantsStyles.detailNameRo}>{plant.name_ro}</Text>
+          <Text style={plantsStyles.detailNameRo}>{getPlantName(plant)}</Text>
           <Text style={plantsStyles.detailNameLatin}>{plant.name_latin}</Text>
           <Badge text={plant.family} color={plant.icon_color} />
         </View>
       </View>
 
-      {/* Tabs — spatiu fata de imagine */}
+      {/* Tabs */}
       <View style={{ marginTop: spacing.md }}>
         <HorizontalTabs
           tabs={[
@@ -78,6 +111,7 @@ export function PlantDetailScreen() {
             { key: 'beneficii', label: t.plants.sections.benefits, content: null },
             { key: 'contraindicatii', label: t.plants.sections.contraindications, content: null },
             { key: 'detalii', label: t.map.tabs.details, content: null },
+            { key: 'comentarii', label: t.plants.tabs.comments, content: null },
           ]}
           activeKey={activeTab}
           onTabChange={setActiveTab}
@@ -88,6 +122,7 @@ export function PlantDetailScreen() {
         style={{ flex: 1 }}
         contentContainerStyle={plantsStyles.detailContent}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
         {activeTab === 'prezentare' && (
           <>
@@ -167,9 +202,41 @@ export function PlantDetailScreen() {
             </View>
           </>
         )}
+
+        {activeTab === 'comentarii' && (
+          <>
+            {plantPOIs.length === 0 ? (
+              <EmptyState message={t.plants.observations.noObservations} />
+            ) : (
+              plantPOIs.map((poi) => (
+                <View key={poi.id} style={{
+                  backgroundColor: colors.surface, borderRadius: borderRadius.lg,
+                  padding: spacing.md, marginBottom: spacing.md,
+                  borderLeftWidth: 3, borderLeftColor: plant.icon_color,
+                }}>
+                  <Text style={{ fontSize: fonts.sizes.sm, color: colors.textSecondary, marginBottom: spacing.xs }}>
+                    {new Date(poi.created_at).toLocaleDateString('ro-RO')}
+                  </Text>
+                  {poi.comment ? (
+                    <Text style={{ fontSize: fonts.sizes.md, color: colors.text, marginBottom: spacing.sm, lineHeight: 20 }}>
+                      "{poi.comment}"
+                    </Text>
+                  ) : null}
+                  <CommentSection poiId={poi.id} compact />
+                </View>
+              ))
+            )}
+          </>
+        )}
       </ScrollView>
 
       <ImageViewer uri={fullscreenImage} onClose={() => setFullscreenImage(null)} />
+
+      <Snackbar
+        visible={lastAction !== null}
+        message={lastAction === 'added' ? t.shared.snackbar.addedToFavorites : t.shared.snackbar.removedFromFavorites}
+        onDismiss={clearLastAction}
+      />
     </View>
   );
 }

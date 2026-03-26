@@ -104,7 +104,7 @@ export function AuthForm({ mode, onSuccess }: AuthFormProps) {
       </Text>
       <Text style={authStyles.cardSubtitle}>
         {mode === 'login'
-          ? 'Intră în contul tău EcoLocatie'
+          ? 'Intră în contul tău EcoLocation'
           : 'Creează un cont nou'}
       </Text>
 

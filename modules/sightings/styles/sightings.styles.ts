@@ -292,6 +292,47 @@ export const createSightingsStyles = (colors: ThemeColors) => StyleSheet.create(
     color: colors.text,
   },
 
+  // ── Language tabs (Step 4) ───────────────────────────────────
+  langTabsRow: {
+    flexDirection: 'row',
+    marginBottom: spacing.md,
+    borderRadius: borderRadius.md,
+    backgroundColor: colors.background,
+    padding: 3,
+  },
+  langTab: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.md - 1,
+    gap: spacing.xs,
+  },
+  langTabActive: {
+    backgroundColor: colors.surface,
+    shadowColor: colors.black,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  langTabText: {
+    fontSize: fonts.sizes.md,
+    fontWeight: '500',
+    color: colors.textSecondary,
+  },
+  langTabTextActive: {
+    color: colors.primary,
+    fontWeight: '700',
+  },
+  langTabDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.error,
+  },
+
   // ── Manual selector search ───────────────────────────────────
   manualSelectorSearchBar: {
     paddingHorizontal: spacing.md,

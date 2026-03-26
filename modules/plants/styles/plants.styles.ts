@@ -1,4 +1,4 @@
-// plants.styles — stilurile centralizate ale modulului plants din EcoLocatie.
+// plants.styles — stilurile centralizate ale modulului plants din EcoLocation.
 // Acopera stilurile pentru ecrane, carduri, detalii, liste si selectorul de plante.
 import { StyleSheet } from 'react-native';
 import { spacing, borderRadius, fonts } from '../../../shared/styles/theme';

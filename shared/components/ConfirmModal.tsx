@@ -12,6 +12,8 @@ import {
   Animated,
   StyleSheet,
   Pressable,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { fonts, spacing, borderRadius } from '../styles/theme';
 import type { ThemeColors } from '../styles/theme';
@@ -98,62 +100,70 @@ export function ConfirmModal({
       statusBarTranslucent
       onRequestClose={onCancel}
     >
-      <Pressable style={styles.overlay} onPress={onCancel}>
-        <Animated.View style={[styles.overlayBg, { opacity: overlayOpacity }]} />
+      <KeyboardAvoidingView
+        style={styles.keyboardAvoiding}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <Pressable style={styles.overlay} onPress={onCancel}>
+          <Animated.View style={[styles.overlayBg, { opacity: overlayOpacity }]} />
 
-        <Animated.View
-          style={[
-            styles.card,
-            { opacity: cardOpacity, transform: [{ scale: cardScale }] },
-          ]}
-        >
-          <Pressable>
-            {icon ? (
-              <View style={styles.iconWrapper}>{icon}</View>
-            ) : null}
-
-            <Text style={styles.title}>{title}</Text>
-
-            {message ? (
-              <Text style={styles.message}>{message}</Text>
-            ) : null}
-
-            {children ? (
-              <View style={styles.childrenWrapper}>{children}</View>
-            ) : null}
-
-            <View style={styles.buttonRow}>
-              <TouchableOpacity
-                style={[styles.cancelButton, !onConfirm && styles.cancelButtonFull]}
-                onPress={onCancel}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.cancelButtonText}>{cancelLabel}</Text>
-              </TouchableOpacity>
-
-              {onConfirm ? (
-                <TouchableOpacity
-                  style={[
-                    styles.confirmButton,
-                    confirmDestructive
-                      ? styles.confirmButtonDestructive
-                      : styles.confirmButtonPrimary,
-                  ]}
-                  onPress={onConfirm}
-                  activeOpacity={0.8}
-                >
-                  <Text style={styles.confirmButtonText}>{confirmLabel}</Text>
-                </TouchableOpacity>
+          <Animated.View
+            style={[
+              styles.card,
+              { opacity: cardOpacity, transform: [{ scale: cardScale }] },
+            ]}
+          >
+            <Pressable>
+              {icon ? (
+                <View style={styles.iconWrapper}>{icon}</View>
               ) : null}
-            </View>
-          </Pressable>
-        </Animated.View>
-      </Pressable>
+
+              <Text style={styles.title}>{title}</Text>
+
+              {message ? (
+                <Text style={styles.message}>{message}</Text>
+              ) : null}
+
+              {children ? (
+                <View style={styles.childrenWrapper}>{children}</View>
+              ) : null}
+
+              <View style={styles.buttonRow}>
+                <TouchableOpacity
+                  style={[styles.cancelButton, !onConfirm && styles.cancelButtonFull]}
+                  onPress={onCancel}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.cancelButtonText}>{cancelLabel}</Text>
+                </TouchableOpacity>
+
+                {onConfirm ? (
+                  <TouchableOpacity
+                    style={[
+                      styles.confirmButton,
+                      confirmDestructive
+                        ? styles.confirmButtonDestructive
+                        : styles.confirmButtonPrimary,
+                    ]}
+                    onPress={onConfirm}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={styles.confirmButtonText}>{confirmLabel}</Text>
+                  </TouchableOpacity>
+                ) : null}
+              </View>
+            </Pressable>
+          </Animated.View>
+        </Pressable>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
 
 const createStyles = (colors: ThemeColors) => StyleSheet.create({
+  keyboardAvoiding: {
+    flex: 1,
+  },
   overlay: {
     flex: 1,
     alignItems: 'center',

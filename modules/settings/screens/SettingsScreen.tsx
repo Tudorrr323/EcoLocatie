@@ -52,7 +52,7 @@ export function SettingsScreen() {
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const { language, setLanguage, themePreference, setThemePreference } = useSettings();
 
-  const languageLabels: Record<Language, string> = { ro: 'Romana', en: 'English' };
+  const languageLabels: Record<Language, string> = { ro: t.account.settings.languageRo, en: t.account.settings.languageEn };
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>

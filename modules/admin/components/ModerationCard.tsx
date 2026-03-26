@@ -1,7 +1,7 @@
 // ModerationCard — card pentru o observatie in asteptare de aprobare.
 // Afiseaza detaliile POI-ului cu butoane Aproba/Respinge pentru admin.
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Card } from '../../../shared/components/Card';
 import { Button } from '../../../shared/components/Button';
@@ -15,7 +15,9 @@ import {
 import type { ThemeColors } from '../../../shared/styles/theme';
 import { useThemeColors } from '../../../shared/hooks/useThemeColors';
 import { useTranslation } from '../../../shared/i18n';
-import type { PointOfInterest } from '../../../shared/types/plant.types';
+import { useSettings, getPlantName } from '../../../shared/context/SettingsContext';
+import { TranslatableText } from '../../../shared/components/TranslatableText';
+import type { Plant, PointOfInterest } from '../../../shared/types/plant.types';
 import type { ModerationAction } from '../types/admin.types';
 
 interface ModerationCardProps {
@@ -26,8 +28,13 @@ interface ModerationCardProps {
 export function ModerationCard({ poi, onModerate }: ModerationCardProps) {
   const colors = useThemeColors();
   const t = useTranslation();
+  const { language } = useSettings();
   const styles = useMemo(() => createModerationCardStyles(colors), [colors]);
-  const plant = getPlantById(poi.plant_id);
+  const [plant, setPlant] = useState<Plant | undefined>(undefined);
+
+  useEffect(() => {
+    getPlantById(poi.plant_id).then(setPlant).catch(() => {});
+  }, [poi.plant_id, language]);
   const confidencePercent = Math.round(poi.ai_confidence * 100);
 
   const confidenceColor =
@@ -41,7 +48,7 @@ export function ModerationCard({ poi, onModerate }: ModerationCardProps) {
     <Card style={styles.card}>
       <View style={styles.header}>
         <Text style={styles.plantName}>
-          {plant ? plant.name_ro : `Planta #${poi.plant_id}`}
+          {plant ? getPlantName(plant) : `#${poi.plant_id}`}
         </Text>
         {plant && (
           <Text style={styles.plantLatin}>{plant.name_latin}</Text>
@@ -80,7 +87,7 @@ export function ModerationCard({ poi, onModerate }: ModerationCardProps) {
       {poi.comment ? (
         <View style={styles.commentBox}>
           <Text style={styles.detailLabel}>{t.admin.moderation.comment}</Text>
-          <Text style={styles.commentText}>{poi.comment}</Text>
+          <TranslatableText text={poi.comment} style={styles.commentText} />
         </View>
       ) : null}
 

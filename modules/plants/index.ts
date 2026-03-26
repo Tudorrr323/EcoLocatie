@@ -1,4 +1,4 @@
-// index.ts — punctul de export public al modulului plants din EcoLocatie.
+// index.ts — punctul de export public al modulului plants din EcoLocation.
 // Re-exporta ecranele si componentele utilizate de alte module ale aplicatiei.
 export { EncyclopediaScreen } from './screens/EncyclopediaScreen';
 export { PlantDetailScreen } from './screens/PlantDetailScreen';

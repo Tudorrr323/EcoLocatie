@@ -1,15 +1,19 @@
 // AuthContext — context global pentru starea de autentificare a utilizatorului.
 // Ofera login, register, logout cu persistare in AsyncStorage si guard de navigare.
+// La startup, verifica token-ul JWT prin /api/auth/me si reincarca profilul.
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { User } from '../types/plant.types';
 import type { RegisterData } from '../../modules/auth/types/auth.types';
 import {
   login as repoLogin,
   register as repoRegister,
+  fetchCurrentUser,
   getUserFromStorage,
   saveUserToStorage,
   clearUserFromStorage,
+  hasStoredToken,
 } from '../../modules/auth/repository/authRepository';
 
 interface AuthContextType {
@@ -31,9 +35,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     (async () => {
-      const stored = await getUserFromStorage();
-      setUser(stored);
-      setLoading(false);
+      try {
+        const hasToken = await hasStoredToken();
+        if (hasToken) {
+          // Validate token by fetching current user from API
+          try {
+            const freshUser = await fetchCurrentUser();
+            await saveUserToStorage(freshUser);
+            setUser(freshUser);
+          } catch {
+            // Token expired or invalid — fallback to cached user or clear
+            const stored = await getUserFromStorage();
+            if (stored) {
+              setUser(stored);
+            } else {
+              await clearUserFromStorage();
+            }
+          }
+        } else {
+          // No token — check for cached user (shouldn't exist, but just in case)
+          await clearUserFromStorage();
+        }
+      } catch {
+        // Fallback: try cached user
+        const stored = await getUserFromStorage();
+        setUser(stored);
+      } finally {
+        setLoading(false);
+      }
     })();
   }, []);
 
@@ -60,6 +89,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(async () => {
     await clearUserFromStorage();
+    await AsyncStorage.clear();
     setUser(null);
   }, []);
 

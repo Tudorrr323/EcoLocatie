@@ -26,6 +26,19 @@ export const lightColors = {
   filterDotBorder: 'rgba(0,0,0,0.1)',
   errorBackground: '#FFEBEE',
   placeholderText: '#BDBDBD',
+  notificationBadge: '#EF4444',
+  notificationUnread: '#F0F7EB',
+  drawerBackground: '#1A9D94',
+  drawerSeparator: 'rgba(255,255,255,0.15)',
+  drawerActiveItem: 'rgba(255,255,255,0.2)',
+  drawerText: '#FFFFFF',
+  drawerTextMuted: 'rgba(255,255,255,0.8)',
+  cameraButton: '#1A9D94',
+  cameraButtonShadow: 'rgba(26,157,148,0.3)',
+  cameraButtonIcon: '#FFFFFF',
+  chatAccent: '#1A9D94',
+  chatAccentLight: 'rgba(26,157,148,0.12)',
+  chatButtonShadow: 'rgba(26,157,148,0.25)',
 } as const;
 
 export type ThemeColors = { [K in keyof typeof lightColors]: string };
@@ -54,6 +67,19 @@ export const darkColors: ThemeColors = {
   filterDotBorder: 'rgba(255,255,255,0.15)',
   errorBackground: '#3D1515',
   placeholderText: '#666666',
+  notificationBadge: '#EF4444',
+  notificationUnread: '#1A2E14',
+  drawerBackground: '#0F2B28',
+  drawerSeparator: 'rgba(255,255,255,0.1)',
+  drawerActiveItem: 'rgba(255,255,255,0.12)',
+  drawerText: '#E8E8E8',
+  drawerTextMuted: 'rgba(255,255,255,0.6)',
+  cameraButton: '#0F2B28',
+  cameraButtonShadow: 'rgba(15,43,40,0.5)',
+  cameraButtonIcon: '#E8E8E8',
+  chatAccent: '#0F2B28',
+  chatAccentLight: 'rgba(15,43,40,0.25)',
+  chatButtonShadow: 'rgba(15,43,40,0.5)',
 };
 
 // Alias pentru compatibilitate — folosit doar in cod non-React (ex: sightingGuard).

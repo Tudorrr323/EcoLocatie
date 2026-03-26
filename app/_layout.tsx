@@ -1,4 +1,4 @@
-// _layout — layout-ul radacina al aplicatiei EcoLocatie (Expo Router).
+// _layout — layout-ul radacina al aplicatiei EcoLocation (Expo Router).
 // Wrapeaza app-ul cu AuthProvider si redirecteaza la /login daca utilizatorul nu e autentificat.
 
 import { useEffect } from 'react';
@@ -7,6 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import { View, ActivityIndicator } from 'react-native';
 import { AuthProvider, useAuthContext } from '../shared/context/AuthContext';
 import { SettingsProvider, useSettings } from '../shared/context/SettingsContext';
+import { NotificationProvider } from '../shared/context/NotificationContext';
 
 function RootLayoutNav() {
   const { isAuthenticated, loading } = useAuthContext();
@@ -69,7 +70,9 @@ export default function RootLayout() {
   return (
     <SettingsProvider>
       <AuthProvider>
-        <RootLayoutNav />
+        <NotificationProvider>
+          <RootLayoutNav />
+        </NotificationProvider>
       </AuthProvider>
     </SettingsProvider>
   );

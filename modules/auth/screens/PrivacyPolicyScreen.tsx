@@ -1,4 +1,4 @@
-// PrivacyPolicyScreen — Politica de Confidentialitate a aplicatiei EcoLocation.
+// PrivacyPolicyScreen — Politica de Confidențialitate a aplicației EcoLocation.
 
 import React, { useMemo } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
@@ -7,12 +7,15 @@ import { ArrowLeft } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { fonts, spacing, borderRadius } from '../../../shared/styles/theme';
 import { useThemeColors } from '../../../shared/hooks/useThemeColors';
+import { useTranslation } from '../../../shared/i18n';
 import type { ThemeColors } from '../../../shared/styles/theme';
 
 export function PrivacyPolicyScreen() {
   const colors = useThemeColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const router = useRouter();
+  const t = useTranslation();
+  const privacy = t.auth.privacy;
 
   function Section({ title, children }: { title: string; children: React.ReactNode }) {
     return (
@@ -37,7 +40,7 @@ export function PrivacyPolicyScreen() {
         <TouchableOpacity style={styles.backBtn} onPress={() => router.back()} activeOpacity={0.7}>
           <ArrowLeft size={22} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Politica de Confidentialitate</Text>
+        <Text style={styles.headerTitle}>{privacy.headerTitle}</Text>
         <View style={styles.backBtn} />
       </View>
 
@@ -45,71 +48,71 @@ export function PrivacyPolicyScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.updated}>Ultima actualizare: 25 martie 2026</Text>
+        <Text style={styles.updated}>{privacy.lastUpdated}</Text>
 
-        <Section title="1. Despre EcoLocation">
-          <P>EcoLocation este o aplicatie mobila dedicata identificarii si cartografierii plantelor medicinale din judetul Galati. Ne angajam sa protejam confidentialitatea utilizatorilor nostri si sa prelucram datele personale cu respectarea Regulamentului (UE) 2016/679 (GDPR) si a legislatiei romane aplicabile.</P>
+        <Section title={privacy.section1Title}>
+          <P>{privacy.section1Text}</P>
         </Section>
 
-        <Section title="2. Date pe care le colectam">
-          <P><Bold>Date de cont:</Bold> prenume, nume de familie, adresa de email, numar de telefon (optional), data nasterii (optional). Aceste date sunt furnizate voluntar la crearea contului.</P>
-          <P><Bold>Date de localizare:</Bold> coordonate GPS utilizate exclusiv pentru marcarea observatiilor pe harta. Localizarea este solicitata explicit si poate fi refuzata.</P>
-          <P><Bold>Imagini:</Bold> fotografii ale plantelor capturate cu camera sau selectate din galerie, asociate observatiilor adaugate.</P>
-          <P><Bold>Continut generat:</Bold> observatii, comentarii, descrieri de habitate si perioade de recoltare introduse de utilizator.</P>
-          <P><Bold>Date tehnice:</Bold> informatii despre dispozitiv si sistem de operare, necesare pentru functionarea corecta a aplicatiei.</P>
+        <Section title={privacy.section2Title}>
+          <P><Bold>{privacy.section2Account}</Bold>{privacy.section2AccountText}</P>
+          <P><Bold>{privacy.section2Location}</Bold>{privacy.section2LocationText}</P>
+          <P><Bold>{privacy.section2Images}</Bold>{privacy.section2ImagesText}</P>
+          <P><Bold>{privacy.section2Content}</Bold>{privacy.section2ContentText}</P>
+          <P><Bold>{privacy.section2Technical}</Bold>{privacy.section2TechnicalText}</P>
         </Section>
 
-        <Section title="3. Scopul prelucrarii datelor">
-          <P>Datele colectate sunt utilizate pentru:</P>
-          <P>• Gestionarea si autentificarea contului de utilizator</P>
-          <P>• Afisarea observatiilor botanice pe harta interactiva</P>
-          <P>• Identificarea automata a plantelor prin servicii AI</P>
-          <P>• Moderarea continutului adaugat de utilizatori</P>
-          <P>• Imbunatatirea functionalitatilor aplicatiei</P>
-          <P>• Respectarea obligatiilor legale</P>
+        <Section title={privacy.section3Title}>
+          <P>{privacy.section3Text}</P>
+          <P>{privacy.section3Item1}</P>
+          <P>{privacy.section3Item2}</P>
+          <P>{privacy.section3Item3}</P>
+          <P>{privacy.section3Item4}</P>
+          <P>{privacy.section3Item5}</P>
+          <P>{privacy.section3Item6}</P>
         </Section>
 
-        <Section title="4. Stocarea si securitatea datelor">
-          <P>In versiunea actuala, datele de sesiune sunt stocate local pe dispozitivul dumneavoastra prin mecanisme securizate (AsyncStorage). Nu sunt transmise catre servere externe fara consimtamantul explicit al utilizatorului.</P>
-          <P>Versiunile viitoare ale aplicatiei vor utiliza servere securizate cu criptare in tranzit (HTTPS/TLS) si in repaus. Vom notifica utilizatorii inainte de orice modificare a modului de stocare.</P>
-          <P>Implementam masuri tehnice si organizatorice adecvate pentru a proteja datele impotriva accesului neautorizat, pierderii sau divulgarii.</P>
+        <Section title={privacy.section4Title}>
+          <P>{privacy.section4Text1}</P>
+          <P>{privacy.section4Text2}</P>
+          <P>{privacy.section4Text3}</P>
         </Section>
 
-        <Section title="5. Partajarea datelor cu terti">
-          <P>Nu vindem, nu inchiram si nu transferam datele dumneavoastra personale catre terti in scop comercial.</P>
-          <P>Datele pot fi dezvaluite exclusiv in urmatoarele situatii:</P>
-          <P>• La solicitarea autoritatilor competente, in baza obligatiilor legale</P>
-          <P>• Catre furnizori de servicii tehnici care actioneaza in calitate de operatori asociati, cu garantii contractuale adecvate</P>
-          <P>• Cu consimtamantul dumneavoastra explicit</P>
+        <Section title={privacy.section5Title}>
+          <P>{privacy.section5Text1}</P>
+          <P>{privacy.section5Text2}</P>
+          <P>{privacy.section5Item1}</P>
+          <P>{privacy.section5Item2}</P>
+          <P>{privacy.section5Item3}</P>
         </Section>
 
-        <Section title="6. Drepturile dumneavoastra">
-          <P>In conformitate cu GDPR, aveti urmatoarele drepturi:</P>
-          <P>• <Bold>Dreptul la acces:</Bold> puteti solicita o copie a datelor personale detinute despre dumneavoastra</P>
-          <P>• <Bold>Dreptul la rectificare:</Bold> puteti corecta datele inexacte sau incomplete</P>
-          <P>• <Bold>Dreptul la stergere:</Bold> puteti solicita stergerea datelor in conditiile prevazute de lege</P>
-          <P>• <Bold>Dreptul la portabilitate:</Bold> puteti primi datele intr-un format structurat, uzual si lizibil</P>
-          <P>• <Bold>Dreptul la opozitie:</Bold> va puteti opune prelucrarii datelor in anumite circumstante</P>
-          <P>• <Bold>Dreptul de a retrage consimtamantul:</Bold> retragerea nu afecteaza legalitatea prelucrarii anterioare</P>
-          <P>Pentru exercitarea acestor drepturi, contactati-ne la adresa de mai jos.</P>
+        <Section title={privacy.section6Title}>
+          <P>{privacy.section6Text}</P>
+          <P>• <Bold>{privacy.section6Access}</Bold>{privacy.section6AccessText}</P>
+          <P>• <Bold>{privacy.section6Rectification}</Bold>{privacy.section6RectificationText}</P>
+          <P>• <Bold>{privacy.section6Erasure}</Bold>{privacy.section6ErasureText}</P>
+          <P>• <Bold>{privacy.section6Portability}</Bold>{privacy.section6PortabilityText}</P>
+          <P>• <Bold>{privacy.section6Opposition}</Bold>{privacy.section6OppositionText}</P>
+          <P>• <Bold>{privacy.section6Withdraw}</Bold>{privacy.section6WithdrawText}</P>
+          <P>{privacy.section6Footer}</P>
         </Section>
 
-        <Section title="7. Cookies si tehnologii similare">
-          <P>Aplicatia nu utilizeaza cookies de urmarire sau publicitate. Pot fi utilizate mecanisme locale de stocare exclusiv pentru functionalitatea aplicatiei (sesiune, preferinte).</P>
+        <Section title={privacy.section7Title}>
+          <P>{privacy.section7Text}</P>
         </Section>
 
-        <Section title="8. Varsta minima">
-          <P>Aplicatia EcoLocation este destinata persoanelor cu varsta de minimum 13 ani. Nu colectam intentionat date personale de la minori sub aceasta varsta. Daca aflam ca am colectat astfel de date, le vom sterge imediat.</P>
+        <Section title={privacy.section8Title}>
+          <P>{privacy.section8Text}</P>
         </Section>
 
-        <Section title="9. Modificari ale politicii">
-          <P>Ne rezervam dreptul de a actualiza aceasta Politica de Confidentialitate. Modificarile semnificative vor fi comunicate utilizatorilor prin notificari in aplicatie. Continuarea utilizarii aplicatiei dupa publicarea modificarilor constituie acceptul acestora.</P>
+        <Section title={privacy.section9Title}>
+          <P>{privacy.section9Text}</P>
         </Section>
 
-        <Section title="10. Contact">
-          <P>Pentru orice intrebari, solicitari sau reclamatii privind prelucrarea datelor personale, ne puteti contacta la:</P>
-          <P>Email: <Bold>ecolocation.galati@gmail.com</Bold></P>
-          <P>De asemenea, aveti dreptul de a depune o plangere la Autoritatea Nationala de Supraveghere a Prelucrarii Datelor cu Caracter Personal (ANSPDCP), www.dataprotection.ro.</P>
+        <Section title={privacy.section10Title}>
+          <P>{privacy.section10Text}</P>
+          <P>{privacy.section10Email}<Bold>{privacy.section10EmailAddress}</Bold></P>
+          <P>{privacy.section10Footer}</P>
         </Section>
       </ScrollView>
     </SafeAreaView>

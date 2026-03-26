@@ -17,5 +17,11 @@ export interface SightingDraft {
   benefits: string;
   contraindications: string;
   comment: string;
+  description_en: string;
+  habitat_en: string;
+  harvestPeriod_en: string;
+  benefits_en: string;
+  contraindications_en: string;
+  comment_en: string;
   aiResults: AIResult[];
 }

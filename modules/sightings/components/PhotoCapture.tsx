@@ -29,7 +29,7 @@ export function PhotoCapture({ imageUri, onOpenCamera, onClear }: PhotoCapturePr
               source={{ uri: imageUri }}
               style={sightingsStyles.photoPreview}
               resizeMode="cover"
-              accessibilityLabel="Previzualizare imagine capturata"
+              accessibilityLabel={t.sightings.photo.previewAlt}
             />
             <View style={sightingsStyles.photoRetakeOverlay}>
               <Camera size={24} color={colors.textLight} />

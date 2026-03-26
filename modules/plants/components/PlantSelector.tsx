@@ -1,7 +1,7 @@
 // PlantSelector — picker pentru alegerea manuala a unei plante.
 // Folosit in flow-ul de creare observatie cand identificarea AI nu returneaza rezultatul corect.
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Pagination } from '../../../shared/components/Pagination';
 import { usePagination } from '../../../shared/hooks/usePagination';
@@ -10,6 +10,7 @@ import type { Plant } from '../../../shared/types/plant.types';
 import { getAllPlants } from '../repository/plantsRepository';
 import { createPlantsStyles } from '../styles/plants.styles';
 import { useThemeColors } from '../../../shared/hooks/useThemeColors';
+import { getPlantName } from '../../../shared/context/SettingsContext';
 
 interface PlantSelectorProps {
   onSelect: (plant: Plant) => void;
@@ -21,17 +22,20 @@ export function PlantSelector({ onSelect, searchQuery }: PlantSelectorProps) {
   const colors = useThemeColors();
   const plantsStyles = useMemo(() => createPlantsStyles(colors), [colors]);
   const [internalQuery] = useState('');
+  const [allPlants, setAllPlants] = useState<Plant[]>([]);
+
+  useEffect(() => {
+    getAllPlants().then(setAllPlants).catch(() => {});
+  }, []);
 
   const query = searchQuery !== undefined ? searchQuery : internalQuery;
-
-  const allPlants = useMemo(() => getAllPlants(), []);
 
   const filtered = useMemo(() => {
     if (!query.trim()) return allPlants;
     const normalizedQuery = removeDiacritics(query.toLowerCase());
     return allPlants.filter(
       (p) =>
-        removeDiacritics(p.name_ro.toLowerCase()).includes(normalizedQuery) ||
+        removeDiacritics(getPlantName(p).toLowerCase()).includes(normalizedQuery) ||
         removeDiacritics(p.name_latin.toLowerCase()).includes(normalizedQuery) ||
         removeDiacritics(p.family.toLowerCase()).includes(normalizedQuery),
     );
@@ -57,7 +61,7 @@ export function PlantSelector({ onSelect, searchQuery }: PlantSelectorProps) {
             >
               <View style={[plantsStyles.selectorDot, { backgroundColor: item.icon_color }]} />
               <View>
-                <Text style={plantsStyles.selectorNameRo}>{item.name_ro}</Text>
+                <Text style={plantsStyles.selectorNameRo}>{getPlantName(item)}</Text>
                 <Text style={plantsStyles.selectorNameLatin}>{item.name_latin}</Text>
               </View>
             </TouchableOpacity>

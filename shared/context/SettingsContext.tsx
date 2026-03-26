@@ -37,7 +37,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         AsyncStorage.getItem(LANG_KEY),
         AsyncStorage.getItem(THEME_KEY),
       ]);
-      if (storedLang === 'ro' || storedLang === 'en') setLanguageState(storedLang);
+      if (storedLang === 'ro' || storedLang === 'en') { setLanguageState(storedLang); _setCurrentLanguage(storedLang); }
       if (storedTheme === 'light' || storedTheme === 'dark' || storedTheme === 'system') setThemePreferenceState(storedTheme);
       setLoaded(true);
     })();
@@ -45,6 +45,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 
   const setLanguage = useCallback((lang: Language) => {
     setLanguageState(lang);
+    _setCurrentLanguage(lang);
     AsyncStorage.setItem(LANG_KEY, lang);
   }, []);
 
@@ -76,4 +77,21 @@ export function useSettings(): SettingsContextType {
   const ctx = useContext(SettingsContext);
   if (!ctx) throw new Error('useSettings trebuie folosit in interiorul SettingsProvider');
   return ctx;
+}
+
+// --- Non-hook language getter (for use outside React components like dataProvider) ---
+let _currentLanguage: Language = 'ro';
+
+export function _setCurrentLanguage(lang: Language) {
+  _currentLanguage = lang;
+}
+
+export function getCurrentLanguage(): Language {
+  return _currentLanguage;
+}
+
+/** Returnează numele plantei în limba curentă (name_en dacă e engleză și disponibil, altfel name_ro). */
+export function getPlantName(plant: { name_ro: string; name_en?: string }): string {
+  if (_currentLanguage === 'en' && plant.name_en) return plant.name_en;
+  return plant.name_ro;
 }

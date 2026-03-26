@@ -21,6 +21,7 @@ import { useTranslation } from '../../../shared/i18n';
 import { DatePickerModal } from '../../../shared/components/DatePickerModal';
 import { createAuthStyles } from '../styles/auth.styles';
 import { useThemeColors } from '../../../shared/hooks/useThemeColors';
+import { LanguageSwitcher } from '../../../shared/components/LanguageSwitcher';
 import type { ThemeColors } from '../../../shared/styles/theme';
 
 const MONTHS_RO = [
@@ -158,13 +159,15 @@ export function RegisterScreen() {
         style={{ flex: 1 }}
       >
         <ScrollView
-          contentContainerStyle={authStyles.scrollContent}
+          contentContainerStyle={[authStyles.scrollContent, { justifyContent: 'center' }]}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View style={[authStyles.titleSection, { marginTop: 16 }]}>
-            <Text style={authStyles.title}>{t.auth.register.title}</Text>
-            <Text style={authStyles.subtitle}>{t.auth.register.subtitle}</Text>
+          <LanguageSwitcher />
+
+          <View style={[authStyles.titleSection, { alignItems: 'center' }]}>
+            <Text style={[authStyles.title, { textAlign: 'center' }]}>{t.auth.register.title}</Text>
+            <Text style={[authStyles.subtitle, { textAlign: 'center' }]}>{t.auth.register.subtitle}</Text>
           </View>
 
           {error && (
@@ -317,6 +320,15 @@ export function RegisterScreen() {
             <Text style={authStyles.switchText}>{t.auth.register.hasAccount}</Text>
             <TouchableOpacity onPress={() => router.push('/login')} activeOpacity={0.7}>
               <Text style={authStyles.switchLink}>{t.auth.register.login}</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={authStyles.legalSection}>
+            <TouchableOpacity onPress={() => router.push('/privacy-policy')} activeOpacity={0.7}>
+              <Text style={authStyles.legalLink}>{t.auth.login.privacyPolicy}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push('/terms')} activeOpacity={0.7}>
+              <Text style={authStyles.legalLink}>{t.auth.login.terms}</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>

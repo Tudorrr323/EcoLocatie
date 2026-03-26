@@ -21,6 +21,7 @@ import { useTranslation } from '../../../shared/i18n';
 import { createAuthStyles } from '../styles/auth.styles';
 import { spacing } from '../../../shared/styles/theme';
 import { useThemeColors } from '../../../shared/hooks/useThemeColors';
+import { LanguageSwitcher } from '../../../shared/components/LanguageSwitcher';
 import type { ThemeColors } from '../../../shared/styles/theme';
 
 export function LoginScreen() {
@@ -93,6 +94,8 @@ export function LoginScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
+          <LanguageSwitcher />
+
           <View style={[authStyles.titleSection, { alignItems: 'center' }]}>
             <Text style={[authStyles.title, { textAlign: 'center' }]}>{t.auth.login.title}</Text>
             <Text style={[authStyles.subtitle, { textAlign: 'center' }]}>{t.auth.login.subtitle}</Text>

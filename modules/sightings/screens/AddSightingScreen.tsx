@@ -3,7 +3,7 @@
 // Intercepteaza gestul de back (Android) si afiseaza ConfirmModal daca observatia are progres.
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, BackHandler } from 'react-native';
+import { Alert, BackHandler, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { useNavigation } from 'expo-router';
@@ -16,18 +16,21 @@ import { AppHeader } from '../../../shared/components/AppHeader';
 import { ConfirmModal } from '../../../shared/components/ConfirmModal';
 import { sightingGuard } from '../../../shared/utils/sightingGuard';
 import { useThemeColors } from '../../../shared/hooks/useThemeColors';
+import { useAuthContext } from '../../../shared/context/AuthContext';
+import { useTranslation } from '../../../shared/i18n';
+import { Snackbar } from '../../../shared/components/Snackbar';
 import type { ThemeColors } from '../../../shared/styles/theme';
-
-// Demo user ID — replace with actual auth context when available
-const DEMO_USER_ID = 1;
 
 export function AddSightingScreen() {
   const colors = useThemeColors();
+  const { user } = useAuthContext();
+  const t = useTranslation();
   const sightingsStyles = useMemo(() => createSightingsStyles(colors), [colors]);
   const formRef = useRef<CreatePOIFormRef>(null);
   const router = useRouter();
   const navigation = useNavigation();
   const [exitModalVisible, setExitModalVisible] = useState(false);
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
   const pendingActionRef = useRef<any>(null);
 
   useEffect(() => {
@@ -82,29 +85,31 @@ export function AddSightingScreen() {
     }
   }, [navigation, router]);
 
-  const handleSubmit = useCallback((draft: SightingDraft) => {
-    const saved = saveSighting(draft, DEMO_USER_ID);
+  const handleSubmit = useCallback(async (draft: SightingDraft) => {
+    try {
+      const saved = await saveSighting(draft, user?.id ?? 0);
 
-    if (saved) {
+      if (saved) {
+        formRef.current?.reset();
+        setSnackbarVisible(true);
+        setTimeout(() => {
+          router.navigate('/(tabs)');
+        }, 1500);
+      } else {
+        Alert.alert(
+          t.sightings.alerts.errorTitle,
+          t.sightings.alerts.errorNoPlant,
+          [{ text: t.sightings.alerts.ok }],
+        );
+      }
+    } catch {
       Alert.alert(
-        'Succes!',
-        'Observatia ta a fost salvata si va fi verificata curand.',
-        [{
-          text: 'OK',
-          onPress: () => {
-            formRef.current?.reset();
-            router.navigate('/(tabs)');
-          },
-        }],
-      );
-    } else {
-      Alert.alert(
-        'Eroare',
-        'Nu s-a putut salva observatia. Asigura-te ca ai selectat o planta si o locatie.',
-        [{ text: 'OK' }],
+        t.sightings.alerts.errorTitle,
+        t.sightings.alerts.errorNetwork,
+        [{ text: t.sightings.alerts.ok }],
       );
     }
-  }, [router]);
+  }, [router, user]);
 
   return (
     <SafeAreaView style={sightingsStyles.screen} edges={['top']}>
@@ -113,14 +118,20 @@ export function AddSightingScreen() {
 
       <ConfirmModal
         visible={exitModalVisible}
-        title="Parasesti observatia?"
-        message="Daca iesi acum, progresul observatiei va fi pierdut si nu poate fi recuperat."
-        confirmLabel="Ies"
-        cancelLabel="Raman"
+        title={t.sightings.exitModal.title}
+        message={t.sightings.exitModal.message}
+        confirmLabel={t.sightings.exitModal.confirm}
+        cancelLabel={t.sightings.exitModal.cancel}
         confirmDestructive
         icon={<LogOut size={36} color={colors.error} />}
         onConfirm={handleConfirmExit}
         onCancel={() => setExitModalVisible(false)}
+      />
+
+      <Snackbar
+        visible={snackbarVisible}
+        message={t.shared.snackbar.observationSaved}
+        onDismiss={() => setSnackbarVisible(false)}
       />
     </SafeAreaView>
   );
